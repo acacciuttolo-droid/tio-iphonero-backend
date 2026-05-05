@@ -3,7 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
+app.use(cors({
+  origin: ['https://dapper-piroshki-a750a9.netlify.app', 'http://localhost', /\.netlify\.app$/],
+  credentials: true,
+}));
 app.use(express.json());
 
 app.use('/api/auth',        require('./routes/auth'));

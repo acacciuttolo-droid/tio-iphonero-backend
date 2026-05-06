@@ -1338,6 +1338,10 @@ function openSupForm(id){
       <div class="row2"><div class="fld"><label>WhatsApp</label><input id="sp-tel" value="${s?.tel||''}" placeholder="+1 xxx xxx xxxx"/></div><div class="fld"><label>Email</label><input id="sp-email" value="${s?.email||''}"/></div></div>
       <div class="row2"><div class="fld"><label>País</label><input id="sp-pais" value="${s?.pais||''}" placeholder="Estados Unidos"/></div><div class="fld"><label>Ciudad</label><input id="sp-ciudad" value="${s?.ciudad||''}" placeholder="Miami"/></div></div>
       <div class="fld"><label>Dirección de envíos</label><textarea id="sp-dir" rows="2" style="resize:vertical">${s?.direccion||''}</textarea></div>
+        <div class="fld" style="margin-top:6px">
+          <label>Link Google Maps <span style="color:var(--muted);font-weight:400;font-size:10px">(opcional)</span></label>
+          <input id="sp-maps-link" placeholder="https://maps.app.goo.gl/..." value="${s?.mapsLink||''}"/>
+        </div>
       <div class="fld"><label>Días de garantía que ofrece</label><input type="number" id="sp-gar" value="${s?.diasGarantia||30}" style="max-width:140px"/></div>
       <div class="fld"><label>Notas</label><textarea id="sp-notas" rows="2" style="resize:vertical">${s?.notas||''}</textarea></div>
     </div>
@@ -2211,7 +2215,7 @@ function enviarWADelivery() {
   const dir = document.getElementById('d-direccion') || document.getElementById('s-dir');
   const nombre = document.getElementById('d-cliente') || document.getElementById('s-nombre');
   const tel = document.getElementById('d-tel') || document.getElementById('s-tel');
-  const maps = document.getElementById('d-maps-link') || document.getElementById('s-maps-link');
+  const maps = document.getElementById('sp-maps-link') || document.getElementById('d-maps-link') || document.getElementById('s-maps-link');
   const notas = document.getElementById('d-notas');
 
   const repartidor = rep ? rep.value : '';

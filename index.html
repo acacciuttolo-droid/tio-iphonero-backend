@@ -904,7 +904,11 @@ function openSaleModal(id){
         <div class="fld"><label>Fecha</label><input type="date" id="s-fecha" value="${today()}"/></div>
       </div>
       <div class="row3">
-        <div class="fld"><label>Forma de pago</label><select id="s-pago" onchange="updateSaleCalc('${id}');document.getElementById('s-tarjeta-row').style.display=this.value==='Tarjeta'?'block':'none'"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>USDT</option><option>Mixto</option></select></div>
+        <div class="fld"><label>Forma de pago</label><select id="s-pago" onchange="updateSaleCalc('${id}');document.getElementById('s-tarjeta-row').style.display=this.value==='Tarjeta'?'block':'none';
+    const descMap={'Tienda Naranja':10.3,'Contimarket':8.8,'Pagopar':6.6};
+    const descEl=document.getElementById('s-desc');
+    if(descEl && descMap[this.value]){descEl.value=descMap[this.value];updateSaleCalc('{id}');}
+    else if(descEl && !['Tarjeta'].includes(this.value)){descEl.value=0;updateSaleCalc('{id}');}"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>USDT</option><option>Mixto</option><option>Fiado</option><option>Tienda Naranja</option><option>Contimarket</option><option>Pagopar</option></select></div>
         <div class="fld"><label>Monto (₲)</label><input type="number" id="s-monto" value="${d.precioGs||''}" oninput="updateSaleCalc('${id}')"/></div>
         <div class="fld"><label>Descuento (%)</label><input type="number" id="s-desc" value="0" oninput="updateSaleCalc('${id}')"/></div>
       </div>
@@ -1624,6 +1628,15 @@ function addCompraItem(){
     <div style="min-width:50px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Cant.</label><input type="number" class="cp-cant" value="1" min="1" style="font-size:13px;padding:8px 11px" oninput="updateCpTotal()"/></div>
     <div style="min-width:130px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Costo c/u (₲)</label><input type="number" class="cp-costo" placeholder="0" style="font-size:13px;padding:8px 11px" oninput="updateCpTotal()"/></div>
     <div style="min-width:110px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">IMEI (opcional)</label><input class="cp-imei" placeholder="xxxxxx" style="font-size:13px;padding:8px 11px"/></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+                <div style="flex:1;min-width:110px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Color <span style="font-weight:400">(opc)</span></label><input class="cp-color" placeholder="Space Black" style="font-size:13px;padding:8px 11px;width:100%;border:1.5px solid var(--border);border-radius:8px"/></div>
+                <div style="flex:1;min-width:90px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Bateria % <span style="font-weight:400">(opc)</span></label><input type="number" class="cp-bateria" min="0" max="100" placeholder="87" style="font-size:13px;padding:8px 11px;width:100%;border:1.5px solid var(--border);border-radius:8px"/></div>
+                <div style="flex:1;min-width:110px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Condicion</label><select class="cp-condicion" style="font-size:13px;padding:8px 11px;width:100%;border:1.5px solid var(--border);border-radius:8px"><option value="Usado">Usado</option><option value="Americano">Americano</option><option value="Nuevo">Nuevo</option><option value="Refurbished">Refurbished</option></select></div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+                <div style="flex:1;min-width:130px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Precio venta Gs <span style="font-weight:400">(opc)</span></label><input type="number" class="cp-precio" placeholder="0" style="font-size:13px;padding:8px 11px;width:100%;border:1.5px solid var(--border);border-radius:8px"/></div>
+                <div style="flex:1;min-width:110px"><label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">Garantia prov. (dias)</label><input type="number" class="cp-gar-dias" placeholder="30" style="font-size:13px;padding:8px 11px;width:100%;border:1.5px solid var(--border);border-radius:8px"/></div>
+              </div>
   </div>`;
   document.getElementById('cp-items').appendChild(div);
 }
@@ -2076,7 +2089,7 @@ async function archivarEquipo(id, ev) {
   try {
     await apiFetch('/api/equipos/' + id, 'PUT', { status: 'archivado' });
     showToast('Equipo archivado', 'ok');
-    if (typeof loadStock === 'function') loadStock();
+    if(typeof loadStock==='function')loadStock(); else if(typeof renderStock==='function')renderStock();
   } catch(err) { showToast('Error: ' + err.message, 'err'); }
 }
 

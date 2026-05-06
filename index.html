@@ -896,7 +896,11 @@ function openSaleModal(id){
     <div style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:16px;font-weight:700;font-size:13px;border:1.5px solid var(--border)">${d.modelo} · ${d.storage} · ${d.grade} · Costo: ₲${gs(d.costoGs)}</div>
     <div class="fsec-body" style="gap:10px;margin-bottom:12px">
       <div class="row2">
-        <div class="fld"><label>Nombre *</label><input id="s-nombre" placeholder="Nombre completo"/></div>
+        <div class="fld" style="position:relative">
+          <label>Nombre *</label>
+          <input id="s-nombre" placeholder="Nombre completo" autocomplete="off" oninput="buscarCliente(this.value)" onblur="setTimeout(()=>document.getElementById('s-sugerencias').style.display='none',200)"/>
+          <div id="s-sugerencias" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:8px;box-shadow:var(--sh);z-index:999;max-height:200px;overflow-y:auto"></div>
+        </div>
         <div class="fld"><label>CI / RUC</label><input id="s-ci" placeholder="Cédula o RUC"/></div>
       </div>
       <div class="row2">
@@ -2155,6 +2159,102 @@ function autoCargarGarantiaCp() {
   const prov = DB.suppliers ? DB.suppliers.find(p => String(p.id) === String(sel.value)) : null;
   if (prov && prov.dias_garantia) {
     document.querySelectorAll('.cp-gar-dias').forEach(inp => { if (!inp.dataset.edited) inp.value = prov.dias_garantia; });
+  }
+}
+
+// == Autocomplete cliente ==
+function buscarCliente(q) {
+  const box = document.getElementById('s-sugerencias');
+  if (!box) return;
+  if (!q || q.length < 2) { box.style.display='none'; return; }
+  const sales = DB.sales || [];
+  const clientes = {};
+  sales.forEach(v => {
+    if (v.clienteNombre && v.clienteNombre.toLowerCase().includes(q.toLowerCase())) {
+      const key = v.clienteNombre + (v.clienteCi||'');
+      if (!clientes[key]) clientes[key] = v;
+    }
+    if (v.clienteCi && v.clienteCi.includes(q)) {
+      const key = v.clienteNombre + (v.clienteCi||'');
+      if (!clientes[key]) clientes[key] = v;
+    }
+  });
+  const results = Object.values(clientes).slice(0, 8);
+  if (!results.length) { box.style.display='none'; return; }
+  box.innerHTML = results.map(v => 
+    '<div style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px" ' +
+    'onmousedown="fillCliente(' + JSON.stringify({nombre:v.clienteNombre,ci:v.clienteCi||'',tel:v.clienteTel||'',maps:v.mapsLink||''}).replace(/"/g,"'") + ')">' +
+    '<strong>' + (v.clienteNombre||'') + '</strong>' +
+    (v.clienteCi ? '<span style="color:var(--muted);margin-left:8px">CI: ' + v.clienteCi + '</span>' : '') +
+    (v.clienteTel ? '<span style="color:var(--muted);margin-left:8px">📞 ' + v.clienteTel + '</span>' : '') +
+    '</div>'
+  ).join('');
+  box.style.display = 'block';
+}
+
+function fillCliente(data) {
+  const n = document.getElementById('s-nombre');
+  const ci = document.getElementById('s-ci');
+  const tel = document.getElementById('s-tel');
+  const maps = document.getElementById('s-maps-link');
+  const box = document.getElementById('s-sugerencias');
+  if (n) n.value = data.nombre || '';
+  if (ci) ci.value = data.ci || '';
+  if (tel) tel.value = data.tel || '';
+  if (maps) maps.value = data.maps || '';
+  if (box) box.style.display = 'none';
+}
+
+// == WhatsApp grupo Delivery ==
+function enviarWADelivery() {
+  const rep = document.getElementById('d-repartidor');
+  const dir = document.getElementById('d-direccion') || document.getElementById('s-dir');
+  const nombre = document.getElementById('d-cliente') || document.getElementById('s-nombre');
+  const tel = document.getElementById('d-tel') || document.getElementById('s-tel');
+  const maps = document.getElementById('d-maps-link') || document.getElementById('s-maps-link');
+  const notas = document.getElementById('d-notas');
+
+  const repartidor = rep ? rep.value : '';
+  const mention = repartidor.toLowerCase().includes('matias') ? '@Matias' : repartidor.toLowerCase().includes('rodrigo') ? '@Rodrigo' : repartidor;
+  
+  const msg = '🛵 *NUEVO DELIVERY*
+' +
+    (mention ? mention + ' para vos!
+
+' : '
+') +
+    '👤 Cliente: ' + (nombre ? nombre.value : '') + '
+' +
+    '📞 Tel: ' + (tel ? tel.value : '') + '
+' +
+    '📍 Direccion: ' + (dir ? dir.value : '') + '
+' +
+    (maps && maps.value ? '🗺 Maps: ' + maps.value + '
+' : '') +
+    (notas && notas.value ? '📝 Notas: ' + notas.value + '
+' : '') +
+    '
+_Enviado desde CRM Tio Iphonero_';
+
+  const groupLink = 'https://chat.whatsapp.com/GCMhxmUBvllCKNWQzpT0FV';
+  // Abrir WhatsApp Web con el mensaje - el usuario lo pega en el grupo
+  const waUrl = 'https://web.whatsapp.com/';
+  
+  // Copiar mensaje al portapapeles
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(msg).then(() => {
+      alert('Mensaje copiado al portapapeles!\n\nAhora abre el grupo Delivery Tio Iphonero en WhatsApp y pegalo (Ctrl+V)');
+      window.open(waUrl, '_blank');
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = msg;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Mensaje copiado!\n\nAhora abre el grupo Delivery Tio Iphonero en WhatsApp y pegalo (Ctrl+V)');
+    window.open(waUrl, '_blank');
   }
 }
 </script>

@@ -2102,24 +2102,21 @@ function colorDot(color) {
 // == Imprimir etiqueta con barcode real ==
 function imprimirEtiqueta(equipo) {
   const imei = equipo.imei || String(equipo.id);
-  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-    '<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>' +
-    '<style>@page{size:5cm 3cm;margin:0}body{margin:0;font-family:Arial,sans-serif;width:5cm;height:3cm;overflow:hidden}' +
-    '.hd{background:#111;display:flex;align-items:center;justify-content:center;height:.8cm}' +
-    '.hd img{height:.65cm;filter:invert(1);object-fit:contain}' +
-    '.mo{text-align:center;font-size:8pt;font-weight:bold;padding:1mm 0 .5mm}' +
-    '.sp{text-align:center;font-size:6pt;color:#555;margin-bottom:1mm}' +
-    'hr{border:none;border-top:.3px solid #ddd;margin:0 3mm 1mm}' +
-    '.bw{display:flex;flex-direction:column;align-items:center}svg{width:4.2cm!important}' +
-    '</style></head><body onload="' +
-    'JsBarcode('#bc','' + imei + '',{format:'CODE128',width:1.2,height:28,displayValue:true,fontSize:7,margin:0,textMargin:2,font:'monospace'});' +
-    'setTimeout(function(){window.print()},400);">' +
-    '<div class="hd"><img src="https://tioiphonero.com.py/wp-content/uploads/2026/05/Logo-Final-Tio-Iphonero.png"/></div>' +
-    '<div class="mo">' + (equipo.modelo||'') + '</div>' +
-    '<div class="sp">' + [(equipo.storage||''),(equipo.bateria?equipo.bateria+'%':''),(equipo.grade||''),(equipo.origin||'')].filter(Boolean).join(' · ') + '</div>' +
-    '<hr><div class="bw"><svg id="bc"></svg></div></body></html>';
+  const modelo = equipo.modelo || '';
+  const specs = [equipo.storage||'', equipo.bateria ? equipo.bateria+'%' : '', equipo.grade||'', equipo.origin||''].filter(Boolean).join(' · ');
   const w = window.open('','_blank','width=420,height=320');
-  if (w) { w.document.write(html); w.document.close(); }
+  if (!w) return;
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
+  w.document.write('<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>');
+  w.document.write('<style>@page{size:5cm 3cm;margin:0}body{margin:0;font-family:Arial,sans-serif;width:5cm;height:3cm;overflow:hidden}.hd{background:#111;display:flex;align-items:center;justify-content:center;height:.8cm}.hd img{height:.65cm;filter:invert(1);object-fit:contain}.mo{text-align:center;font-size:8pt;font-weight:bold;padding:1mm 0 .5mm}.sp{text-align:center;font-size:6pt;color:#555;margin-bottom:1mm}hr{border:none;border-top:.3px solid #ddd;margin:0 3mm 1mm}.bw{display:flex;flex-direction:column;align-items:center}svg{width:4.2cm!important}<\/style>');
+  w.document.write('<\/head><body>');
+  w.document.write('<div class="hd"><img src="https://tioiphonero.com.py/wp-content/uploads/2026/05/Logo-Final-Tio-Iphonero.png"><\/div>');
+  w.document.write('<div class="mo">' + modelo + '<\/div>');
+  w.document.write('<div class="sp">' + specs + '<\/div>');
+  w.document.write('<hr><div class="bw"><svg id="barcode"><\/svg><\/div>');
+  w.document.write('<script>JsBarcode(document.getElementById("barcode"),"' + imei + '",{format:"CODE128",width:1.2,height:28,displayValue:true,fontSize:7,margin:0,textMargin:2,font:"monospace"});setTimeout(function(){window.print()},400);<\/script>');
+  w.document.write('<\/body><\/html>');
+  w.document.close();
 }
 
 </script>

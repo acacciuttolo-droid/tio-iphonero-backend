@@ -269,7 +269,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <div class="login-err" id="login-err"><span>✕</span><span id="login-err-text"></span></div>
     <div class="login-field"><label>Email</label><input type="email" id="login-email" placeholder="tioiphonero@gmail.com" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <div class="login-field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <button onclick="doLogin()" id="login-btn" style="width:100%;background:var(--c1);color:#fff;padding:14px;font-size:15px;font-weight:700;border-radius:10px;margin-top:8px">Ingresar al sistema</button>
+    <button onclick="doLogin()" id="login-btn" style="width:100%;background:var(--c1);color:#fff;padding:14px;font-size:15px;font-weight:700;border-radius:10px;margin-top:8px">🔐 Ingresar al sistema</button>
     <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--muted)">R.I. Curupayty Esq. Juan Bautista Rivarola · Asunción, Paraguay</div>
   </div>
 </div>
@@ -283,28 +283,31 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
   </div>
   <nav>
     <div class="nav-section">Principal</div>
-    <button class="nav-btn active" onclick="nav('dashboard')"><span class="nav-icon">⬡</span>Dashboard</button>
-    <button class="nav-btn" onclick="nav('stock')"><span class="nav-icon">▦</span>Inventario</button>
-    <button class="nav-btn" onclick="nav('form')"><span class="nav-icon">＋</span>Nuevo Equipo</button>
+    <button class="nav-btn active" onclick="nav('dashboard')"><span class="nav-icon">🏠</span>Dashboard</button>
+    <button class="nav-btn" onclick="nav('stock')"><span class="nav-icon">📱</span>Inventario</button>
+    <button class="nav-btn" onclick="nav('form')"><span class="nav-icon">➕</span>Nuevo Equipo</button>
     <div class="nav-section">Operaciones</div>
-    <button class="nav-btn" onclick="nav('garantias')"><span class="nav-icon">⚠</span>Garantías <span class="nav-badge" id="badge-gar">0</span></button>
-    <button class="nav-btn" onclick="nav('prestamos')"><span class="nav-icon">↔</span>Préstamos <span class="nav-badge" id="badge-pre" style="background:var(--orange)">0</span></button>
-    <button class="nav-btn" onclick="nav('caja')"><span class="nav-icon"></span>Caja del día</button>
+    <button class="nav-btn" onclick="nav('garantias')"><span class="nav-icon">🛡️</span>Garantías <span class="nav-badge" id="badge-gar">0</span></button>
+    <button class="nav-btn" onclick="nav('prestamos')"><span class="nav-icon">🔄</span>Préstamos <span class="nav-badge" id="badge-pre" style="background:var(--orange)">0</span></button>
+    <button class="nav-btn" onclick="nav('caja')"><span class="nav-icon">💵</span>Caja del día</button>
     <div class="nav-section">Análisis</div>
-    <button class="nav-btn" onclick="nav('reportes')"><span class="nav-icon"></span>Reportes</button>
+    <button class="nav-btn" onclick="nav('reportes')"><span class="nav-icon">📊</span>Reportes</button>
     <div class="nav-section">Operaciones</div>
-    <button class="nav-btn" onclick="nav('compras')"><span class="nav-icon"></span>Compras</button>
-    <button class="nav-btn" onclick="nav('delivery')"><span class="nav-icon"></span>Delivery <span class="nav-badge" id="badge-delivery" style="background:var(--teal)">0</span></button>
+    <button class="nav-btn" onclick="nav('compras')"><span class="nav-icon">🛒</span>Compras</button>
+    <button class="nav-btn" onclick="nav('delivery')"><span class="nav-icon">🚚</span>Delivery <span class="nav-badge" id="badge-delivery" style="background:var(--teal)">0</span></button>
     <div class="nav-section">Configuración</div>
-    <button class="nav-btn" onclick="nav('proveedores')"><span class="nav-icon"></span>Proveedores</button>
-    <button class="nav-btn" onclick="nav('search')"><span class="nav-icon">⌕</span>Búsqueda</button>
+    <button class="nav-btn" onclick="nav('proveedores')"><span class="nav-icon">🏭</span>Proveedores</button>
+    <button class="nav-btn" onclick="nav('search')"><span class="nav-icon">🔍</span>Búsqueda</button>
+    <button class="nav-btn" onclick="nav('archivados')"><span class="nav-icon">🗄️</span>Archivados</button>
+    <div class="nav-section">Equipo</div>
+    <button class="nav-btn" onclick="nav('rrhh')"><span class="nav-icon">👥</span>Recursos Humanos</button>
   </nav>
   <div class="sidebar-foot">
     <div class="user-info">
       <div class="user-avatar" id="user-avatar">A</div>
       <div><div class="user-name" id="user-name">Alejandro</div><div class="user-role" id="user-role">admin</div></div>
     </div>
-    <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+    <button class="btn-logout" onclick="doLogout()">🚪 Cerrar sesión</button>
   </div>
 </aside>
 
@@ -315,7 +318,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
 <div class="page active" id="page-dashboard">
   <div class="ph-row">
     <div><h1 style="font-size:24px;font-weight:800;letter-spacing:-.5px">Dashboard</h1><p style="font-size:13px;color:var(--muted);margin-top:3px" id="dash-date"></p></div>
-    <button class="btn-primary" onclick="nav('form')">＋ Nuevo equipo</button>
+    <button class="btn-primary" onclick="nav('form')">📱 Nuevo equipo</button>
   </div>
 
   <!-- Quick access -->
@@ -383,7 +386,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
 <div class="page" id="page-stock">
   <div class="ph-row">
     <div><h1 style="font-size:22px;font-weight:800">Inventario</h1><p style="font-size:13px;color:var(--muted)" id="stock-count">0 equipos</p></div>
-    <button class="btn-primary" onclick="nav('form')">＋ Nuevo Equipo</button>
+    <button class="btn-primary" onclick="nav('form')">📱 Nuevo Equipo</button>
   </div>
   <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
     <input id="filt-q" placeholder="Buscar modelo, IMEI, color..." style="max-width:280px" oninput="renderStock()"/>
@@ -466,8 +469,8 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     </div></div>
 
     <div style="display:flex;gap:10px">
-      <button class="btn-primary" onclick="saveDevice()" style="flex:1" id="form-save-btn">Cargar Equipo</button>
-      <button class="btn-sec" onclick="cancelForm()">Cancelar</button>
+      <button class="btn-primary" onclick="saveDevice()" style="flex:1" id="form-save-btn">💾 Cargar Equipo</button>
+      <button class="btn-sec" onclick="cancelForm()">❌ Cancelar</button>
     </div>
   </div>
 </div>
@@ -544,7 +547,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
 <div class="page" id="page-delivery">
   <div class="ph-row">
     <div><h1 style="font-size:22px;font-weight:800">Control de Delivery</h1><p style="font-size:13px;color:var(--muted)">Órdenes de entrega · Matías y Rodrigo</p></div>
-    <button class="btn-primary" onclick="openOrdenForm()">＋ Nueva Orden</button>
+    <button class="btn-primary" onclick="openOrdenForm()">📦 Nueva Orden</button>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="setDeliveryTab('pendientes',this)">Pendientes</button>
@@ -825,6 +828,7 @@ function renderStock(){
   const st=document.getElementById('filt-status')?.value||'';
   const cat=document.getElementById('filt-cat')?.value||'';
   const list=DB.devices.filter(d=>{
+    if(d.status==='archivado')return false;
     if(st&&d.status!==st)return false;
     if(cat&&d.categoria!==cat)return false;
     if(q&&!`${d.modelo} ${d.imei||''} ${d.color||''} ${d.origin||''}`.toLowerCase().includes(q))return false;
@@ -852,13 +856,14 @@ function devRowHTML(d){
   else{priceDisplay=`<div class="dev-price">₲${gs(d.precioGs||0)}</div>`;if(d.costoGs&&d.precioGs)priceDisplay+=`<div class="dev-margin">+${(((+d.precioGs-+d.costoGs)/(+d.costoGs))*100).toFixed(0)}% margen</div>`;}
   let actions='';
   actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();openLabelModal('${d.id}')" title="Etiqueta"></button>`;
-  if(d.status==='stock')actions+=`<button class="btn-sm btn-sell" onclick="event.stopPropagation();openSaleModal('${d.id}')">Vender</button>`;
-  if(['stock','vendido'].includes(d.status))actions+=`<button class="btn-sm btn-war" onclick="event.stopPropagation();openGarModal('${d.id}')">Garantía</button>`;
-  if(d.status==='stock')actions+=`<button class="btn-sm btn-loan" onclick="event.stopPropagation();openLoanModal('${d.id}')">Préstamo</button>`;
-  if(['garantia_local','garantia_proveedor','reparacion'].includes(d.status))actions+=`<button class="btn-sm btn-blue" onclick="event.stopPropagation();openAdvanceGarModal('${d.id}')">Avanzar</button>`;
-  if(d.status==='prestamo'||d.status==='cambio_asignado')actions+=`<button class="btn-sm btn-ok" onclick="event.stopPropagation();returnEquip('${d.id}')">Devolver ✓</button>`;
+  if(d.status==='stock')actions+=`<button class="btn-sm btn-sell" onclick="event.stopPropagation();openSaleModal('${d.id}')">💰 Vender</button>`;
+  if(['stock','vendido'].includes(d.status))actions+=`<button class="btn-sm btn-war" onclick="event.stopPropagation();openGarModal('${d.id}')">🛡️ Garantía</button>`;
+  if(d.status==='stock')actions+=`<button class="btn-sm btn-loan" onclick="event.stopPropagation();openLoanModal('${d.id}')">🔄 Préstamo</button>`;
+  if(['garantia_local','garantia_proveedor','reparacion'].includes(d.status))actions+=`<button class="btn-sm btn-blue" onclick="event.stopPropagation();openAdvanceGarModal('${d.id}')">⏩ Avanzar</button>`;
+  if(d.status==='prestamo'||d.status==='cambio_asignado')actions+=`<button class="btn-sm btn-ok" onclick="event.stopPropagation();returnEquip('${d.id}')">✅ Devolver</button>`;
   if(d.status==='vendido')actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();openWarrantyPrint('${d.id}')" title="Garantía" style="color:var(--green)"></button>`;
   actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();editDevice('${d.id}')" title="Editar">✎</button>`;
+  if(d.status!=='archivado')actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();archivarEquipo('${d.id}')" title="Archivar" style="color:var(--muted);font-size:14px">🗄️</button>`;
   return `<div class="dev-row" onclick="openDetail('${d.id}')">
     <div class="dev-dot" style="background:${sm.dot}"></div>
     <div class="dev-info">
@@ -926,7 +931,7 @@ function openSaleModal(id){
     </div>
     <div style="display:flex;gap:10px">
       <button onclick="confirmSale('${id}')" class="btn-primary" style="flex:1">Confirmar Venta</button>
-      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);setTimeout(()=>updateSaleCalc(id),50);
 }
@@ -1030,7 +1035,7 @@ function openGarModal(id){
     </div>
     <div style="display:flex;gap:10px">
       <button onclick="confirmGar('${id}')" class="btn-primary" style="flex:1;background:var(--amber)">Registrar Garantía</button>
-      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);
 }
@@ -1074,7 +1079,7 @@ function openAdvanceGarModal(equipoId){
     <p style="font-size:12px;color:var(--muted);margin-bottom:12px"><strong>Resuelto:</strong> el equipo del proveedor vuelve a stock para venta. El equipo de cambio dado al cliente queda como vendido definitivamente.</p>
     <div style="display:flex;gap:10px">
       <button onclick="confirmAdvanceGar('${gar.id}','${equipoId}')" class="btn-primary" style="flex:1">Confirmar</button>
-      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);
 }
@@ -1118,7 +1123,7 @@ function openLoanModal(id){
     </div>
     <div style="display:flex;gap:10px">
       <button onclick="confirmLoan('${id}')" class="btn-primary" style="flex:1;background:var(--orange)">Registrar Préstamo</button>
-      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);
 }
@@ -1345,7 +1350,7 @@ function openSupForm(id){
       <div class="fld"><label>Días de garantía que ofrece</label><input type="number" id="sp-gar" value="${s?.diasGarantia||30}" style="max-width:140px"/></div>
       <div class="fld"><label>Notas</label><textarea id="sp-notas" rows="2" style="resize:vertical">${s?.notas||''}</textarea></div>
     </div>
-    <div style="display:flex;gap:10px"><button onclick="saveSup('${id||''}')" class="btn-primary" style="flex:1">Guardar Proveedor</button><button class="btn-sec" onclick="closeModal()">Cancelar</button></div>`);
+    <div style="display:flex;gap:10px"><button onclick="saveSup('${id||''}')" class="btn-primary" style="flex:1">Guardar Proveedor</button><button class="btn-sec" onclick="closeModal()">❌ Cancelar</button></div>`);
 }
 async function saveSup(id){
   const nombre=document.getElementById('sp-nombre')?.value.trim();if(!nombre)return toast('Ingresá nombre','err');
@@ -1426,11 +1431,11 @@ function openDetail(id){
   body+=`</div>`;
   document.getElementById('detail-body').innerHTML=body;
   let foot='';
-  if(d.status==='stock')foot+=`<button class="btn-primary btn-sm" onclick="closeDetail();openSaleModal('${id}')">Vender</button>`;
+  if(d.status==='stock')foot+=`<button class="btn-primary btn-sm" onclick="closeDetail();openSaleModal('${id}')">💰 Vender</button>`;
   if(['stock','vendido'].includes(d.status))foot+=`<button class="btn-sm btn-war" onclick="closeDetail();openGarModal('${id}')">⚠ Garantía</button>`;
-  if(d.status==='stock')foot+=`<button class="btn-sm btn-loan" onclick="closeDetail();openLoanModal('${id}')">Préstamo</button>`;
-  if(['garantia_local','garantia_proveedor','reparacion'].includes(d.status))foot+=`<button class="btn-sm btn-blue" onclick="closeDetail();openAdvanceGarModal('${id}')">Avanzar</button>`;
-  if(d.status==='vendido')foot+=`<button class="btn-sm btn-ok" onclick="openWarrantyPrint('${id}')">Garantía</button>`;
+  if(d.status==='stock')foot+=`<button class="btn-sm btn-loan" onclick="closeDetail();openLoanModal('${id}')">🔄 Préstamo</button>`;
+  if(['garantia_local','garantia_proveedor','reparacion'].includes(d.status))foot+=`<button class="btn-sm btn-blue" onclick="closeDetail();openAdvanceGarModal('${id}')">⏩ Avanzar</button>`;
+  if(d.status==='vendido')foot+=`<button class="btn-sm btn-ok" onclick="openWarrantyPrint('${id}')">🛡️ Garantía</button>`;
   foot+=`<button class="btn-sec btn-sm" onclick="closeDetail();editDevice('${id}')">✎ Editar</button>`;
   foot+=`<button class="btn-icon btn-sm" onclick="openLabelModal('${id}')"></button>`;
   document.getElementById('detail-foot').innerHTML=foot;
@@ -1598,7 +1603,7 @@ function openCompraForm(id) {
     </div>
     <div style="display:flex;gap:10px">
       <button onclick="saveCompra('${id||''}')" class="btn-primary" style="flex:1">Registrar Compra</button>
-      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);
   // Add first item by default
@@ -1823,7 +1828,7 @@ function openOrdenForm(saleId){
           Notificar al grupo Delivery
         </button>
         <button onclick="saveOrden()" class="btn-primary" style="flex:1">Crear Orden</button>
-      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);
   // Auto-fill from sale
@@ -2003,7 +2008,7 @@ function abrirRendicion(deliveryId){
     <div class="fld" style="margin-bottom:14px"><label>¿Quién recibe el dinero?</label><input id="rend-recibe" placeholder="Tu nombre"/></div>
     <div style="display:flex;gap:10px">
       <button onclick="confirmarRendicion('${deliveryId}')" class="btn-primary" style="flex:1;background:var(--green)">✓ Confirmar rendición</button>
-      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);
 }

@@ -270,7 +270,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <div class="login-field"><label>Email</label><input type="email" id="login-email" placeholder="tioiphonero@gmail.com" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <div class="login-field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <button onclick="doLogin()" id="login-btn" style="width:100%;background:var(--c1);color:#fff;padding:14px;font-size:15px;font-weight:700;border-radius:10px;margin-top:8px">Ingresar al sistema</button>
-    <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--muted)">📍 R.I. Curupayty Esq. Juan Bautista Rivarola · Asunción, Paraguay</div>
+    <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--muted)">R.I. Curupayty Esq. Juan Bautista Rivarola · Asunción, Paraguay</div>
   </div>
 </div>
 
@@ -289,14 +289,14 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <div class="nav-section">Operaciones</div>
     <button class="nav-btn" onclick="nav('garantias')"><span class="nav-icon">⚠</span>Garantías <span class="nav-badge" id="badge-gar">0</span></button>
     <button class="nav-btn" onclick="nav('prestamos')"><span class="nav-icon">↔</span>Préstamos <span class="nav-badge" id="badge-pre" style="background:var(--orange)">0</span></button>
-    <button class="nav-btn" onclick="nav('caja')"><span class="nav-icon">💵</span>Caja del día</button>
+    <button class="nav-btn" onclick="nav('caja')"><span class="nav-icon"></span>Caja del día</button>
     <div class="nav-section">Análisis</div>
-    <button class="nav-btn" onclick="nav('reportes')"><span class="nav-icon">📊</span>Reportes</button>
+    <button class="nav-btn" onclick="nav('reportes')"><span class="nav-icon"></span>Reportes</button>
     <div class="nav-section">Operaciones</div>
-    <button class="nav-btn" onclick="nav('compras')"><span class="nav-icon">🛒</span>Compras</button>
-    <button class="nav-btn" onclick="nav('delivery')"><span class="nav-icon">🚴</span>Delivery <span class="nav-badge" id="badge-delivery" style="background:var(--teal)">0</span></button>
+    <button class="nav-btn" onclick="nav('compras')"><span class="nav-icon"></span>Compras</button>
+    <button class="nav-btn" onclick="nav('delivery')"><span class="nav-icon"></span>Delivery <span class="nav-badge" id="badge-delivery" style="background:var(--teal)">0</span></button>
     <div class="nav-section">Configuración</div>
-    <button class="nav-btn" onclick="nav('proveedores')"><span class="nav-icon">🤝</span>Proveedores</button>
+    <button class="nav-btn" onclick="nav('proveedores')"><span class="nav-icon"></span>Proveedores</button>
     <button class="nav-btn" onclick="nav('search')"><span class="nav-icon">⌕</span>Búsqueda</button>
   </nav>
   <div class="sidebar-foot">
@@ -321,7 +321,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
   <!-- Quick access -->
   <div class="qa-grid">
     <button class="qa-card" onclick="nav('form')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
-      <span class="qa-icon">📦</span>
+      <span class="qa-icon"></span>
       <div class="qa-label">Nueva Venta</div>
       <div class="qa-val" id="qa-stock">0</div>
       <div class="qa-sub">equipos en stock</div>
@@ -333,13 +333,13 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
       <div class="qa-sub">incidencias activas</div>
     </button>
     <button class="qa-card" onclick="nav('reportes')" style="background:linear-gradient(135deg,#10b981,#059669)">
-      <span class="qa-icon">📈</span>
+      <span class="qa-icon"></span>
       <div class="qa-label">Ventas del mes</div>
       <div class="qa-val" id="qa-ventas">₲0</div>
       <div class="qa-sub">ingresos totales</div>
     </button>
     <button class="qa-card" onclick="nav('caja')" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">
-      <span class="qa-icon">💵</span>
+      <span class="qa-icon"></span>
       <div class="qa-label">Caja del día</div>
       <div class="qa-val" id="qa-caja">₲0</div>
       <div class="qa-sub">balance neto hoy</div>
@@ -845,19 +845,19 @@ function devRowHTML(d){
   if(d.fechaGarProvInicio){const exp=addDays(d.fechaGarProvInicio,d.diasGarProv||30);const dias=diffDays(today(),exp);garBadges+=`<span class="gar-badge ${dias>7?'gar-ok':dias>0?'gar-warn':'gar-exp'}">${dias>0?dias+'d':'VENCIDA'} gar.prov</span>`;}
   let assignedInfo='';
   if(activeGar?.clienteNombre)assignedInfo=`<span style="font-size:11px;color:var(--purple);font-weight:600">↔ ${activeGar.clienteNombre}</span>`;
-  if(activeLoan?.clienteNombre)assignedInfo=`<span style="font-size:11px;color:var(--orange);font-weight:600">📤 ${activeLoan.clienteNombre}</span>`;
+  if(activeLoan?.clienteNombre)assignedInfo=`<span style="font-size:11px;color:var(--orange);font-weight:600">${activeLoan.clienteNombre}</span>`;
   let priceDisplay='';
   if(d.status==='vendido'&&lastSale)priceDisplay=`<div class="dev-price" style="color:var(--red)">₲${gs(lastSale.montoGs)}</div>`;
   else if(['cambio_asignado','prestamo'].includes(d.status))priceDisplay=`<div class="dev-price" style="color:var(--purple);font-size:12px">${sm.label}</div>`;
   else{priceDisplay=`<div class="dev-price">₲${gs(d.precioGs||0)}</div>`;if(d.costoGs&&d.precioGs)priceDisplay+=`<div class="dev-margin">+${(((+d.precioGs-+d.costoGs)/(+d.costoGs))*100).toFixed(0)}% margen</div>`;}
   let actions='';
-  actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();openLabelModal('${d.id}')" title="Etiqueta">🏷</button>`;
+  actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();openLabelModal('${d.id}')" title="Etiqueta"></button>`;
   if(d.status==='stock')actions+=`<button class="btn-sm btn-sell" onclick="event.stopPropagation();openSaleModal('${d.id}')">Vender</button>`;
   if(['stock','vendido'].includes(d.status))actions+=`<button class="btn-sm btn-war" onclick="event.stopPropagation();openGarModal('${d.id}')">Garantía</button>`;
   if(d.status==='stock')actions+=`<button class="btn-sm btn-loan" onclick="event.stopPropagation();openLoanModal('${d.id}')">Préstamo</button>`;
   if(['garantia_local','garantia_proveedor','reparacion'].includes(d.status))actions+=`<button class="btn-sm btn-blue" onclick="event.stopPropagation();openAdvanceGarModal('${d.id}')">Avanzar</button>`;
   if(d.status==='prestamo'||d.status==='cambio_asignado')actions+=`<button class="btn-sm btn-ok" onclick="event.stopPropagation();returnEquip('${d.id}')">Devolver ✓</button>`;
-  if(d.status==='vendido')actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();openWarrantyPrint('${d.id}')" title="Garantía" style="color:var(--green)">📋</button>`;
+  if(d.status==='vendido')actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();openWarrantyPrint('${d.id}')" title="Garantía" style="color:var(--green)"></button>`;
   actions+=`<button class="btn-icon btn-sm" onclick="event.stopPropagation();editDevice('${d.id}')" title="Editar">✎</button>`;
   return `<div class="dev-row" onclick="openDetail('${d.id}')">
     <div class="dev-dot" style="background:${sm.dot}"></div>
@@ -867,7 +867,7 @@ function devRowHTML(d){
         <span class="chip chip-sm">${d.storage}</span>
         <span class="chip ${GRADE_CLS[d.grade]||'grade-a'}">${d.grade}</span>
         <span class="chip chip-sm">${d.origin}</span>
-        ${d.bateria?`<span style="font-size:11px;color:var(--muted);font-family:var(--mono)">🔋${d.bateria}%</span>`:''}
+        ${d.bateria?`<span style="font-size:11px;color:var(--muted);font-family:var(--mono)">${d.bateria}%</span>`:''}
         <span class="chip ${sm.cls}">${sm.label}</span>
       </div>
       <div class="dev-meta">
@@ -892,7 +892,7 @@ function devRowHTML(d){
 ══════════════════════════════════════════════════════════════════ */
 function openSaleModal(id){
   const d=DB.devices.find(x=>x.id===id);if(!d)return;
-  const html=`<div class="modal-title">💰 Registrar Venta</div>
+  const html=`<div class="modal-title">Registrar Venta</div>
     <div style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:16px;font-weight:700;font-size:13px;border:1.5px solid var(--border)">${d.modelo} · ${d.storage} · ${d.grade} · Costo: ₲${gs(d.costoGs)}</div>
     <div class="fsec-body" style="gap:10px;margin-bottom:12px">
       <div class="row2">
@@ -971,7 +971,7 @@ async function confirmSale(id){
       </div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:16px">¿Querés imprimir el certificado de garantía?</p>
       <div style="display:flex;gap:10px">
-        <button onclick="openWarrantyPrintById('${sale.id}');closeModal();" class="btn-primary" style="flex:1;background:var(--green)">📋 Imprimir Garantía</button>
+        <button onclick="openWarrantyPrintById('${sale.id}');closeModal();" class="btn-primary" style="flex:1;background:var(--green)">Imprimir Garantía</button>
         <button class="btn-sec" onclick="closeModal()">Ahora no</button>
       </div>`;
     openModal(html);
@@ -1065,7 +1065,7 @@ function openAdvanceGarModal(equipoId){
   const gar=DB.guarantees.find(g=>g.equipoId===equipoId&&!['resuelto','entregado'].includes(g.estado));if(!gar)return;
   const d=DB.devices.find(x=>x.id===equipoId);
   const nextStates=[['en_local','En local (taller)'],['enviado_proveedor','Enviado al proveedor'],['en_proveedor','En proveedor'],['recibido','Recibido del proveedor'],['resuelto','Resuelto — equipo vuelve a stock'],['entregado','Entregado al cliente']];
-  const html=`<div class="modal-title">🔄 Avanzar Garantía</div>
+  const html=`<div class="modal-title">Avanzar Garantía</div>
     <div style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:16px;font-size:13px;font-weight:700;border:1.5px solid var(--border)">${d?.modelo} · Estado: <span style="color:var(--amber)">${gar.estado.replace(/_/g,' ')}</span></div>
     <div class="fsec-body" style="gap:10px;margin-bottom:12px">
       <div class="fld"><label>Nuevo estado</label><select id="adv-estado">${nextStates.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></div>
@@ -1099,7 +1099,7 @@ async function confirmAdvanceGar(garId,equipoId){
 ══════════════════════════════════════════════════════════════════ */
 function openLoanModal(id){
   const d=DB.devices.find(x=>x.id===id);
-  const html=`<div class="modal-title">📤 Registrar Préstamo</div>
+  const html=`<div class="modal-title">Registrar Préstamo</div>
     <div style="background:var(--orangebg);border:1.5px solid var(--orangeb);border-radius:9px;padding:10px 14px;margin-bottom:16px;font-size:13px">
       <div style="font-weight:700">${d?.modelo} · ${d?.storage}</div>
       <div style="font-size:12px;color:var(--orange);margin-top:3px">Equipo temporal — vuelve a stock cuando el cliente lo devuelva</div>
@@ -1155,16 +1155,16 @@ function renderGarantias(){
         <div style="flex:1">
           <div style="font-weight:800;font-size:15px;margin-bottom:4px">${d?.modelo||'?'} <span style="font-size:12px;font-weight:500;color:var(--muted)">${d?.storage||''} · ${d?.grade||''}</span></div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:6px">IMEI: ${d?.imei||'—'} · Costo: ₲${gs(d?.costoGs)}</div>
-          ${g.clienteNombre?`<div style="font-size:13px;margin-bottom:4px">👤 <strong>${g.clienteNombre}</strong>${g.clienteCi?' · CI: '+g.clienteCi:''}</div>`:''}
+          ${g.clienteNombre?`<div style="font-size:13px;margin-bottom:4px"><strong>${g.clienteNombre}</strong>${g.clienteCi?' · CI: '+g.clienteCi:''}</div>`:''}
           <div style="background:var(--amberbg);border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:8px"><strong>Problema:</strong> ${g.descripcion}</div>
-          ${sup?`<div style="font-size:12px;color:var(--blue);margin-bottom:4px">📦 ${sup.nombre}${g.diasEnProv!==null?' · '+g.diasEnProv+'d enviado':''}</div>`:''}
+          ${sup?`<div style="font-size:12px;color:var(--blue);margin-bottom:4px">${sup.nombre}${g.diasEnProv!==null?' · '+g.diasEnProv+'d enviado':''}</div>`:''}
           ${diasR!==null?`<span class="gar-badge ${diasR>7?'gar-ok':diasR>0?'gar-warn':'gar-exp'}" style="display:inline-block">Gar. prov: ${diasR>0?diasR+'d restantes':'VENCIDA'}</span>`:''}
           ${cambio?`<div style="font-size:12px;background:var(--purplebg);border-radius:7px;padding:6px 10px;color:var(--purple);font-weight:600;margin-top:6px">↔ Cambio dado: ${cambio.modelo} ${cambio.storage}</div>`:''}
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
           <span class="chip chip-garantia">${g.estado.replace(/_/g,' ')}</span>
           <button class="btn-sm btn-blue" onclick="openAdvanceGarModal('${g.equipoId}')">Avanzar estado</button>
-          <button class="btn-sm btn-sec" onclick="openRemitoPrint('${g.equipoId}')">📄 Remito</button>
+          <button class="btn-sm btn-sec" onclick="openRemitoPrint('${g.equipoId}')">Remito</button>
         </div>
       </div>
     </div>`;
@@ -1184,7 +1184,7 @@ function renderPrestamos(){
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div style="flex:1">
           <div style="font-weight:800;font-size:15px">${d?.modelo||'?'} <span style="font-size:12px;font-weight:500;color:var(--muted)">${d?.storage||''} · ${d?.grade||''}</span></div>
-          <div style="font-size:13px;margin:4px 0">👤 <strong>${l.clienteNombre}</strong>${l.clienteCi?' · CI: '+l.clienteCi:''}${l.clienteTel?' · '+l.clienteTel:''}</div>
+          <div style="font-size:13px;margin:4px 0"><strong>${l.clienteNombre}</strong>${l.clienteCi?' · CI: '+l.clienteCi:''}${l.clienteTel?' · '+l.clienteTel:''}</div>
           <div style="font-size:12px;color:var(--muted)">Motivo: ${l.motivo} · Salió: ${fd(l.fechaSalida)} (${dias}d)</div>
           ${l.fechaRetorno?`<div style="font-size:12px;color:${vencido?'var(--red)':'var(--green)'};font-weight:600">Retorno: ${fd(l.fechaRetorno)}${vencido?' ⚠ VENCIDO':''}</div>`:''}
         </div>
@@ -1231,8 +1231,8 @@ function runReport(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div class="scard"><div class="scard-title">Por forma de pago</div>${Object.entries(porPago).map(([k,v])=>`<div class="rep-row"><span>${k}</span><span style="font-family:var(--mono);font-weight:700">₲ ${gs(v)}</span></div>`).join('')||`<div style="color:var(--muted);font-size:13px">Sin ventas</div>`}</div>
       <div class="scard"><div class="scard-title">Gastos desglosados</div>
-        <div class="rep-row"><span>🔥 Combustible</span><span style="font-family:var(--mono)">₲ ${gs(combust)}</span></div>
-        <div class="rep-row"><span>🚚 Delivery</span><span style="font-family:var(--mono);color:var(--green)">+₲ ${gs(delivery)}</span></div>
+        <div class="rep-row"><span>Combustible</span><span style="font-family:var(--mono)">₲ ${gs(combust)}</span></div>
+        <div class="rep-row"><span>Delivery</span><span style="font-family:var(--mono);color:var(--green)">+₲ ${gs(delivery)}</span></div>
         <div class="rep-row"><span>Otros gastos</span><span style="font-family:var(--mono);color:var(--red)">₲ ${gs(totalG-combust)}</span></div>
       </div>
     </div>
@@ -1273,8 +1273,8 @@ function renderCaja(){
         <div class="stat-val" style="color:${(totalV+totalI-totalG)>=0?'var(--green)':'var(--red)'};font-size:22px">₲ ${gs(totalV+totalI-totalG)}</div>
       </div>
     </div>
-    <div id="ventas-hoy" style="display:none;margin-bottom:14px"><div class="scard"><div class="scard-title">💰 Ventas del día <button onclick="toggleCajaSection('ventas-hoy')" class="btn-icon btn-sm" style="font-size:12px">✕</button></div>${ventasRows}<div style="border-top:1.5px solid var(--border);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between"><span style="font-weight:700">Total</span><span style="font-family:var(--mono);font-weight:800;color:var(--blue)">₲ ${gs(totalV)}</span></div></div></div>
-    <div id="movs-hoy" style="display:none;margin-bottom:14px"><div class="scard"><div class="scard-title">📋 Movimientos de hoy <button onclick="toggleCajaSection('movs-hoy')" class="btn-icon btn-sm" style="font-size:12px">✕</button></div>${movsRows}</div></div>
+    <div id="ventas-hoy" style="display:none;margin-bottom:14px"><div class="scard"><div class="scard-title">Ventas del día <button onclick="toggleCajaSection('ventas-hoy')" class="btn-icon btn-sm" style="font-size:12px">✕</button></div>${ventasRows}<div style="border-top:1.5px solid var(--border);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between"><span style="font-weight:700">Total</span><span style="font-family:var(--mono);font-weight:800;color:var(--blue)">₲ ${gs(totalV)}</span></div></div></div>
+    <div id="movs-hoy" style="display:none;margin-bottom:14px"><div class="scard"><div class="scard-title">Movimientos de hoy <button onclick="toggleCajaSection('movs-hoy')" class="btn-icon btn-sm" style="font-size:12px">✕</button></div>${movsRows}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
       <div class="scard">
         <div class="scard-title">Por forma de pago</div>
@@ -1320,12 +1320,12 @@ function renderSuppliers(){
       <div style="flex:1">
         <div style="font-weight:700;font-size:15px">${s.nombre}${s.empresa?` <span style="font-size:12px;color:var(--muted);font-weight:400">${s.empresa}</span>`:''}</div>
         <div style="font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:14px;flex-wrap:wrap">
-          ${s.pais?`<span>🌎 ${s.pais}${s.ciudad?', '+s.ciudad:''}</span>`:''}
-          ${s.tel?`<span>📞 ${s.tel}</span>`:''}
+          ${s.pais?`<span>${s.pais}${s.ciudad?', '+s.ciudad:''}</span>`:''}
+          ${s.tel?`<span>${s.tel}</span>`:''}
           ${s.email?`<span>✉ ${s.email}</span>`:''}
           <span>Gar: ${s.diasGarantia||30}d</span>
         </div>
-        ${s.direccion?`<div style="font-size:12px;color:var(--muted);margin-top:2px">📍 ${s.direccion}</div>`:''}
+        ${s.direccion?`<div style="font-size:12px;color:var(--muted);margin-top:2px">${s.direccion}</div>`:''}
       </div>
       <button class="btn-sec btn-sm" onclick="openSupForm('${s.id}')">✎ Editar</button>
     </div>`).join(''):`<div style="text-align:center;color:var(--muted);padding:60px">Sin proveedores registrados</div>`;
@@ -1388,7 +1388,7 @@ function openDetail(id){
         <span class="chip ${sm.cls}">${sm.label}</span>
       </div>
       <div style="font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap">
-        <span>${d.storage}</span><span>${d.origin}</span>${d.color?`<span>${d.color}</span>`:''}${d.bateria?`<span>🔋${d.bateria}%</span>`:''}
+        <span>${d.storage}</span><span>${d.origin}</span>${d.color?`<span>${d.color}</span>`:''}${d.bateria?`<span>${d.bateria}%</span>`:''}
       </div>
     </div>
     <button onclick="closeDetail()" style="background:var(--bg);color:var(--ink2);padding:7px 12px;font-size:16px;border-radius:8px;border:1.5px solid var(--border);flex-shrink:0">✕</button>`;
@@ -1407,32 +1407,32 @@ function openDetail(id){
   </div>`;
   if(sales.length){
     body+=`<div class="detail-section"><div class="detail-section-title">Cliente${sales.length>1?'s':''}</div>`;
-    sales.forEach(s=>{body+=`<div style="background:var(--bg);border-radius:9px;padding:10px 13px;margin-bottom:8px;font-size:13px"><div style="font-weight:700">${s.clienteNombre||'—'}</div><div style="color:var(--muted);font-size:12px;margin-top:3px;display:flex;gap:12px;flex-wrap:wrap">${s.clienteCi?'CI: '+s.clienteCi:''} ${s.clienteTel?'📞 '+s.clienteTel:''} <span>${s.formaPago} · ${fd(s.fecha)} · ₲${gs(s.montoGs)}</span></div></div>`;});
+    sales.forEach(s=>{body+=`<div style="background:var(--bg);border-radius:9px;padding:10px 13px;margin-bottom:8px;font-size:13px"><div style="font-weight:700">${s.clienteNombre||'—'}</div><div style="color:var(--muted);font-size:12px;margin-top:3px;display:flex;gap:12px;flex-wrap:wrap">${s.clienteCi?'CI: '+s.clienteCi:''} ${s.clienteTel?''+s.clienteTel:''} <span>${s.formaPago} · ${fd(s.fecha)} · ₲${gs(s.montoGs)}</span></div></div>`;});
     body+=`</div>`;
   }
   if(gars.length){
     body+=`<div class="detail-section"><div class="detail-section-title">Garantías</div>`;
-    gars.forEach(g=>{const supG=g.proveedorId?DB.suppliers.find(s=>s.id===g.proveedorId):null;body+=`<div style="border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;margin-bottom:8px;font-size:12px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-weight:700">${fd(g.fechaIngreso)}</span><span style="font-weight:700;color:var(--amber)">${g.estado.replace(/_/g,' ').toUpperCase()}</span></div><div>${g.descripcion}</div>${supG?`<div style="color:var(--blue);margin-top:3px">📦 ${supG.nombre}</div>`:''}</div>`;});
+    gars.forEach(g=>{const supG=g.proveedorId?DB.suppliers.find(s=>s.id===g.proveedorId):null;body+=`<div style="border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;margin-bottom:8px;font-size:12px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-weight:700">${fd(g.fechaIngreso)}</span><span style="font-weight:700;color:var(--amber)">${g.estado.replace(/_/g,' ').toUpperCase()}</span></div><div>${g.descripcion}</div>${supG?`<div style="color:var(--blue);margin-top:3px">${supG.nombre}</div>`:''}</div>`;});
     body+=`</div>`;
   }
   // Historial
   const allHist=[
-    ...sales.map(s=>({fecha:s.fecha,tipo:'venta',color:'var(--red)',icon:'💰',nota:`${s.clienteNombre||'?'} · ${s.formaPago} · ₲${gs(s.montoGs)}`})),
+    ...sales.map(s=>({fecha:s.fecha,tipo:'venta',color:'var(--red)',icon:'',nota:`${s.clienteNombre||'?'} · ${s.formaPago} · ₲${gs(s.montoGs)}`})),
     ...gars.flatMap(g=>(g.historial||[]).map(h=>({fecha:h.fecha,tipo:h.estado||'garantia',color:'var(--amber)',icon:'⚠',nota:h.nota||g.descripcion}))),
-    {fecha:d.fechaIngreso,tipo:'ingreso',color:'var(--muted)',icon:'📦',nota:'Ingreso al stock'},
+    {fecha:d.fechaIngreso,tipo:'ingreso',color:'var(--muted)',icon:'',nota:'Ingreso al stock'},
   ].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
   body+=`<div class="detail-section"><div class="detail-section-title">Historial completo</div>`;
   body+=allHist.map(h=>`<div class="hline"><span class="hline-date">${fd(h.fecha)}</span><span class="hline-type" style="color:${h.color}">${h.icon} ${h.tipo}</span><span class="hline-note">${h.nota}</span></div>`).join('');
   body+=`</div>`;
   document.getElementById('detail-body').innerHTML=body;
   let foot='';
-  if(d.status==='stock')foot+=`<button class="btn-primary btn-sm" onclick="closeDetail();openSaleModal('${id}')">💰 Vender</button>`;
+  if(d.status==='stock')foot+=`<button class="btn-primary btn-sm" onclick="closeDetail();openSaleModal('${id}')">Vender</button>`;
   if(['stock','vendido'].includes(d.status))foot+=`<button class="btn-sm btn-war" onclick="closeDetail();openGarModal('${id}')">⚠ Garantía</button>`;
-  if(d.status==='stock')foot+=`<button class="btn-sm btn-loan" onclick="closeDetail();openLoanModal('${id}')">📤 Préstamo</button>`;
-  if(['garantia_local','garantia_proveedor','reparacion'].includes(d.status))foot+=`<button class="btn-sm btn-blue" onclick="closeDetail();openAdvanceGarModal('${id}')">🔄 Avanzar</button>`;
-  if(d.status==='vendido')foot+=`<button class="btn-sm btn-ok" onclick="openWarrantyPrint('${id}')">📋 Garantía</button>`;
+  if(d.status==='stock')foot+=`<button class="btn-sm btn-loan" onclick="closeDetail();openLoanModal('${id}')">Préstamo</button>`;
+  if(['garantia_local','garantia_proveedor','reparacion'].includes(d.status))foot+=`<button class="btn-sm btn-blue" onclick="closeDetail();openAdvanceGarModal('${id}')">Avanzar</button>`;
+  if(d.status==='vendido')foot+=`<button class="btn-sm btn-ok" onclick="openWarrantyPrint('${id}')">Garantía</button>`;
   foot+=`<button class="btn-sec btn-sm" onclick="closeDetail();editDevice('${id}')">✎ Editar</button>`;
-  foot+=`<button class="btn-icon btn-sm" onclick="openLabelModal('${id}')">🏷</button>`;
+  foot+=`<button class="btn-icon btn-sm" onclick="openLabelModal('${id}')"></button>`;
   document.getElementById('detail-foot').innerHTML=foot;
   document.getElementById('detail-overlay').classList.add('open');
   requestAnimationFrame(()=>document.getElementById('detail-panel').classList.add('open'));
@@ -1452,14 +1452,14 @@ function barcodeCanvas(value,w=300,h=48){const bars=encodeC128(value);const canv
 
 function openLabelModal(id){
   const d=DB.devices.find(x=>x.id===id);
-  const html=`<div class="modal-title">🏷 Etiqueta</div>
+  const html=`<div class="modal-title">Etiqueta</div>
     <div id="label-preview" style="border:1.5px solid var(--border);border-radius:9px;padding:16px;background:#fff;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #ddd">
         <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAYbBhsDASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAgJBQcBBAYDAv/EAFMQAQABAwMBBAQICgUKBAUFAAABAgMEBQYRBwgSITETQVHRFVVhkZKTobEJFBYYIjJxgZTBI0JFVFYXJDM2RFJicuHwJUNGUzQ1Y4Lxc4OiwuL/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AhkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADPbC2xqO8N04WgaZbmvIya4p8I57seuQfrY2zdw701i3pW39Pu5d+ueJ7sT3aflmfUlFsbscV1Ytu/u3W6bVc8TVasx5fJzy2ti2djdm/ptam/bov6nXRHlx6XIucer5OXg9O0rrx1iv8Awpk6t+SuhXaubNqmie/NH7OY9QPQ1dkzpjcx5s283L9LxxFXponif2Nc9QOx1qONj3Mraer0ZXdpmqLF2niqr5InlsPK7Nm5bGNN7TOpmqU50RzFVyOaef2csJp+9ervRbWLWN1Ct/Dm2a64o/HqKZ5txzxzM8yCG26tuaztjVbuma3gXsPJtzxNNymY5+WGJWS9Y+nm1utnTunWNH9DVnTYm7h5NviZmfPuz9yu3W9D1HSNwX9Dy7FVOZZvehmjjxmeeAdTTsLK1DMt4eFYrv37tXdooojmZlJDpd2St069i2tQ3Lk06TYuRFUWZpmbnHzxw3H2Q+huDtrb1jdO4sOm9q+VEXLNNceFmmfLw9vCS9NMRHERxHqgEadP7H2wbWJFGXl5169664r4j5nmN59jXBrs3bm2dartXIj9C3fp5if38pfHAKoep/TDdvTzUZxdwafXbtzP6F+mJmiv9kvFLcd+7P0TeehX9I1rDt37V2mYiqY/SpmY84lWd116c5/Tbe+To+RTVVi1VTVjXePCuj1A1+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAln+D62tj5GsarujIoiasSiLduZjy55nn/wDiiYnF+D9uW6+nGv2KePTRd58PPyr4B2NJ0ier/aV1PP1SfTaDtq56K1Z55pruRM+f0UpcezasWqbVmimi3THFNMRxEI4djuqjH1/fODf5pzaNUma6avPjmpJKAcsRuzb+nbl0LK0jU8ei9j5FuqiYqjy5jjmGXcVeQIu9lzL1HZPVHc3SzUb9dzFs3Jv4Xf8AVTMRPEfI9VvroBp24us+m70ibdvDtz6TLs8eNdcR4fdDytu5Tl9tyurBq79NnDmm/NPqnuz5pRwD549m3Zs0WrdMU0UUxTTEeqIfQAAAJ8kY+39tezn9OcfcFFuPxjBvcVVcePdnj3JONJdtW7bt9CdVi5xzVVTFPPt8QVsgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABHj4Q+1rFybs8Wse9XPspomQfEZfD21uDMnjG0bPuT/w49U/yei0rpL1B1OmKsXbWdMT5d63NP3g8MNzaV2aOqufTTV8C0WIq/wDcvUxx9r2ej9jnfuTXRObqen4tE/rfpRVMfNIIzCZmi9iu3TVE6ruqao9cWaOJ+2HtdF7IewcOmmcvLzMuqPPvTEc/YCv59Ldm9cq7tu1XXPsimZWYaR2c+l+nzTMaFbvVU+u5Mz/N6/TOmWxdOmKsXbOn01R65t8/eCrPB2zuHO/+E0TUL/8AyY9c/wAnp9I6O9RtTimcba+oRTPrrsVU/fC0XD0TSMSOMbTMS1H/AA2oh3aLNuiOKLdFP7KeAVv6V2XuqWbNPf021jxV67lcRw9BHZA6h+j5nKwe97O9HvWB8QcQCrLqb0Y3zsCib+s6ZXXix/59qJqoj9sx5NcrhNd0jT9a029p+p4trJxrtM01UV08xwrI7SmwqNgdTc7S8aOMK5Ppcf5KZmfAGsgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAElewdvS1ou/MjbuXeiizqVHFHenw78eX3yjU72g6pl6LrGLqmDdqtZGNciuiqmeJ5gE0+o9eo9F+v35c2rF2vbWtz3c7uxzTbqmfOfZ5yk5tfXtL3FpFjVNIzLWVjXqYqpqt1RPzta9K9e0Drf0hsxrOPZya7luLWZZqiJmivjzj2etr7M6HdRtg5V3L6Wbtr/E6qpqjTsmqaqY+SOY4BKCZh4LrJ1K0Tp5tjIz87KtTmTRMY+PFXNddfq8PPzaWn86nLj8UqxsHGifCb/8AR+Hyszsrs65udr1rcvU3cF3Xs6mqK6cfv1Taon2cSD5dkXZ2sX9S1jqZuW1ct5ms3Jqx6LkcVU2/VKScPjh49nFxreNj26bVq3TFNFNMcREQ+wAAAAEoh/hBt7WKNHwdm416Jv3K/TX6Ynyjw45+1KDfW48Lau187XM+5TRZxbU1+M+cxHkqw6pbuzt7721DcGdcqqqv3J7lMz+rTz4RAPLgAAAAAAAAAAAAAAAAAAAAAAAAAAyGhaLquu59vB0jBv5mRcnimi3TzIMey23dua5uHKpxtG0vKzblU8cWrczHzpWdGOyNVkY1jVt95M2+9xVGFbnxj/mmPelXsvYu19oYVGLoWj4uLFMcd+Lcd+f2z5ggrsbspdQNdot3tSizpVmriZ9LVHe4/ZHLc21exrtjEqpu63rWXm1cfpUUcRT90SlVxADUWhdnTpZpVFEU7et5FVP9a7XVMz9r2GndN9j6fx+K7Z06iY8p9FE/e9aAxuLoGjY3/wAPpWFa/wCWzTH8ndt49m3HFFq3RH/DTEPqA4imIc8AAAAAAAAHMOJqiAcz5IFfhBsnFudRMDHtRT6e3j83Jjz+RMbqP1B23sbQMnVdY1Gxbm1RM02Yr5rrnjyiFZXV7e+Z1A3znbiy4miL1XFq3M/qURM8R9oPIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3p2Pup13Y/UCzpubemNJ1GqLd2Jnwoq9U/bKxvHuUX7VF23VFVFcc0zHrhTnauV2rtN23VNNdM8xMeqVi3Y56o2t8bDo0nOv86vpkRbuRVPjXRx4VfZIN9cQEAAAAADiqeIctd9feoWH076fZ2r3rkfjdVE28a3z41VzHgCNPbw6qVZmdb2FpN/+gszNeZVTP61XlFP3ojO/uDVczXNZytVz7tV3Iybk111TPPjMugAAAAAAAAAAAAAAAAAAAAAAAAADYPQ/phrHUzddrTcK3NGHRMVZN+Y8KKefvB8uj3S/cPUnX7eBpeNXTjRMemyZj9CiFhXRfo3tbptpFq1hYtvI1DiJu5VymJqmfk58no+mextD2FtrH0TRMai1bt0xFdyKeKrk+2Zeq4BxEeDkAAmXxyMqxYp7169btxHrqqiAfYeO3B1O2JoMV/Ce5cCxNHnT3+Z+x4PWu1B0n0+mr0es15lUf1bFvn75gG7RF3We2TszHmadO0jUMn2TVTTTH3vF6v20M6qao0zbdFEf1ZuXP8AoCavJMq+tT7XnUXJiqMaxh40T5TFMTMfY8pq3aT6r6hE0/D9WPE/+1Tx9wLLLmTYt/6S9bo/5qohjsvcmg4nP4zrGFa48+9ehVrq3VLf+qV97M3VqlXyRkVRH3vOZmt6vmVTVl6nl35nzmu7VPILS9S6sdPtPpqnI3Tp8d3ziK+Xj9c7S3S3Taf0dajJq9lqnn71aszMzzMzLgE9tb7Y2ycSru4GlahmfLEUx/8A2eQ1TtrVfpRp20o/4ZvXePumUOAEltZ7Ym/8umujC07Aw4nymIiqY+eHi9a7SXVTUqaqJ1yLFNXqtW4j7mnQGY3LubXtx5U5OtaplZlczz/S3ZqiP3TLDgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2D0D39k9PeoeDq9F2qnFqrpoyqYnwqo58f5tfALhdB1PE1jSMbUsK7Tdx8i3FdFVM+ExLvIjdg7qlVn4VewtUyIm7j09/Dmqrxmn10/Z9qXMAAAAA4rniJn2K7e21vzN3J1OyNBiblvB0qqbVNFXh3qufGfsWJyhj28ul1VNynf8ApePM0z+hm92PL2VT80gh0AAAAAAAAAAAAAAAAAAAAAAAADmImZiIjmZBmNl7d1DdW5MPRNMs1Xb+TcimOPVHrlZx0M6aaT012fj6Xg2onLuUU1ZV7jxrr48f3c8tNdhzpNa0bb8b21nFn4QzI/zWK4/Ut+39/glPEAASAx+vazpuh6dcz9VzLWLj245qrrq4iGC6o780Pp/tm9retZNFummJi1bmf0rlXHlCuzrh1p3P1K1S7RkZVdjSqap9Di0TPd49sgkX1k7XGBp127puxseMy7TzTOVc8KYn5PPlGDefWHqBuu7XVqe4Mv0dUz/R27k00xHs45eAAfu/du37k3L1yq5XPnVVPMy/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADeXTHoFqm8Ok+qbxiq5bvWqe9h2uP9LERPP8mkcmzcx8i5Yu0zTct1TTVE+qYBl9jbjztp7owdd0+7VRexbtNfhPHMRPjC0zpPu7E3tsfTtexLkVemtR6SInnu1R5wqYSZ7EPVavbW5p2hq2R/4bqFUeg70+Fu55fb4An0PzRVFVMVUzzExzEv0AAAxG8dCwtybczdFz7VN3HyrU0VRMfIy5IKnOr+zMvYm+c/QsqiqKbVyZtVTHHeo5niXj0/u250sp3PtP8qtLx+dR0+mZuRTHjXRxz/JAKqmaappqjiYniYBwAAAAAAAAAAAAAAAAAAAAAA2b2ben9/qB1KwMCaJnCx64vZVXHhFMer5+GsojmeIWFdiDp7O1+nsa7nWIoztUjvxMx4xb58Ps4Bv/AErCx9OwLGDi24t2LFuLdFMR5REcQ7READDbx3Fpu1tvZet6tfps4uNRNdUzPHPHqZiuqKaZmZ4iPNBPtwdXJ1vXZ2RouR/mWHMxl10VeFdfs/dx9oNQ9euqOrdSt238y/frp063XMYtjnwpp58/2tbgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9n0Z2Tmb939p+g4tFXcuVxVeriPCmiJ8XjaKaq6oppiZqmeIiE/uxH0sna+0Pyp1XH7upalTFVqKo8aLfnHz+AN9bV27p+3dsYmg4NiijEx7MW4piPOOOEBe2b0vu7L33VrmBj8aRqkzXTNMeFFfPjH2wsU4a/687CxuoPT7O0a5RTORFFVWPX66a+PAFVjsafl5GBnWczFuTbvWa4roqj1TE8vvuDS8vRdZytLzbVVq/jXJorpqjiY4dAFnHZg6l43UPp9jXK7kfCWFTFnJo58eY9fzcNtqyuyx1KudPeoePVfuTGnZtUWcimZ8I58IlZdp+XYzcOzl49dNdm9RFdFUTzExMA+4AAAOvqGJYzcS7iZNum5Zu0zTXTMeExKs7tQdNsjp/1DyqLVmqNNy6puY1fHh4z5crOZhp/tUdNqeoHTjKt4lqKtTxKZu40xHjVMR5fYCswffPxb+Dm3sTJt1W71muaK6ZjxiYfAAAAAAAAAAAAAAAAAAAAAHt+iG0ru8+o+laPRbmu1Vfpru+HlTE8z9y1HR8Kzp2mY2Bj0RRZx7VNuimPKIiOP5Iffg+NkTM6lvHLs+Ef0OPMx+zmY+1MyPIAHFc8RyDXHaL3zZ2H0y1HVZuxTlXKfRY9PPjNUxPkq+1XNv6lqORnZVybl6/XNddUz4zMpF9u/ftWu78t7ZxL/ADiaZzFymmfCa/D7uJRqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABODpz2funXUbpRo2tWbN3Bzr2PxcuWq5mJriZiZmOfkau6sdlLde2bF3UNvXY1fEo5qminwuUx+yeOW8+wNrf490ru6ZVXzVhX5jiZ9U+P8ANI+qmJjiYiYkFOubiZOFk142XYuWL1E8VUXKZiYl8FlHXvoDtrqHgX83EsWdP1qmmZt3rdHdiuePKrhXz1A2brmyNw39F13ErsXrdUxTVx+jXHtiQedAAAAAAAAAAAAAAAAB9sHGvZmZZxMeiqu7eriiimI8ZmZBtXsu9N8nqB1Dxqa7Uzp2FVF7IrmPDwmPBZjg41rExbWNYopotWqYpppiOIiIap7LXTe10+6dY1u7app1HNppvZNXHjEzHPH7uW3YAcTDkBCLt49LowdRp37plji1kVdzLpop8Iq/3vtRJW67823gbs2tnaFqNqm5ZyrVVH6Uc8TMeEqs+qm0szZW99Q0HLt1Uehuz6OZj9amfKQeXpmaaoqieJieYlYF2JOp9vdWzvyZz78fCOmUxFEVVeNdHyfOr8ex6ObyzNi7907XMW7VRRRdim9ET4VUT4TE/OC2KJ5GH2druHuTbmFrOBdpuWcm1TXE0z5TMeMMxAAADiuImPHxhyAr77bfTG5tjeM7o0/H407UZ5r7seFFfr++EcFsHWTZeJvrYeoaFk26aq7lqqbNUx4018eE/Pwq13doeZtzcWbo+daqt3sa7NExVHn8oMSAAAAAAAAAAAAAAAAAA++BjXMzOsYlqmarl65TbpiPbM8Pg252UNm17v6uabRXa7+Lh1+nvTx4foxMx9sQCffQfa1raPTHR9JotxTXFim5c4jjmqrx/m94/Fiim3bpt0xxTTEREfJD9gPNdTNyY209k6nruVXFNGNYqmOfXPHg9LPkir+EA3nGnbUw9rWLnF3Nq79yIn+rEf8AUEKd0avka9uDN1fKrmq7lXqrlUzPtnljAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABLn8HbrMW9Y1nRqqv8ASUxcpjn9nuTajyVtdi/XY0brVp9qqeKMyKrU+P8Awyslp8gJak7R/STS+pO0r/GPRRq+NRNeNfiP0uf92Z9jbbiY8AU969pWbomsZOlahZqs5ONcm3coqjymJ4dFKD8IJtbF0zfWm69h40Wvx+zVF+qmPCqqOPH7ZRfAAAAAAAAAAAAAAASP7EfTGndO8Pym1LH7+Bptfeo70eFVbQu0tDzNx7iwtGwbc13sq7TRHEeUTPjK0jovsXA6f7DwNCwqIium3TXfq48arkxzV9syD2tFMUxERHER5OQAAAmOUYe3H0stbh2xG8dLx4+EtPp4v92PGu35+P7OZSeYLfebpeBtLU8nWO5+JUY9fpYq8pjuz4AqKqiaZmJjiY8JhwyW6b2Hkbj1C9gUTbxa8iubVPsp5Y0ExOwd1Sm3Vd2Hq+VzTVM14U1z5euafvTPjyU/7W1rM29uDC1nAuTbyMW7FymYn2epaN0S35idQNiYOtWLlM35t005FMT+rXEeP28g90AAADiYQ17eXTCmPQ740jF8f1MyKKfl/Wn50y2J3ZoWDuPQMzRtQtxcx8q1VbqiY8uY45BUEPbdaNj5uwt95+i5NuqLNN2ZsVzHhVRPjDxIAAAAAAAAAAAAAAAACdP4PzZ/wdtPP3PkWeLmbc7lqqY/qxx/1Qi0XT7+q6tiabi0zVeyb1NqiPlqnj+a1vpJtuztTp7o2i2qIpmxjU+k4jzqnxn7wesjyAB+L9ym1aquVzxTRTNUz8isztZb0/LPq9qN6zcmrFwapxrXj4fozxM/Yn1153Pb2p0w1jVKrkUVxYmi34/1p8FV2bkXMvMvZV2Zqru1zXVM+uZnkHxAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB6PpnqlzRt/aJqNuqYm1m2pmY9neiJ+xbNpOTTl6bjZVE803rNNcfviJU94tyq1k2rtM8TRXFUT+yVqvQnVqdZ6WaFmRVNU/itFNUz7Yjj+QPckgCMP4QTRfxzpzg6pTTzViZHEz8kxPuQKWe9qzR51nonrlmmnvV2rfpY8PZE+9WHMcTMA4AAAAAAAAAAAAB7Lo7sjP37vnB0TDtzVRVciq9Vx4U0RPM/YCSfYR6VTVcub81ex4RHdw6ao/dNX3pmwxGztBw9t7cwtGwbdNuzi2qaIiI85iPGWYAAAAAlDnt39VvR26NgaPe4qqjv5tdM+rnwp+z7UlOsO9sHYWxdQ1/NuRTVbtzFmnnxqr48Ij96rbeevZm5tzZ2t51yq5eyrs1zMz5R6oBhwAEhOxf1U/Ivecbf1K5PwZqdUURzPhbr58J+/50e31xb9zGybeRZqmm5bqiqmY9UwC4y1XTcopromJpqjmJj1v00r2S+pmPvzp9Yxsi/FWqYFFNq/TM+MxHhE/Y3VAAABIAjn21el0bt2ZO4tNsxOo6bT36uI8a6PX9nKvqumqiuqiqOKqZ4mPZK4rOxrWXiXcW/RFdq7RNFdM+uJjiVa/as6Z39gdQb92xZmNMz65u2Kojwjnzj5+QabAAAAAAAAAAAAAAABvPsW7R/KXq7i5d6138fTo9PVzHh3o8Y+2Fj9ERFMRHhEI0dgzZFeibBvbjyrXdv6nVzbmY8e5H/cpMQASPjmXqMfFu3654pt0TVM/JEcgiL+EI3pFjB07Z2Nd/Tvf01+In1R5fehY2V2lN2Vbw6tavnxXNdm1dmxa8efCmeP5NagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALFOw1rXwn0foxqq5quYd6bc8+qPGVdaYv4OrXYpu67oVdyf0oi9RT++IBM4IkBht7afTqm1NTwKoiYvY1dPH7lSOt4dzT9Xy8K7HFdi7VRV+2JXC3aYqt1Uz64mFWnaT0aND60biw6aeKasqq5THHqmZBrkAAAAAAAAAAAHNMTVVFMRzMzxELAexN0v/JbaE7k1PG7uo6jHeo70eNFHqRb7LPTa91A6h43prUzp2DXTev1THhPHjx9iy7BxrWJiWsWxRFFq1RFFNMeUREA+0Rw5AAABxXVFNMzMxER5y5mWnO1X1Io2B07vzj3aY1LNpqtY9PPjHh5/bAIwdtnqn+VO7J2tpmR3tN06ri5NNXMV1+v7oRufXLyLuVlXcm9XNdy5VNVVUz4zMvkAAAADZnZx6hZXT7qLhZ0XZjBv1xayaOfCaZnzWeaPqGLqmm2NQwrtN3Hv0RXRXTPMTEqeImYmJieJhObsKdT/AIV0Kdk6nkd7KxI5xpqq8aqI9X3AlYEeQAAA1P2m+nVjf/TzLs0WYqz8WibuPVEePMePH3tsPzXTFUTFUcxPhMAp11DFvYOdfw8iiaL1m5VbrpmOJiYniXwSb7cfTCNvbno3XpeN3cHPq/poojwpr48/sRkAAAAAAAAAAAAAZXaOkXte3LgaRYpmqvKv0W+Ij2zEMUkN2F9mTuDqhOs37fOLpdHf5mPCa554+4E8dh6NZ2/tDS9Hx6IooxsamjiPbx4/ezjimIiOIcgNZ9pXd1Gz+kusZ8XIov3bXobPj4zVVPH3ctmT5IV/hCt3zcztM2nYu/o2/wCmvUxPyeHPzgiJkXa7+Rcv3Ku9XcqmqqfbMvmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADe3Yk1uNJ6x49mu5NNOZbm1x7fX/Jol7Dozqs6N1M0PO73cinKpiZ9kTPH8wWxU+Tl8cG7TexLN6meYuW6aon5Jjl9gKvJX32+dG/EeqtrUaaIppzLETMx65j/APKwSfJEb8IlokXNA0bXabcc2r02qqo+Xjj7gQlAABl9p7c1jdGs2dJ0XCu5WTeqimKaKeePln2AxAmb0u7HuPNi1m711Gua6oiZxbM+XyTPH826NO7OfSvDs026du0XOI471dyqZn7QVl8T7DifYs+/N/6W/wCGbH0qvefm/wDSz/DFj6VXvBWDxPsOJ9krP/8AIB0t/wAMWPpVe9xPZ/6W8/6s2PpVe8FYPE+yXY03BydQz7OFi2qrl69XFFFMR5zMrNo6AdLYn/Vmx9Kr3shovRbpzo+p2NSwNuY1vJsVd63V4zxP75Bi+zJ03xen/TzEtVWojUMuiLuTXx48z6vmbYjycUUxTTFNMRERHEQ5AAAAkHV1bOx9O0+/nZVym3Zs0TXXVM+UQrJ7S/UfJ6h9RMvKpvV/B2NVNrFt8+EREz4/v8Ene3J1TnQdvRs3Sr/dzc6mfT1Uz40Uez7UEJmZmZmeZnzBwCVvY26F6fujCv7r3dg+nwKv0MWzXzEVTx41fb9gIpC0P/IL0t44/JXF+er3uJ6BdLJ/9LY3z1e8FXrnifZK0D/ID0s/wvj/AEqve5/yB9Lf8L4/0qveCr7uz7J+Z6LpvujUNnbxwNe065VRdx7sTMR/Wp58YlZBHQTpd/hfH+lV7yegnS3nmNr40fsqq94PW9Od04W8do4OvYNcTRkW4qqiJ/Vnjxh6Nhdo7Z0faulU6XomJGLiUzzFuJmYj52aAAAAB5Tqns/A3ts3O0POtU1emtT6OqY8aavVKrbf+18/aG6s7QtQt1U3Me7VTEzH61PPhK3SXid2dK9i7p1X4T1vQMfKyuOJuTzEz8wKo+J9knE+yVov+Qjpdz/qri/PV73MdCel8f8ApXF+er3gq54n2ScT7JWj/wCQvpdx/qpifPV73MdDOl1P/pTD+er3gq34n2ScT7JWZax086F6NPd1PTdDxZ9ly/xPzcujjbC7P+uT+K4WNoV2uryi3k8T94K2hPDqR2Rdp6ti3MraWXc07J4mqm3Nc1W6p/fyh91O6d7l6e63Vpuv4NdqOf6O9Ec0XI9sSDyAAAACxTsRbOjbnSujUr1ru5OpV+kmZjx7vEcfzQM6c7cyd2710vb+LRNVeZkU2549UTPEytf2tpVjRdv4OlY9MU28azTbiI+SAZOAAdfUsq1hYN/MvVRTbs26q6pn1REcqreuu7b28+p2savcrmq1+MVW7PyUUz3Y+yE+u1nu+Np9JdQrt3O5fzKZsW/Hx8fP7FZ1dU111V1TzNU8zIPyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7Gm35xdQx8mmeJtXaa4/dLrgLauk+rW9b6daDqVuvvxdwbXen/iiiIn7XqWh+xDr1WsdF8Szcr5uYdyu1MeyO9Vw3wA0v2y9DjWOh+q1U24ruYnF6nw8uIluh5vqZptGr7E1nTq6Iqi9i108fuBUjMcTw4dvWcarD1bKxao4m1dqpmP3uoD74OLezcy1iY9E3Lt2uKKKY85mZ4WPdlro/pfT/aONqWRYou61m24uXrtVPM2+f6sezwQw7KWg2df6z6PjZERNu1X6WYmOf1fH+Szqzbpt2qbdMcU0xERAP3EAAAAAAAAAAAAMFvvceFtXa2drmfcpt2sa1NXjPnPHhDOzPEIVdvHqlTk5dGw9Kv8Aeotz38yqir1+qn7ZBGvqrvHN3zvbP3Bm11TN+5Po6Zn9Snnwh5UcxEzPERzIPWdJNm5u+t86doGHaqqpvXafTVRHhRRz4zP7lpeydAw9sbYwdEwbdNFnFtRRERHnPrloLsP9LZ2ztb8rdTsd3P1Gj+jiqnxoo/7mUmIAAAAAAAAAAAAAAAABxVMREzM8RCNPWvq9ubWN5/5OOmFn8Y1Cqe5lZlEcxZ5njz+Txbd67blu7U6Ya1rFieL1rHqi3PsqmJ4a27F+0LOHsWreWbR6XVdZu1Xa7tcc1RT6o5/fIMZoHZdwtQojP33uLUtXz7sRVcp9PX3KZ9keLu6v2VdoRZm5t/U9S0rMp8bd23fr8J9XrSJgmARQ23vzfvRjemNtTqBVc1Pb+Vci3jalV492J8uZ8/nbv6r7E291S2RXi5NFq7Nyz6TEyKY8aZmOYmJfrrts/B3j051PAyrVNV23Zqu2K+PGiumOYmJ9Xk8V2N90ZeudOLulahXNeTo+RVizVM8zMRM8fZwCvrfO3M7am6M7QtQt1UXsW9VRzMfrRE+E/vhhEn/wgu3rOn790/WLNEU/jtniviOOZiIj+SMAAOaYmqqKY85niASf7AOz/hHfOTue/Z71rAoim1VMeHenn3QnnHk0t2O9nxtbo9p9y9a7mVn/AOcXOY8eJiOG6QCfIdLXs+1pmj5eoXqopt49mu5VM/JEyCEv4QPecZ+59P2ri3ebWHR6S9ET4d6ef5Sim9T1X3Fe3T1A1fWbtc1emyau7zP9WJ4j7nlgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATU/B2axNWm61pFdfhRVFyin9//AFS/jxV89grWZweqlzAqrimjLsTTxM+cxMT/ACWC0+QOXyy7UXce5bqjmKqZiX1J8gVSdd9KnRurGv4E0dyKMqqaY+SZeHb+7dWhVaV1qu5tNvu2c7GouRPHnVzVz/JoEG8OxPlW8frhgRcmI9Jbrpjn292VkdMxx4Kkul+469qb60vXKZmIx79NVfH+7z4/YtV2breJuHbWBrGDdpu2cmzTXExPr9f2gzAAAAAAAAAAAPxeuU27dVyuYimmJmZ9kA8P1x3xibC2Bn6zfu003vRzRYp58aq5jwVb7j1fL13XMvV8+5VcyMq7VcrqmefGZ5bx7ZvVCveW96tD0/ImdL02qaOKZ8Kq48Jn70fgG2uy504udQuo2PYv2Zq03Dqpu5MzHhMc+X2S1ZgYt7NzLOJjUTXeu1xRRTHnMysx7LvTXG6e9OsW1cs0xqeZEXcq5x48zEeH7vEG1MDFs4eHZxbFEUWrNEUU0xHhEQ+4AAAAAAAAAAAAAAAAA1J2tcG/ndENdox6ZqqotTXMR7IiX07KOqY2p9ENBnHqjmxam1cp9dNUf/lsnXtMxtY0jK0zMoiuxkW5t1xPslETZe4NT7OvU/N2zuO3dq2lqF6bmNkxH6NvmfP7gTJgYjbm49G3BgW87SdQsZVi5HMVUVxLvZufiYWPVfy8m1ZtUxzVVXVxEQDH71zLOBtPVMvIqim3bxbkzM/8stBdhbHvV6LufVu7MY+XqVdVqZ9ccyxXaB6r3t96ja6Y9OJqzr2Xci3nZVrxpt0c+Mcx+xvfpftbT+nnTzE0qju2reNY9JkVz4c1cc1TP7+QRe/CM5dqrU9v4lNUTcpoqqmPXwiC2z2qN9299dU83Jxbnfw8SqbFmYnwmKfCZ+xqYB7Hoxtq5u3qTo2i0Ud+m9kUzcj/AIYnxeOSy/B87LnL3DqG78qzzbxaItY9Ux/Wnnn7oBNbSMO1gabjYVmiKLdm3FFMR5REQ7ZHkANHdszekbV6TZWNZud3L1H+hoiJ8eJmOfs5bxq8kAu3tvD4Y6g4+37F3vWdOt/pRE/1p5n+YI1VTNVU1TPMzPMuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsbs3azOidYtByu9FNNWRFFUzPqmJhaXbqiqmKo8YmOVPu3sqrC13By6Ku7VZyKK4n9lULZ+n+pxrGzNI1KJifxjEt1zxPrmmAZ0kARA/CK6DTXpeha/RRPft112q6vk/R4/mhWse7bejRqfRTNv93vV4lXpafDy/74VwgJCdl7r9ldP8inQtfuV39Du1/ozM+Njn2fIj2At42jurQt06Xb1HQ9Sx82xXETzbrieP2s13oVF7X3huTbN6LuiavlYkxPPFFc8T+5sjT+0r1SxLUW/hem7xHHNdMz/MFlneg70K3vzouqPxhZ+hPvd7bvaL6ta1rONpeJm0XL+TciiiKaJnxn94LFORhdkWtXs7XwLeu36b+oxZp/GK6Y4iauPFmgAAAAJaP7XPU+nYew72FhXqadU1CibdqOfGmJ85bj1vUcbSdKydRy7kW7GPbquV1TPHhEKxO0X1Fyeo3UPM1GapjCsVzZxaOfDu0zxz+/jkGuMi9cv36796ua7lyqaqqp85mfN8wBJfsQ9K53LumN36pjzOnafVHooqjwruer5uE+qIpppimmOIjwiFY2xuvm+dmbds6Hod3FsYtry/o55mfbPizkdqbqn/AH7G+hV7wWPcwcwrhntTdUp/27H+hPvfme1J1Rn/AG+x9CfeCyDmDlW5X2n+qVX9pWo/+2fe+c9pvql8a0fRn3gsn5OVa/5zXVL42o+jPvPzmuqXxtR9GfeCyjk5Vqz2mOqc/wBr0fRn3vzPaW6pz/bFP0Z94LLOTlWlHaV6p/HNP0Z979R2l+qUf2vT9GfeCyvk5Vrx2muqUf2tR9Gfe/Udp3qlH9qW5/8Atn3gsm5g5hW7Hag6o/GVr6M+9zHah6oR/aFn6M+8FkPeg5hXBHaj6oR/t9n6E+9zHal6oR/t1j6E+8Fj3MHMK4/zp+qH99x/oT7z86fqh/fMb6E+8FjnMPN7+2Xt3e+i3NK3BgW8qzXExEzH6VM+2JQHntT9UZ/23H+hPvfme1L1Sn/bsf6E+8G+Mzsx67oWbXe2HvjO0y1NXMWqp54+TzhxX2d+oO4LlNrd3UbMysTwiq3R64+doeO1L1S/v+N9Cfe/F7tQ9U7lE0/CNinn1xRPvBNnp7062J0j0O7kYtFnHmmnvZGbkVR3quPbKN/aj7SdnV8TI2psjI72NXzbycumfCqPXFKO+8+pm9N2zMa1rmTetz/5cVzFLxwOZmZmZmeZnzcAD92qJuXaLdMczVMRCzzsu7Tp2n0h0nEqtdzIv24vXfDxmZiFf/Z+2nc3l1W0bR6aJqtemi5enjniiJjn74WnYePbxsa3j2qYpot0xTTEeqIB9oABiN461j7e2zqGs5VcU2sTHruzMz7KZlVD1A16/ubeWqa3kVd6rKyKq4/ZzxH2RCdfbr3dOhdL/gmxc7t/Uq+5MRPj3eY5/mr2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABzTPFUT7JWa9kjWI1fono1Xe5nHo9DPj7PD+SslO/wDB7a1GTsLUtJqq5qxsiKoiZ8onkEpAAeM616TGt9Mdd06aO/NzEr4j5e7KqTLo9FlXrfHHdrmPmlcPnWKMrEu49cc03KZpn96prqppNWh9Q9b0uaZp9Bl10xHyc8g8wAAAAlv2E+lNWdnV781fH/zez+hh01x+tVz+t9n2o49LNo5+9t76doOBZruTfux6SYjwpp9cytM2Pt7B2ntfC0TCoot2cW1FHMeHMxHjIM7THEOWIzdzaBh3fRZWs6fZr/3a8miJ+92sDVdOz6e9hZ2NkRP/ALV2mr7pB3QiQBxU5l57qFufA2htLP13UL1Nu3j2aqqe9P61XHhHzgjt26OqdOj6FTsrSsj/AD3MjnJmifGij2fcgvM8zzPm9F1I3Tnbx3hqGvZ12qurIvVTRE/1afVHzcPOAAAAAAAAAAAAAAAAAA9jsjpnvPemFczNuaRXnWbdXdqmiumOJ/fIPHDaf5v3Vb/C2R9On3n5vvVf/C1/6dPvBqwbUjs+dWJ8trX/AKyn3ufze+rP+Fb/ANZT7waqG1PzfOrH+Fb/ANZT73FXZ96sRH+qt/6yn3g1YPSb22PujZl+1Z3HpN/BquxzRNceFX7/ACebAAAB9sOxcysu1jWqZqru1xRTEeuZkExPwemz4ijVN35FqOZ4sWapj988fNCZMeTXXZ32jTs3pVpGlVW4oyKrNNy/7e/NMctigOKp4cvP9RNdtbb2bqms3q4opxseuuJn2xTPAIG9t/e8bl6n16TjXu/i6XT6LiJ8O/5z96PzJ7p1O7rG48/U79U1XMm/VXMz+1jAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEofwfWvfie/c7RqquKcqx3ojnzmJhF5tHsua1Oi9Z9Evd6aabt30dXj6pBaFHkOLc808x5OQJVudtfRPgnrdn36KOLebRF6PD1zMxP3LI58kKPwieiej1TRNcpp8LlFVqqePZPP8wRDAAcxEzPERzMuHp+lWiflF1D0TSJomujIyqYriPZHjP3AmN2LNhYmzdg5O/Ndt0Wb+Tb9JRXcjj0drz5/f4MZubqL1G6z7lyNvdNqa9O0KxXNu9qPd/W8ePCZ/kz/a813I29sfQenegT6GdUqt4tXc8Ji3Hh6v2Q3H0a2Xp+xthafouFZooqi1TVeqiPGqvjxmZBpbSuyji5Nn0u4956vmZlUc1VUXZ4iWJ3D2fd9bJonWOnu8s+/cs/pRi3rnPe49Xj4JU379NvmZqimI85mX6x71F+iK7ddNdM+U0zzEg0f2eut1/dGo3Nm7xxfg3cmL+jNNcd303q5j5W+4lFLtnbanbGoaR1S0CmMbUMPIpi9NuO73+JiY548/Wkf0+1uncWzdL1qn/asemuf2+sGdlBzt39To1PWLWytKyucfFnvZXcnwqq9k/Yk52heoWP076e5uqTXT+OXKJt41HPjNc+ET+7lWBrWo5Wrark6lmXKrl/IuVXK6qp5nmZB0wAAAAAAAAAAAAAAAAAG7uyL1Nu7E3/awsq/MaZqNUW7tNU+FMz5T9zSL9W66rdym5RVNNVM8xMecSC4zGu279i3etVRVbuUxVTMT5xMcw+vCPfYw6o1b02TGianeidS0yiLccz410R4RP3JCQBwcABwcADUvah6dWOoHTjKsW7VM5+HTVex64jx5iOeP38KzM3Hu4mZexb1M03LVc0VRPqmJ4XF1001UzTVETE+ExKs3tc7Ws7X6yapaxrcUY+VVF+iIjw8Yjn7eQagAAbR7MG0q929XdJxZtzXYx7nprvh4cQ1cm3+D22ZONomo7vybXFeRX6GxMx/Vjnn7oBLa1TFNEU0xERHhEex+iACUaO3tvP4G6e2NvY93jI1G5+nET49yOPfKS1U8K2+2Vu+rc3VvKx7d2asbT49DRHPhzzPINIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM1sfOq07d2l5tNU0zayaJ5j9rCv3Yrm1fouUzxNNUTALgNt5dOdoWFl0TzTesU1xP7YZBrvs5a1Gu9Htv53f79UY1Fquf+KmmIlsQBHHt76JVqPSS3n26ea8PJiqZ48onjn7kjnguv8Aocbg6S6/p80xNX4pcrp8PXFMyCqkfTJtzZyLlqfOiuaZ/dL5gNndl7IsY3W3b1d+qKaZyJiJn292WsWV2hq93QN0abrNn9fEyKbsfunx+wEze2TbqweqOxdZyPDCoyopqqnyieUpcO/byMS1fs1RVbuURVTMeuJhpXqVoen9c+heNqelXKK9Qt2aMrFrp8ZpvRHjT97F9mnrFi5enWtjbyvfB24tP/oIpveHpYp/R5iZ/YDeOsYMZ+Jexa5qpou0zTMxPEwbY0izoulWNPx6q6qLUcRNU8zLI0126471NdNUe2J5dLXdb0nQtNvahqmbZxsezTNVdVdURxEA0r26M/Gxui97HuzHpci9FNuPXM/9y9/0HsV6X0c0CnM/o5t4cVV971R4yjvrmqZvaP6vYWk6bYufkbpF2Ll+9McRd/S8fniGx+1p1IxenfTWNvaRept6lmWvxezRTPjbo44mfmBGLtidTa98dQLumYV6Z0vTJ9FRET4V1euf+/Y0U/d+7cv3q712qaq66pqqmfXMvwAAAAAAAAAAAAAAAAAAAAD3fQzfeb0/3/gaxj3KosTcijIoifCqiVo229Yw9d0XE1bAu03cfJtU3KJifbHKn5NTsKdWLd/Cq2FrOTxdt/pYVVc+cc+NP2/YCX8DiJcgAASr87fl+xc6r2LVuqJuW8aIrj2eMp86rnY+m6ffzsu5Tbs2KJrrqmfKIjlVn183dVvTqhrGsxVFVmq9NFnj/djw/kDwQAO1pGHc1DVMXBtUzVXfu00RH7ZWq9FNs29p9NdG0ai3FFVrHpm5xHnVMRM/agL2Qdk3N39XsC5Xa7+HpvOTfmY8OI8I+2YWWW6aaaYimOIjwiAfoCfIHlerG57Gz9gavr9+vu/iuPVVR8tXE8Qqj13PvaprGXqN+ua7mRdqrqmfllNv8IHu+cLaWFtexd7teZX37tMT/Vjj/qguAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwLsBa3Vn9J8jTLtzmvCyp7sc+VNXPuSRQf/AAeGufi+4tY0Wu5+jkW6blNPyx4fzTgjyAdTWcanL0vKxao5pvWqqJ/fHDtuKo5gFRvUbTp0rfOsYExx6LKrj7eXn23u1zonwJ1r1eiKe7TkVRep/ZMcfyahAABIHsp9dbnTzUadA1vvXNCya/GrnxszPr/Yk71A6SdPusWPZ3Jo2dTi6jNPftZuLMd6Z48OYhXC9XsjqJvDZuVRf0DWsnGimf8AR9+e5P7YBLWelPaG0CPxHQd90ZWHRPFE3rtUTx+zxdjC7O+/d35VF7qbve9k4sTzVi2apqpn55aq0Ttg9QcTG9Hn4Wm5lf8Av+jmP5ywu6+1T1O1m1csYuTi6darjj+gomKo/ZPIJba7uLpx0C2NVi4VNizVbombeNbmPSXq4j1q/wDqzvzVuoW7snXdTrmIrqmLNrnmLdPqhgde1zVtdzKszV8+/mX6p5mu7XMyxwAAAAAAAAAAAAAAAAAAAAAADI7c1jN0HWsXVtOu1WsnGuRXRVEscAsd7PHX/QN+aRj6dquRRha5bpimu3XVHFyfbDelFdNcRNNUTE+uFOmHlZGHkU5GLers3aJ5proniYbZ2b2jOp+2cajFsazGXYo4/RyYmuePZzyCzTmHU1LUcLTsWvJzsm3j2aI5qqrq4iIQF1Hte9Rr+HFrGsafj3ePG5FuZ/m1VvrqxvvedyqrW9cyK7dX/lW6ppo+bkEge1n2iMfV8W9s7Z16asermnLyonwqjy7scf8AfiiNMzMzMzzMkzMzzM8zLgAGa2PoGXufdenaJhW5ru5V+mjiI8o58Z+bkE3OwJs/4I2Hlbiv2u7kajX3aZmP6kTPuhJ2GB2Dt7H2vtHTdDxqYijEx6Lc8R51REcz87PAPzdqiiiqqqeIiOZfp4brpuijaPTLWdYqr7tdFiqm3/zTE8AgN2ud3zuzrDqU2rvfxcKfQWuJ8PCZ5aedjUcq5m59/LvVTVcu3JrqmfOeZdcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG6exrrMaR1q06mq73KMmJtT8vMwspp8lQ+xtYu6BuzTdXs1d2rGv018/Jytk2nq2Pru3cDVsWuK7WVZpuUzE8+cAypPkAIXfhDtm3KMrSt441rmiqPxe/VEeXjzEz86Hq17rTsvH330/1HQb9ETXctTVZmfVXEcx9vCrbdmh5u3NxZui6hZrtZGLdmiqKo4/ZPzAxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACaHYU6TXsWi5vzXMXuVVx3cGmunx4/3vval7L3Q/U+oOv2NY1OxXY0HFuRXXXXTx6aY9Uc/KsS0nT8XS9OsYGFZps49iiKKKKY4iIiAdunyAAmeIQ9/CC77opwsDZeHf8A066pu5NMT6vDiJ+eUsNzati6HoWZq2Zdpt2Ma1NyuqqePKFVvWHd1/e3UDU9evVzVReuz6KJnyo58AeQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT/AOwpvyjXen/5M5N6Jy9M4iiJnxmj1fcgA2D0D3/ldPOoeDrFuur8VqrijJoifCqiZ8QWpRIxm2NZwtf0TF1bAu03cfItxXTVE+1kwJR17V3Qazv3Cq3Ft+1RZ1vHtzNdMeEX4jx4n5UinHHPIKeta0rUNG1G7p+pYt3GyLVU01UXKZpnmP2uktB6wdENndRseqrOxKcXP4nuZVmniqJ+X2ofdSeyxv3bV+7e0ii3rOFEzNNVqqIriPlieAR/HotU2Ru3TLs28zb+oW6o8/6CqfuY6dB1uP7Iz/4er3AxwyPwFrfxRn/w9Xuc/AOt/FGf/D1e4GNGS+ANc+KM/wDh6vc5/J/XPifP/h6vcDGDJ/k/rvxPn/w9Xuc/k9r3xNn/AMPV7gYsZT8nte+Js/8Ah6vcRt3Xp8tGz/4er3AxYyv5N6/8S5/8PV7nP5Nbg+Js/wDh6vcDEjLfk1uD4l1D+Hq9zn8mdw/Euofw9XuBiBl/yY3F8Sah/D1e4/JjcXxJqH8PV7gYgZiNr7jn+xNQ/h6vc/X5K7k+I9Q+oq9wMKM1+Sm5fiPUPqKvc5/JPc3xFqH1FXuBhBm/yT3L8R6h9RV7j8ktzfEWofUVe4GEGc/JHc/xFqH1FXucxs/dE+Wg6h9RV7gYIZ78jt0/EOofUVe4/I3dPxDqH1FXuBgRnvyN3T8Q6h9RV7j8jd0/EOofUVe4GBGe/I3dXxDqH1FXufqNlbrny0DUPqKvcDz49FGyN2z5bf1D6ip9bWwN5XauKNu6hM//AKMg8wNjaJ0S6k6tcpoxttZNPPrr4pj7Zbc6f9j3dWpXqL+59Ssabjc8zbtz3rk/fAIx4mNkZd+mxi2Lt+7VPFNFumapn90JPdnvsu6pr17F17etFeHp3MXKMXyruft9cQk30w6E7E2JRRcwtOoy8unjm/kR3quW06KKaaYppiIiI4iIjyBj9v6Np2haVY0zSsW3jYtiiKaKKI48GRAAmeIJaa7TXV/T+nG1L1jHu0XNZyqJpx7UT408/wBaQad7dfVru2Y6f6NkeNc97Nroq9UeHd+2fmQzdzWtTzdY1O/qWo5Fd/Jv1zXXXXPMzMzy6YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJS9jfrnVt3NtbK3Ll/+GXq4jGvXJ/0VU+HHPs8k6se9bvWaLtqumu3XHNNUTzEwpxpqqoqiqmqaaonmJifGEsuy52krulV4+1N75NVeF4UY+ZXPM0eqIqn2AnAOppeo4Wp4dvMwMm3kWLkc010VcxMO2A4mmJjj1OQHVv6bgX/APT4WNd/57VM/fD4fAOi/FGB/D0e5kQGN+ANF+KNP/h6PcfAOi/FGB/D0e5kgGO+AtG+KcD+Ho9x8B6P8VYH8PT7mRAY/wCA9H+KsH+Hp9x8CaP8VYP1FPuZABj/AID0f4qwf4en3EaJo/xVg/w9PuZAB0PgXSPivC+op9x8C6T8V4X1FPud8B0PgbSfizC+op9x8DaV8WYX1FPud8B0fgfSvi3C+op9x8D6V8W4X1FPud4B0fgfS/VpuH9RT7j4I0v4uw/qafc7wDpfBOmfF2H9TT7j4J0z4uxPqafc7oDpfBOmfF2J9TT7j4J0z4vxPqafc7oDpfBWm/F+J9TT7nPwXp39wxPqafc7gDp/Ben/ANwxfqafc5+DNP8A7ji/U0+52wHU+DNO/uGL9TT7nHwXp39wxfqafc7gDqfBmn/3HF+pp9x8G4H9yxvqqfc7YDq/B+D/AHPG+qp9z9U4OJT+ri2I/Zbh2AH4ot0Ufq000/sh++AAAAJnh8MzLx8OxVfyr1uzapjmqquriIhGjtCdp/SNt2b2ibNuW9Q1KqJprv0/qWp/nINjdfes2gdNNAvd/It5Gr3Ke7j41E8zz7Z9kK5d/wC7tY3ruTJ1zWcmu9evVzMUzPhRHsiPU6m6txavufV72q61m3cvJu1TM1V1TPHyR7GJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABt7op163d05yrePTfqz9K5iK8a7XM8R/w8+SbPSvr7sTfOPat29Rowc6qI72PfmInn5PFWQ/Vq5XauU3LdU010zzExPjEguNs3rd6iK7VdFdMxzE0zzEvpyq+2N166k7SoosYevZF/Go8rV+uao49ni3Ftrtl6zZppo1vQrWR4eNVu5xP3Am+Ip6b2zdrT/8w0LOon/6fFXuZGntk7Bnz0vVY/8A2494JNiMv55GwPi3Vfq495+eR0/+LdV+rj3gk0Iyz2yOn8f2Zqv1ce9+Z7ZWwfVperfVx7wScEYZ7ZewvVpOrfVx73H55mxPijVvq494JPiL/wCeZsT4n1b6Ee8/PM2J8Tar9CPeCUAi7PbM2N6tF1T6Ee9x+eZsjj/5Lqn0Y94JRiLf55myfiTU/ox73H55uyviPU/ox7wSlEWvzzdmfEepfNB+ebsz4k1L5oBKURY/PM2d8Saj80OJ7Zm0OPDRNQ+aASoEVvzzNp/Eed9jj88zanxFnfYCVQir+ebtT4izfnhxPbN2p8RZvzwCVYin+eZtf4izPnhxPbN2x8RZnzwCVoijPbN218Q5fzw/P55u2/iDL+kCWAifHbO258QZf0n6jtm7Z9egZn0oBK4RQq7Z22/6ugZf0ofKrtnaD6tv5P0/+gJaCJFXbO0Xjw29kfT/AOjr3+2hgRH9Ftu7M/Lc/wCgJfuOUJdX7Z+q1xxp23LVHy13f/8ALxO4u1l1J1GmqjBuWNPifKbfjMfcCwXUdU0/T7NV7OzLGPbpjmarlcQ0r1P7Tewtp27tjT8n4XzqeYi3ZmO7E/LPKBm7uoe8t11zVrmv5uXTP9Sq7Pd+Z5UG3+r3aA3vv+7dx6sqrTtNmeKcexXMcx8sxxy1DVVNVU1VTMzM8zM+twAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//9k=" style="width:22px;height:22px;object-fit:contain" />
         <div><div style="font-weight:800;font-size:13px">TÍO IPHONERO</div><div style="font-size:9px;color:#777">${LOCAL.tel} · ${LOCAL.ig}</div></div>
       </div>
       <div style="font-weight:700;font-size:14px">${d?.modelo||''}</div>
-      <div style="font-size:11px;color:#555;margin-top:3px;display:flex;gap:10px">${d?.storage||''} ${d?.bateria?'· 🔋'+d.bateria+'%':''} · ${d?.grade||''} · ${d?.origin||''}</div>
+      <div style="font-size:11px;color:#555;margin-top:3px;display:flex;gap:10px">${d?.storage||''} ${d?.bateria?'· '+d.bateria+'%':''} · ${d?.grade||''} · ${d?.origin||''}</div>
       <div id="barcode-container" style="margin-top:8px"></div>
       ${d?.imei?`<div style="font-family:monospace;font-size:9px;text-align:center;letter-spacing:2px;margin-top:3px">${d.imei}</div>`:''}
     </div>
@@ -1488,7 +1488,7 @@ function openRemitoPrint(equipoId){
     <hr style="border-color:#e5e7eb;margin:12px 0"/>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:#888"><span>${LOCAL.nombre} · ${LOCAL.dir}</span><span>${now}</span></div>
   </div>`;
-  const html=`<div class="modal-title">📄 Remito para proveedor</div>
+  const html=`<div class="modal-title">Remito para proveedor</div>
     <div style="border:1.5px solid var(--border);border-radius:9px;overflow:hidden;max-height:360px;overflow-y:auto;margin-bottom:16px;font-size:11px">${content}</div>
     <div style="display:flex;gap:10px"><button onclick="printHTML(\`${content.replace(/`/g,"'")}\`)" class="btn-primary" style="flex:1">Imprimir / PDF</button><button class="btn-sec" onclick="closeModal()">Cerrar</button></div>`;
   openModal(html);
@@ -1513,9 +1513,9 @@ function printWarrantyCert(d,sale){
   const content=`<div style="font-family:'Plus Jakarta Sans',sans-serif;color:#111;padding:14mm 16mm;max-width:210mm;margin:0 auto">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #6366f1">
       <div style="display:flex;align-items:center;gap:12px"><div><div style="font-weight:800;font-size:20px;color:#6366f1">TÍO IPHONERO</div><div style="font-size:11px;color:#555">${LOCAL.dir} · ${LOCAL.ciudad}</div><div style="font-size:11px;color:#555">${LOCAL.tel} · ${LOCAL.email} · ${LOCAL.ig}</div></div></div>
-      <div style="text-align:right"><div style="font-weight:800;font-size:16px">🛡️ CERTIFICADO DE GARANTÍA</div><div style="font-size:12px;color:#666;margin-top:3px">Emitido: ${fechaCompra}</div></div>
+      <div style="text-align:right"><div style="font-weight:800;font-size:16px">️ CERTIFICADO DE GARANTÍA</div><div style="font-size:12px;color:#666;margin-top:3px">Emitido: ${fechaCompra}</div></div>
     </div>
-    <div style="margin-bottom:16px"><div style="font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;color:#555">📋 Datos del cliente y equipo</div>
+    <div style="margin-bottom:16px"><div style="font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;color:#555">Datos del cliente y equipo</div>
     <table style="width:100%;border-collapse:collapse;font-size:13px">
       <tr style="border-bottom:1px solid #e5e7eb"><td style="padding:7px 10px;font-weight:600;width:42%;background:#f9fafb">Nombre y Apellido</td><td style="padding:7px 10px">${(sale.clienteNombre||'—').toUpperCase()}</td></tr>
       <tr style="border-bottom:1px solid #e5e7eb"><td style="padding:7px 10px;font-weight:600;background:#f9fafb">Cédula de Identidad</td><td style="padding:7px 10px">${sale.clienteCi||'—'}</td></tr>
@@ -1529,8 +1529,8 @@ function printWarrantyCert(d,sale){
     <div style="margin-bottom:10px"><div style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">✅ 1. Cobertura</div><div style="font-size:12px;line-height:1.7;color:#333">La garantía cubre fallas internas y defectos de fábrica no atribuibles al mal uso:<br/>• Placa base, cámara, batería y pantalla (sin daño físico externo).<br/>• Defectos de software o errores originados en el reacondicionamiento.<br/>• Componentes internos defectuosos no causados por el usuario.<br/>Si el equipo no puede repararse, Tío Iphonero podrá sustituirlo por otro de características y valor similares.</div></div>
     <div style="margin-bottom:10px"><div style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">❌ 2. Exclusiones</div><div style="font-size:12px;line-height:1.7;color:#333">• Golpes, caídas, fisuras, roturas o daños por líquidos.<br/>• Apertura o intervención de terceros no autorizados.<br/>• Remoción o daño del sello de seguridad de Tío Iphonero.<br/>• Alteraciones del sistema operativo (jailbreak, software no oficial).<br/>• Desgaste normal por uso · Pérdida, robo o siniestro.</div></div>
     <div style="margin-bottom:10px"><div style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">⚠️ 3. Condiciones</div><div style="font-size:12px;line-height:1.7;color:#333">• Presentar este certificado original · El sello de seguridad debe estar intacto.<br/>• La garantía es intransferible · Reparación máximo 15 días hábiles.</div></div>
-    <div style="margin-bottom:10px"><div style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🔄 4. Cambios y devoluciones</div><div style="font-size:12px;line-height:1.7;color:#333">No se admiten cambios ni devoluciones por preferencia. No se realizan reembolsos en efectivo; el monto se considera crédito a favor.</div></div>
-    <div style="margin-bottom:16px"><div style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🔐 5. Desvinculación de cuentas (iCloud)</div><div style="font-size:12px;line-height:1.7;color:#333">Para cualquier reemplazo, el cliente debe entregar el equipo con iCloud / Buscar mi iPhone desactivado. Tío Iphonero no se responsabiliza por pérdida de datos.</div></div>
+    <div style="margin-bottom:10px"><div style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">4. Cambios y devoluciones</div><div style="font-size:12px;line-height:1.7;color:#333">No se admiten cambios ni devoluciones por preferencia. No se realizan reembolsos en efectivo; el monto se considera crédito a favor.</div></div>
+    <div style="margin-bottom:16px"><div style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">5. Desvinculación de cuentas (iCloud)</div><div style="font-size:12px;line-height:1.7;color:#333">Para cualquier reemplazo, el cliente debe entregar el equipo con iCloud / Buscar mi iPhone desactivado. Tío Iphonero no se responsabiliza por pérdida de datos.</div></div>
     <div style="border-top:1.5px solid #111;padding-top:14px"><table style="width:100%;font-size:12px"><tr><td style="width:50%;padding:8px 12px;vertical-align:bottom"><div style="border-top:1px solid #555;padding-top:8px;margin-top:40px;color:#555;font-size:11px">Por Tío Iphonero – Vendedor/a</div></td><td style="width:50%;padding:8px 12px;vertical-align:bottom"><div style="border-top:1px solid #555;padding-top:8px;margin-top:40px;color:#555;font-size:11px">Firma y Conformidad del Cliente</div></td></tr></table></div>
     <div style="text-align:center;font-size:10.5px;color:#888;border-top:1px solid #e5e7eb;padding-top:10px;margin-top:12px">${LOCAL.nombre} · ${LOCAL.dir} · ${LOCAL.ciudad} · ${LOCAL.tel} · ${LOCAL.email} · ${LOCAL.ig}</div>
   </div>`;
@@ -1576,7 +1576,7 @@ function toast(msg,t='ok'){
 function openCompraForm(id) {
   const c = id ? (DB.compras||[]).find(x=>x.id===id) : null;
   const supOpts = DB.suppliers.map(s=>`<option value="${s.id}" ${c?.proveedorId===s.id?'selected':''}>${s.nombre}${s.empresa?' ('+s.empresa+')':''}</option>`).join('');
-  const html = `<div class="modal-title" style="font-size:20px">🛒 ${c?'Editar':'Nueva'} Compra</div>
+  const html = `<div class="modal-title" style="font-size:20px">${c?'Editar':'Nueva'} Compra</div>
     <div class="fsec-body" style="gap:10px;margin-bottom:12px">
       <div class="row2">
         <div class="fld"><label>Proveedor *</label><select id="cp-prov" onchange="autoCargarGarantiaCp()"><option value="">— Seleccioná —</option>${supOpts}</select></div>
@@ -1589,7 +1589,7 @@ function openCompraForm(id) {
       </div>
       <div class="fld"><label>Notas</label><textarea id="cp-notas" rows="2" style="resize:vertical">${c?.notas||''}</textarea></div>
     </div>
-    <div style="font-weight:700;font-size:13px;margin-bottom:10px">📦 Equipos comprados</div>
+    <div style="font-weight:700;font-size:13px;margin-bottom:10px">Equipos comprados</div>
     <div id="cp-items"></div>
     <button onclick="addCompraItem()" class="btn-sec btn-sm" style="margin-bottom:14px;width:100%">＋ Agregar equipo</button>
     <div style="background:var(--bg);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
@@ -1749,7 +1749,7 @@ function renderCompras(){
           </div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${itemsStr}</div>
           <div style="display:flex;gap:14px;font-size:13px">
-            <span>📦 ${c.items.reduce((s,i)=>s+i.cantidad,0)} equipo${c.items.reduce((s,i)=>s+i.cantidad,0)>1?'s':''}</span>
+            <span>${c.items.reduce((s,i)=>s+i.cantidad,0)} equipo${c.items.reduce((s,i)=>s+i.cantidad,0)>1?'s':''}</span>
             <span style="font-family:var(--mono);font-weight:700;color:var(--red)">₲ ${gs(c.total)}</span>
           </div>
         </div>
@@ -1763,8 +1763,8 @@ function renderCompras(){
    DELIVERY & ÓRDENES
 ══════════════════════════════════════════════════════════════════ */
 const DELIVERYS = [
-  {id:'matias',nombre:'Matías',tel:'595976500021',emoji:'🟢'},
-  {id:'rodrigo',nombre:'Rodrigo',tel:'595976500022',emoji:'🔵'},
+  {id:'matias',nombre:'Matías',tel:'595976500021',emoji:''},
+  {id:'rodrigo',nombre:'Rodrigo',tel:'595976500022',emoji:''},
 ];
 let deliveryTab = 'pendientes';
 
@@ -1783,7 +1783,7 @@ function openOrdenForm(saleId){
     const d = DB.devices.find(x=>x.id===s.equipoId);
     return `<option value="${s.id}" ${s.id===saleId?'selected':''}>${d?d.modelo+' '+d.storage:'Equipo'} — ${s.clienteNombre||'?'} — ${fd(s.fecha)}</option>`;
   }).join('');
-  const html = `<div class="modal-title">🚴 Nueva Orden de Entrega</div>
+  const html = `<div class="modal-title">Nueva Orden de Entrega</div>
     <div class="fsec-body" style="gap:10px;margin-bottom:12px">
       <div class="fld"><label>Venta vinculada (opcional)</label><select id="od-sale" onchange="autoFillDelivery(this.value)"><option value="">— Sin venta vinculada —</option>${ventaOpts}</select></div>
       <div class="row2">
@@ -1820,7 +1820,7 @@ function openOrdenForm(saleId){
     </div>
     <div style="display:flex;gap:10px">
       <button type="button" onclick="enviarWADeliveryForm()" style="width:100%;background:#25D366;color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px">
-          📲 Notificar al grupo Delivery
+          Notificar al grupo Delivery
         </button>
         <button onclick="saveOrden()" class="btn-primary" style="flex:1">Crear Orden</button>
       <button class="btn-sec" onclick="closeModal()">Cancelar</button>
@@ -1889,15 +1889,15 @@ function saveOrden(){
 
 function openWhatsAppLink(orden){
   const del=DELIVERYS.find(d=>d.id===orden.deliveryId);
-  const monto=orden.monto>0?`\n💰 A cobrar: ₲ ${gs(orden.monto)} (${orden.formaPago})`:'\n✅ Ya pagado';
+  const monto=orden.monto>0?`\nA cobrar: ₲ ${gs(orden.monto)} (${orden.formaPago})`:'\n✅ Ya pagado';
   const msg=encodeURIComponent(
-    `🚴 *ORDEN DE ENTREGA - TÍO IPHONERO*\n\n`+
-    `📦 *Pedido:* ${orden.descripcion}\n`+
-    `👤 *Cliente:* ${orden.clienteNombre}\n`+
-    `📞 *Teléfono:* ${orden.clienteTel||'No especificado'}\n`+
-    `📍 *Dirección:* ${orden.direccion}\n`+
+    `*ORDEN DE ENTREGA - TÍO IPHONERO*\n\n`+
+    `*Pedido:* ${orden.descripcion}\n`+
+    `*Cliente:* ${orden.clienteNombre}\n`+
+    `*Teléfono:* ${orden.clienteTel||'No especificado'}\n`+
+    `*Dirección:* ${orden.direccion}\n`+
     `${monto}\n`+
-    `${orden.notas?'\n📝 Notas: '+orden.notas:''}\n\n`+
+    `${orden.notas?'\nNotas: '+orden.notas:''}\n\n`+
     `ID orden: #${orden.id.slice(0,6).toUpperCase()}`
   );
   const waUrl=`https://wa.me/${del.tel}?text=${msg}`;
@@ -1905,10 +1905,10 @@ function openWhatsAppLink(orden){
     <div style="background:var(--greenbg);border:1.5px solid var(--greenb);border-radius:10px;padding:16px;margin-bottom:16px">
       <div style="font-weight:700;margin-bottom:4px">${orden.clienteNombre} — ${orden.descripcion}</div>
       <div style="font-size:12px;color:var(--muted)">${orden.direccion}</div>
-      <div style="font-size:12px;margin-top:6px;font-weight:600">${orden.pagoEstado==='prepagado'?'✅ Ya pagado':'💰 Cobrar ₲'+gs(orden.monto)+' en puerta'}</div>
+      <div style="font-size:12px;margin-top:6px;font-weight:600">${orden.pagoEstado==='prepagado'?'✅ Ya pagado':'Cobrar ₲'+gs(orden.monto)+' en puerta'}</div>
     </div>
     <p style="font-size:13px;margin-bottom:14px">Enviá la orden a <strong>${del.emoji} ${del.nombre}</strong> por WhatsApp:</p>
-    <a href="${waUrl}" target="_blank" style="display:block;background:#25D366;color:#fff;text-align:center;padding:14px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;margin-bottom:14px">📱 Abrir WhatsApp — ${del.nombre}</a>
+    <a href="${waUrl}" target="_blank" style="display:block;background:#25D366;color:#fff;text-align:center;padding:14px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;margin-bottom:14px">Abrir WhatsApp — ${del.nombre}</a>
     <button class="btn-sec" onclick="closeModal()" style="width:100%">Cerrar</button>`;
   openModal(html);
 }
@@ -1927,10 +1927,10 @@ function renderDelivery(){
     const statusColors={pendiente:{bg:'var(--amberbg)',border:'var(--amberb)',txt:'var(--amber)',label:'Pendiente'},en_camino:{bg:'var(--bluebg)',border:'var(--blueb)',txt:'var(--blue)',label:'En camino'},entregado:{bg:'var(--greenbg)',border:'var(--greenb)',txt:'var(--green)',label:'Entregado'},cobrado:{bg:'var(--greenbg)',border:'var(--greenb)',txt:'var(--green)',label:'Cobrado ✓'}};
     const sc=statusColors[o.estado]||statusColors.pendiente;
     let actions='';
-    if(o.estado==='pendiente') actions+=`<button class="btn-sm btn-blue" onclick="cambiarEstadoOrden('${o.id}','en_camino')">🛵 Salió</button>`;
+    if(o.estado==='pendiente') actions+=`<button class="btn-sm btn-blue" onclick="cambiarEstadoOrden('${o.id}','en_camino')">Salió</button>`;
     if(o.estado==='en_camino') actions+=`<button class="btn-sm btn-ok" onclick="marcarEntregado('${o.id}')">✓ Entregado</button>`;
-    if(o.estado==='entregado'&&o.pagoEstado!=='prepagado') actions+=`<button class="btn-sm" style="background:var(--purplebg);color:var(--purple);border:1.5px solid var(--purpleb)" onclick="marcarCobrado('${o.id}')">💰 Cobrado</button>`;
-    actions+=`<button class="btn-icon btn-sm" onclick="reenviarWhatsApp('${o.id}')">📱</button>`;
+    if(o.estado==='entregado'&&o.pagoEstado!=='prepagado') actions+=`<button class="btn-sm" style="background:var(--purplebg);color:var(--purple);border:1.5px solid var(--purpleb)" onclick="marcarCobrado('${o.id}')">Cobrado</button>`;
+    actions+=`<button class="btn-icon btn-sm" onclick="reenviarWhatsApp('${o.id}')"></button>`;
     if(['pendiente'].includes(o.estado)) actions+=`<button class="btn-sm btn-red" onclick="cancelarOrden('${o.id}')">✕</button>`;
     return `<div class="scard" style="border-left:4px solid ${sc.txt};margin-bottom:10px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -1942,10 +1942,10 @@ function renderDelivery(){
             <span style="font-size:11px;color:var(--muted)">#${o.id.slice(0,6).toUpperCase()}</span>
           </div>
           <div style="font-size:13px;font-weight:600;margin-bottom:3px">${o.descripcion}</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">📍 ${o.direccion}</div>
-          ${o.clienteTel?`<div style="font-size:12px;color:var(--muted)">📞 ${o.clienteTel}</div>`:''}
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${o.direccion}</div>
+          ${o.clienteTel?`<div style="font-size:12px;color:var(--muted)">${o.clienteTel}</div>`:''}
           <div style="margin-top:6px;display:flex;gap:12px;font-size:12px">
-            ${o.pagoEstado==='prepagado'?`<span style="color:var(--green);font-weight:600">✅ Pre-pagado (${o.formaPago})</span>`:`<span style="color:${o.estado==='cobrado'?'var(--green)':'var(--amber)'};font-weight:700">💰 ₲${gs(o.monto)} — ${o.formaPago}</span>`}
+            ${o.pagoEstado==='prepagado'?`<span style="color:var(--green);font-weight:600">✅ Pre-pagado (${o.formaPago})</span>`:`<span style="color:${o.estado==='cobrado'?'var(--green)':'var(--amber)'};font-weight:700">₲${gs(o.monto)} — ${o.formaPago}</span>`}
           </div>
           ${o.notas?`<div style="font-size:11px;color:var(--muted);margin-top:4px;background:var(--bg);border-radius:6px;padding:4px 9px">${o.notas}</div>`:''}
         </div>
@@ -1975,11 +1975,11 @@ function renderCuentasDelivery(){
         <div style="background:var(--greenbg);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--green);font-weight:700;margin-bottom:3px">COBRADAS</div><div style="font-size:20px;font-weight:800;color:var(--green)">${totalCobrado}</div></div>
       </div>
       <div style="background:${totalPend>0?'var(--redbg)':'var(--greenbg)'};border:1.5px solid ${totalPend>0?'var(--redb)':'var(--greenb)'};border-radius:9px;padding:12px 14px;margin-bottom:10px;text-align:center">
-        <div style="font-size:11px;font-weight:700;color:${deudaColor};text-transform:uppercase;margin-bottom:3px">${totalPend>0?'💰 Debe rendir':'✅ Sin deuda'}</div>
+        <div style="font-size:11px;font-weight:700;color:${deudaColor};text-transform:uppercase;margin-bottom:3px">${totalPend>0?'Debe rendir':'✅ Sin deuda'}</div>
         <div style="font-size:22px;font-weight:800;font-family:var(--mono);color:${deudaColor}">₲ ${gs(totalPend)}</div>
         ${pendCobranza.length>0?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${pendCobranza.length} orden${pendCobranza.length>1?'es':''} sin rendir</div>`:''}
       </div>
-      ${pendCobranza.length?`<button onclick="abrirRendicion('${del.id}')" class="btn-primary" style="width:100%;background:var(--green)">💵 Registrar rendición</button>`:''}
+      ${pendCobranza.length?`<button onclick="abrirRendicion('${del.id}')" class="btn-primary" style="width:100%;background:var(--green)">Registrar rendición</button>`:''}
       <div style="margin-top:10px">
         ${pendCobranza.slice(0,3).map(o=>`<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>${o.clienteNombre} — ${o.descripcion.slice(0,20)}</span><span style="font-family:var(--mono);font-weight:700;color:var(--amber)">₲${gs(o.monto)}</span></div>`).join('')}
         ${pendCobranza.length>3?`<div style="font-size:11px;color:var(--muted);padding-top:5px">+${pendCobranza.length-3} más...</div>`:''}
@@ -1994,7 +1994,7 @@ function abrirRendicion(deliveryId){
   const del=DELIVERYS.find(d=>d.id===deliveryId);
   const pendCobranza=DB.ordenes.filter(o=>o.deliveryId===deliveryId&&o.estado==='entregado'&&o.pagoEstado!=='prepagado');
   const total=pendCobranza.reduce((s,o)=>s+(+o.monto||0),0);
-  const html=`<div class="modal-title">💵 Rendición — ${del.nombre}</div>
+  const html=`<div class="modal-title">Rendición — ${del.nombre}</div>
     <div style="margin-bottom:14px">${pendCobranza.map(o=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span>${o.clienteNombre} — ${o.descripcion.slice(0,25)}</span><span style="font-family:var(--mono);font-weight:700">₲${gs(o.monto)}</span></div>`).join('')}</div>
     <div style="background:var(--greenbg);border:1.5px solid var(--greenb);border-radius:10px;padding:14px;text-align:center;margin-bottom:14px">
       <div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:4px">TOTAL A RECIBIR</div>
@@ -2197,7 +2197,7 @@ function buscarCliente(q) {
     'onmousedown="fillCliente(' + JSON.stringify({nombre:v.clienteNombre,ci:v.clienteCi||'',tel:v.clienteTel||'',maps:v.mapsLink||''}).replace(/"/g,"'") + ')">' +
     '<strong>' + (v.clienteNombre||'') + '</strong>' +
     (v.clienteCi ? '<span style="color:var(--muted);margin-left:8px">CI: ' + v.clienteCi + '</span>' : '') +
-    (v.clienteTel ? '<span style="color:var(--muted);margin-left:8px">📞 ' + v.clienteTel + '</span>' : '') +
+    (v.clienteTel ? '<span style="color:var(--muted);margin-left:8px">' + v.clienteTel + '</span>' : '') +
     '</div>'
   ).join('');
   box.style.display = 'block';
@@ -2228,21 +2228,21 @@ function enviarWADelivery() {
   const repartidor = rep ? rep.value : '';
   const mention = repartidor.toLowerCase().includes('matias') ? '@Matias' : repartidor.toLowerCase().includes('rodrigo') ? '@Rodrigo' : repartidor;
   
-  const msg = '🛵 *NUEVO DELIVERY*
+  const msg = '*NUEVO DELIVERY*
 ' +
     (mention ? mention + ' para vos!
 
 ' : '
 ') +
-    '👤 Cliente: ' + (nombre ? nombre.value : '') + '
+    'Cliente: ' + (nombre ? nombre.value : '') + '
 ' +
-    '📞 Tel: ' + (tel ? tel.value : '') + '
+    'Tel: ' + (tel ? tel.value : '') + '
 ' +
-    '📍 Direccion: ' + (dir ? dir.value : '') + '
+    'Direccion: ' + (dir ? dir.value : '') + '
 ' +
-    (maps && maps.value ? '🗺 Maps: ' + maps.value + '
+    (maps && maps.value ? 'Maps: ' + maps.value + '
 ' : '') +
-    (notas && notas.value ? '📝 Notas: ' + notas.value + '
+    (notas && notas.value ? 'Notas: ' + notas.value + '
 ' : '') +
     '
 _Enviado desde CRM Tio Iphonero_';
@@ -2303,15 +2303,15 @@ function enviarWADeliveryForm() {
   const mention = repNombre.toLowerCase().includes('matias') ? '@Matias' :
                   repNombre.toLowerCase().includes('rodrigo') ? '@Rodrigo' : repNombre;
 
-  const msg = '🛵 *NUEVO DELIVERY* - Tio Iphonero\n' +
+  const msg = '*NUEVO DELIVERY* - Tio Iphonero\n' +
     (mention ? mention + ' para vos!\n\n' : '\n') +
-    '👤 *Cliente:* ' + (nombre?.value||'') + '\n' +
-    '📞 *Tel:* ' + (tel?.value||'') + '\n' +
-    '📍 *Direccion:* ' + (dir?.value||'') + '\n' +
-    (maps?.value ? '🗺 *Maps:* ' + maps.value + '\n' : '') +
-    (desc?.value ? '📦 *Producto:* ' + desc.value + '\n' : '') +
-    (monto?.value && monto.value != '0' ? '💰 *A cobrar:* G$ ' + parseInt(monto.value).toLocaleString('es-PY') + '\n' : '') +
-    (notas?.value ? '📝 *Notas:* ' + notas.value + '\n' : '') +
+    '*Cliente:* ' + (nombre?.value||'') + '\n' +
+    '*Tel:* ' + (tel?.value||'') + '\n' +
+    '*Direccion:* ' + (dir?.value||'') + '\n' +
+    (maps?.value ? '*Maps:* ' + maps.value + '\n' : '') +
+    (desc?.value ? '*Producto:* ' + desc.value + '\n' : '') +
+    (monto?.value && monto.value != '0' ? '*A cobrar:* G$ ' + parseInt(monto.value).toLocaleString('es-PY') + '\n' : '') +
+    (notas?.value ? '*Notas:* ' + notas.value + '\n' : '') +
     '\n_CRM Tio Iphonero_';
 
   if (navigator.clipboard) {

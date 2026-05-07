@@ -2228,24 +2228,14 @@ function enviarWADelivery() {
   const repartidor = rep ? rep.value : '';
   const mention = repartidor.toLowerCase().includes('matias') ? '@Matias' : repartidor.toLowerCase().includes('rodrigo') ? '@Rodrigo' : repartidor;
   
-  const msg = '*NUEVO DELIVERY*
-' +
-    (mention ? mention + ' para vos!
-
-' : '
-') +
-    'Cliente: ' + (nombre ? nombre.value : '') + '
-' +
-    'Tel: ' + (tel ? tel.value : '') + '
-' +
-    'Direccion: ' + (dir ? dir.value : '') + '
-' +
-    (maps && maps.value ? 'Maps: ' + maps.value + '
-' : '') +
-    (notas && notas.value ? 'Notas: ' + notas.value + '
-' : '') +
-    '
-_Enviado desde CRM Tio Iphonero_';
+ const msg = 'NUEVO DELIVERY\n' +
+      (mention ? mention + ' para vos!\n' : '') +
+      'Cliente: ' + (nombre ? nombre.value : '') + '\n' +
+      'Tel: ' + (tel ? tel.value : '') + '\n' +
+      'Direccion: ' + (dir ? dir.value : '') + '\n' +
+      (maps && maps.value ? 'Maps: ' + maps.value + '\n' : '') +
+      (notas && notas.value ? 'Notas: ' + notas.value + '\n' : '') +
+      'Enviado desde CRM Tio Iphonero';
 
   const groupLink = 'https://chat.whatsapp.com/GCMhxmUBvllCKNWQzpT0FV';
   // Abrir WhatsApp Web con el mensaje - el usuario lo pega en el grupo

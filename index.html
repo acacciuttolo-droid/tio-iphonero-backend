@@ -1785,10 +1785,14 @@ function openOrdenForm(saleId){
   }).join('');
   const html = `<div class="modal-title">🚴 Nueva Orden de Entrega</div>
     <div class="fsec-body" style="gap:10px;margin-bottom:12px">
-      <div class="fld"><label>Venta vinculada (opcional)</label><select id="od-sale"><option value="">— Sin venta vinculada —</option>${ventaOpts}</select></div>
+      <div class="fld"><label>Venta vinculada (opcional)</label><select id="od-sale" onchange="autoFillDelivery(this.value)"><option value="">— Sin venta vinculada —</option>${ventaOpts}</select></div>
       <div class="row2">
         <div class="fld"><label>Nombre del cliente *</label><input id="od-nombre" placeholder="Nombre completo"/></div>
         <div class="fld"><label>Teléfono *</label><input id="od-tel" placeholder="+595 9xx xxxxxx"/></div>
+        <div class="fld">
+          <label>Link Google Maps <span style="color:var(--muted);font-weight:400;font-size:10px">(opcional)</span></label>
+          <input id="od-maps" placeholder="https://maps.app.goo.gl/..."/>
+        </div>
       </div>
       <div class="fld"><label>Dirección de entrega *</label><input id="od-dir" placeholder="Calle, número, barrio, ciudad"/></div>
       <div class="fld"><label>Descripción del pedido *</label><input id="od-desc" placeholder="ej: iPhone 14 128GB Negro + cargador"/></div>
@@ -1815,7 +1819,10 @@ function openOrdenForm(saleId){
       <div class="fld"><label>Notas para el delivery</label><textarea id="od-notas" rows="2" style="resize:vertical" placeholder="Referencias, horarios, indicaciones especiales..."></textarea></div>
     </div>
     <div style="display:flex;gap:10px">
-      <button onclick="saveOrden()" class="btn-primary" style="flex:1">Crear Orden</button>
+      <button type="button" onclick="enviarWADeliveryForm()" style="width:100%;background:#25D366;color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px">
+          📲 Notificar al grupo Delivery
+        </button>
+        <button onclick="saveOrden()" class="btn-primary" style="flex:1">Crear Orden</button>
       <button class="btn-sec" onclick="closeModal()">Cancelar</button>
     </div>`;
   openModal(html);
@@ -2259,6 +2266,69 @@ _Enviado desde CRM Tio Iphonero_';
     document.body.removeChild(ta);
     alert('Mensaje copiado!\n\nAhora abre el grupo Delivery Tio Iphonero en WhatsApp y pegalo (Ctrl+V)');
     window.open(waUrl, '_blank');
+  }
+}
+
+// == Autocompletar delivery desde venta vinculada ==
+function autoFillDelivery(ventaId) {
+  if (!ventaId) return;
+  const venta = (DB.sales||[]).find(v => v.id === ventaId);
+  if (!venta) return;
+  const nombre = document.getElementById('od-nombre');
+  const tel = document.getElementById('od-tel');
+  const dir = document.getElementById('od-dir');
+  const maps = document.getElementById('od-maps');
+  const desc = document.getElementById('od-desc');
+  const monto = document.getElementById('od-monto');
+  if (nombre) nombre.value = venta.clienteNombre || '';
+  if (tel) tel.value = venta.clienteTel || '';
+  if (dir) dir.value = venta.direccion || '';
+  if (maps) maps.value = venta.mapsLink || '';
+  if (desc) desc.value = (DB.devices||[]).find(d=>d.id===venta.equipoId)?.modelo || '';
+  if (monto) monto.value = venta.montoGs || 0;
+}
+
+// == WhatsApp delivery desde formulario ==
+function enviarWADeliveryForm() {
+  const rep = document.querySelector('.delivery-btn.sel, .od-rep-btn.sel');
+  const nombre = document.getElementById('od-nombre');
+  const tel = document.getElementById('od-tel');
+  const dir = document.getElementById('od-dir');
+  const maps = document.getElementById('od-maps');
+  const notas = document.getElementById('od-notas');
+  const monto = document.getElementById('od-monto');
+  const desc = document.getElementById('od-desc');
+
+  const repNombre = rep ? rep.textContent.trim() : '';
+  const mention = repNombre.toLowerCase().includes('matias') ? '@Matias' :
+                  repNombre.toLowerCase().includes('rodrigo') ? '@Rodrigo' : repNombre;
+
+  const msg = '🛵 *NUEVO DELIVERY* - Tio Iphonero\n' +
+    (mention ? mention + ' para vos!\n\n' : '\n') +
+    '👤 *Cliente:* ' + (nombre?.value||'') + '\n' +
+    '📞 *Tel:* ' + (tel?.value||'') + '\n' +
+    '📍 *Direccion:* ' + (dir?.value||'') + '\n' +
+    (maps?.value ? '🗺 *Maps:* ' + maps.value + '\n' : '') +
+    (desc?.value ? '📦 *Producto:* ' + desc.value + '\n' : '') +
+    (monto?.value && monto.value != '0' ? '💰 *A cobrar:* G$ ' + parseInt(monto.value).toLocaleString('es-PY') + '\n' : '') +
+    (notas?.value ? '📝 *Notas:* ' + notas.value + '\n' : '') +
+    '\n_CRM Tio Iphonero_';
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(msg).then(() => {
+      if(confirm('Mensaje copiado!\n\nAbre el grupo Delivery Tio Iphonero en WhatsApp y pega el mensaje.\n\n¿Abrir WhatsApp Web?')) {
+        window.open('https://web.whatsapp.com/', '_blank');
+      }
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = msg;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Mensaje copiado! Pega en el grupo Delivery Tio Iphonero en WhatsApp.');
+    window.open('https://web.whatsapp.com/', '_blank');
   }
 }
 </script>

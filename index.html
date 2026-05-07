@@ -2238,27 +2238,10 @@ function enviarWADelivery() {
       'Enviado desde CRM Tio Iphonero';
 
   const groupLink = 'https://chat.whatsapp.com/GCMhxmUBvllCKNWQzpT0FV';
-  // Abrir WhatsApp Web con el mensaje - el usuario lo pega en el grupo
-  const waUrl = 'https://web.whatsapp.com/';
-  
-  // Copiar mensaje al portapapeles
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(msg).then(() => {
-      alert('Mensaje copiado al portapapeles!\n\nAhora abre el grupo Delivery Tio Iphonero en WhatsApp y pegalo (Ctrl+V)');
-      window.open(waUrl, '_blank');
-    });
-  } else {
-    const ta = document.createElement('textarea');
-    ta.value = msg;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    alert('Mensaje copiado!\n\nAhora abre el grupo Delivery Tio Iphonero en WhatsApp y pegalo (Ctrl+V)');
+    const msgEncoded = encodeURIComponent(msg);
+    const waUrl = 'https://wa.me/?text=' + msgEncoded;
     window.open(waUrl, '_blank');
   }
-}
-
 // == Autocompletar delivery desde venta vinculada ==
 function autoFillDelivery(ventaId) {
   if (!ventaId) return;

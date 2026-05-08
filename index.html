@@ -2015,7 +2015,7 @@ function abrirRendicion(deliveryId){
 
 function confirmarRendicion(deliveryId){
   const recibe=document.getElementById('rend-recibe')?.value.trim()||'Admin';
-  const ahora=new Date().toISOString();
+
   DB.ordenes=DB.ordenes.map(o=>{
     if(o.deliveryId===deliveryId&&o.estado==='entregado'&&o.pagoEstado!=='prepagado'){
       return{...o,estado:'cobrado',cobradoEn:ahora,rendidoEn:ahora,recibidoPor:recibe};
@@ -2115,7 +2115,7 @@ async function archivarEquipo(id, ev) {
   if (ev) ev.stopPropagation();
   if (!confirm('Archivar este equipo? No aparecera en el inventario activo.')) return;
   try {
-    await apiFetch('/api/equipos/' + id, 'PUT', { status: 'archivado' });
+  
     renderStock(); renderArchivados();
     if(typeof loadStock==='function')loadStock(); else if(typeof renderStock==='function')renderStock();
   } catch(err) {  }

@@ -4,7 +4,11 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-  origin: ['https://dapper-piroshki-a750a9.netlify.app', 'http://localhost', /\.netlify\.app$/],
+  origin: [
+    'https://acacciuttolo-droid.github.io',
+    'http://localhost',
+    /\.netlify\.app$/
+  ],
   credentials: true,
 }));
 app.use(express.json());

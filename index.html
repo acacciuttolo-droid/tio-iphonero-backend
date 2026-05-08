@@ -2116,9 +2116,9 @@ async function archivarEquipo(id, ev) {
   if (!confirm('Archivar este equipo? No aparecera en el inventario activo.')) return;
   try {
     await apiFetch('/api/equipos/' + id, 'PUT', { status: 'archivado' });
-    showToast('Equipo archivado', 'ok');
+    renderStock(); renderArchivados();
     if(typeof loadStock==='function')loadStock(); else if(typeof renderStock==='function')renderStock();
-  } catch(err) { showToast('Error: ' + err.message, 'err'); }
+  } catch(err) {  }
 }
 
 // == Color dot ==

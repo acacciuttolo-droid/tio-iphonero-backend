@@ -2795,7 +2795,11 @@ function rrhhRender(){
 function rrhhRenderFuncionarios(){
   const el = document.getElementById('rrhh-list');
   if(!el) return;
-  const list = DB.empleados || [];
+  const list = [...(DB.empleados || [])].sort((a,b)=>{
+    const aa = a.activo !== false ? 0 : 1;
+    const bb = b.activo !== false ? 0 : 1;
+    return aa - bb;
+  });
   if(!list.length){
     el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:60px">Sin funcionarios cargados.<br>Agregá el primero con el botón de arriba.</div>';
     return;
@@ -2803,9 +2807,12 @@ function rrhhRenderFuncionarios(){
   el.innerHTML = list.map(e => {
     const iniciales = (e.nombre||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const activo = e.activo !== false;
-    return `<div class="scard">
+    const avatarHtml = e.foto
+      ? `<img src="${e.foto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border)">`
+      : `<div style="width:44px;height:44px;border-radius:50%;background:${activo?'var(--purple)':'var(--muted)'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0">${iniciales}</div>`;
+    return `<div class="scard"${activo?'':' style="opacity:.6"'}>
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <div style="width:44px;height:44px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0">${iniciales}</div>
+        ${avatarHtml}
         <div style="flex:1;min-width:160px">
           <div style="font-weight:800;font-size:15px">${e.nombre}</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px">${e.cargo||'Sin cargo'} ${e.tel?'· '+e.tel:''}</div>
@@ -2814,7 +2821,7 @@ function rrhhRenderFuncionarios(){
         <div style="text-align:right;min-width:120px">
           <div style="font-family:var(--mono);font-weight:700;font-size:14px">₲${gs(e.salario||0)}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px">salario base</div>
-          <span class="chip ${activo?'chip-ok':'chip-err'}" style="margin-top:4px;display:inline-block">${activo?'Activo':'Inactivo'}</span>
+          <span style="display:inline-block;margin-top:4px;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:700;background:${activo?'var(--greenbg)':'var(--redbg)'};color:${activo?'var(--green)':'var(--red)'};border:1px solid ${activo?'rgba(5,150,105,.3)':'rgba(220,38,38,.3)'}">${activo?'● Activo':'● Inactivo'}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn-sm btn-blue" onclick="rrhhLiquidar('${e.id}')">📋 Liquidar</button>
@@ -2839,7 +2846,7 @@ function rrhhRenderLiquidaciones(){
     const iniciales = (emp?.nombre||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     return `<div class="scard" style="cursor:pointer" onclick="rrhhVerRecibo('${liq.id}')">
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <div style="width:40px;height:40px;border-radius:50%;background:var(--bluebg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--blue);flex-shrink:0;border:1.5px solid var(--blueb)">${iniciales}</div>
+        ${emp?.foto ? `<img src="${emp.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid var(--border)">` : `<div style="width:40px;height:40px;border-radius:50%;background:var(--bluebg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--blue);flex-shrink:0;border:1.5px solid var(--blueb)">${iniciales}</div>`}
         <div style="flex:1">
           <div style="font-weight:700;font-size:14px">${emp?.nombre||'Empleado'}</div>
           <div style="font-size:12px;color:var(--muted)">${liq.periodo||''} · ${emp?.cargo||''}</div>
@@ -2878,6 +2885,7 @@ function rrhhNuevoFuncionario(){
       <div class="fld"><label>Estado</label>
         <select id="rrhh-activo"><option value="1">Activo</option><option value="0">Inactivo</option></select>
       </div>
+      <div class="fld"><label>Foto de perfil</label><input type="file" id="rrhh-foto" accept="image/*" onchange="rrhhPreviewFoto(this)" style="font-size:13px"/><div id="rrhh-foto-preview" style="margin-top:6px"></div></div>
       <div class="fld"><label>Notas</label><textarea id="rrhh-notas" rows="2" style="resize:vertical" placeholder="Observaciones internas..."></textarea></div>
     </div>
     <div style="display:flex;gap:10px">
@@ -2905,7 +2913,9 @@ function rrhhGuardarFuncionario(){
     direccion: document.getElementById('rrhh-direccion')?.value.trim()||'',
     activo: document.getElementById('rrhh-activo')?.value === '1',
     notas: document.getElementById('rrhh-notas')?.value.trim()||'',
+    foto: window._rrhhFotoBase64 || (rrhhEditId ? (DB.empleados||[]).find(e=>e.id===rrhhEditId)?.foto||'' : ''),
   };
+  window._rrhhFotoBase64 = null;
   if(!DB.empleados) DB.empleados=[];
   if(rrhhEditId){ DB.empleados = DB.empleados.map(e=>e.id===rrhhEditId?emp:e); toast('Funcionario actualizado ✓'); }
   else { DB.empleados.push(emp); toast('Funcionario agregado ✓'); }
@@ -2938,6 +2948,7 @@ function rrhhEditarFuncionario(id){
       <div class="fld"><label>Estado</label>
         <select id="rrhh-activo"><option value="1"${e.activo!==false?' selected':''}>Activo</option><option value="0"${e.activo===false?' selected':''}>Inactivo</option></select>
       </div>
+      <div class="fld"><label>Foto de perfil</label><input type="file" id="rrhh-foto" accept="image/*" onchange="rrhhPreviewFoto(this)" style="font-size:13px"/><div id="rrhh-foto-preview" style="margin-top:6px">${e.foto?`<img src="${e.foto}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">`:'Foto actual: ninguna'}</div></div>
       <div class="fld"><label>Notas</label><textarea id="rrhh-notas" rows="2" style="resize:vertical">${e.notas||''}</textarea></div>
     </div>
     <div style="display:flex;gap:10px">
@@ -2945,6 +2956,17 @@ function rrhhEditarFuncionario(id){
       <button class="btn-sec" onclick="closeModal()">Cancelar</button>
     </div>`;
   openModal(html);
+}
+
+function rrhhPreviewFoto(input){
+  if(!input.files||!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    window._rrhhFotoBase64 = e.target.result;
+    const prev = document.getElementById('rrhh-foto-preview');
+    if(prev) prev.innerHTML = `<img src="${e.target.result}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--border);margin-top:4px">`;
+  };
+  reader.readAsDataURL(input.files[0]);
 }
 
 function rrhhLiquidar(empleadoId){
@@ -2972,7 +2994,7 @@ function rrhhLiquidar(empleadoId){
       </div>
       <div class="row2">
         <div class="fld"><label>Adelantos / Descuentos (₲)</label><input type="text" inputmode="numeric" id="liq-descuentos" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
-        <div class="fld"><label>IPS empleado (%) </label><input type="number" id="liq-ips" value="9" min="0" max="100" step="0.1" oninput="rrhhCalcLiq()"/></div>
+        <div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="liq-ips-check" checked onchange="rrhhCalcLiq()" style="width:16px;height:16px;cursor:pointer"> Descontar IPS</label><input type="number" id="liq-ips" value="9" min="0" max="100" step="0.1" oninput="rrhhCalcLiq()" style="margin-top:6px"/></div>
       </div>
       <div class="fld"><label>Notas / Observaciones</label><textarea id="liq-notas" rows="2" style="resize:vertical"></textarea></div>
     </div>
@@ -3000,10 +3022,11 @@ function rrhhCalcLiq(){
   const bonos = parseInt((document.getElementById('liq-bonos')?.value||'').replace(/\./g,'')||'0');
   const horas = parseInt((document.getElementById('liq-horas')?.value||'').replace(/\./g,'')||'0');
   const desc = parseInt((document.getElementById('liq-descuentos')?.value||'').replace(/\./g,'')||'0');
+  const ipsCheck = document.getElementById('liq-ips-check')?.checked !== false;
   const ipsPct = parseFloat(document.getElementById('liq-ips')?.value||'9');
   const salProp = Math.round(sal * dias / 30);
   const bruto = salProp + com + bonos + horas;
-  const ips = Math.round(bruto * ipsPct / 100);
+  const ips = ipsCheck ? Math.round(bruto * ipsPct / 100) : 0;
   const neto = bruto - ips - desc;
   const s = id => { const el=document.getElementById(id); if(el) el.textContent='₲'+gs(arguments[1]); };
   if(document.getElementById('lr-salario')) document.getElementById('lr-salario').textContent='₲'+gs(salProp);
@@ -3024,10 +3047,11 @@ function rrhhGuardarLiquidacion(empleadoId){
   const bonos = parseInt((document.getElementById('liq-bonos')?.value||'').replace(/\./g,'')||'0');
   const horas = parseInt((document.getElementById('liq-horas')?.value||'').replace(/\./g,'')||'0');
   const desc = parseInt((document.getElementById('liq-descuentos')?.value||'').replace(/\./g,'')||'0');
+  const ipsCheck = document.getElementById('liq-ips-check')?.checked !== false;
   const ipsPct = parseFloat(document.getElementById('liq-ips')?.value||'9');
   const salProp = Math.round(sal * dias / 30);
   const bruto = salProp + com + bonos + horas;
-  const ips = Math.round(bruto * ipsPct / 100);
+  const ips = ipsCheck ? Math.round(bruto * ipsPct / 100) : 0;
   const neto = bruto - ips - desc;
   const liq = {
     id: uid(), empleadoId,

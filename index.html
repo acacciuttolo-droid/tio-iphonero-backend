@@ -690,7 +690,7 @@ const gs=n=>new Intl.NumberFormat('es-PY').format(Math.round(n||0));
 const fd=s=>s?new Date(s+'T00:00:00').toLocaleDateString('es-PY'):'—';
 const fdh=s=>{if(!s)return'—';if(s.includes(' ')){const[d,h]=s.split(' ');return fd(d)+' '+h;}return fd(s);};
 const today=()=>{const d=new Date();return new Date(d.toLocaleString('en-US',{timeZone:'America/Asuncion'})).toISOString().slice(0,10);};
-const nowPY=()=>{const d=new Date();const py=new Date(d.toLocaleString('en-US',{timeZone:'America/Asuncion'}));return py.toISOString().slice(0,10)+' '+py.toTimeString().slice(0,5);};
+const nowPY=()=>{const d=new Date();const dateStr=d.toLocaleDateString('en-CA',{timeZone:'America/Asuncion'});const timeStr=d.toLocaleTimeString('es-PY',{timeZone:'America/Asuncion',hour:'2-digit',minute:'2-digit',hour12:false});return dateStr+' '+timeStr;};
 const addDays=(d,n)=>{const dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.toISOString().slice(0,10)};
 const diffDays=(a,b)=>Math.round((new Date(b)-new Date(a))/(1000*60*60*24));
 
@@ -824,7 +824,7 @@ function updateMarginFmt(){
   document.getElementById('margin-preview').style.display='flex';
 }
 
-async function autoFillProvGar(provId){
+function autoFillProvGar(provId){
   if(!provId) return;
   const sup = DB.suppliers.find(s=>s.id===provId);
   if(!sup) return;

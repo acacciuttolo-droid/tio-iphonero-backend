@@ -295,6 +295,8 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <div class="nav-section">Operaciones</div>
     <button class="nav-btn" onclick="nav('compras')"><span class="nav-icon">🛒</span>Compras</button>
     <button class="nav-btn" onclick="nav('delivery')"><span class="nav-icon">🚚</span>Delivery <span class="nav-badge" id="badge-delivery" style="background:var(--teal)">0</span></button>
+    <div class="nav-section">Operaciones</div>
+    <button class="nav-btn" onclick="nav('servtec')"><span class="nav-icon">🔧</span>Servicio Técnico <span class="nav-badge" id="badge-servtec" style="background:var(--purple)">0</span></button>
     <div class="nav-section">Configuración</div>
     <button class="nav-btn" onclick="nav('proveedores')"><span class="nav-icon">🏭</span>Proveedores</button>
     <button class="nav-btn" onclick="nav('search')"><span class="nav-icon">🔍</span>Búsqueda</button>
@@ -563,6 +565,22 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <div><h1 style="font-size:22px;font-weight:800">Archivados</h1><p style="font-size:13px;color:var(--muted)">Equipos fuera del inventario activo</p></div>
   </div>
   <div id="archivados-list"></div>
+<div class="page" id="page-servtec">
+  <div class="ph-row">
+    <div><h1 style="font-size:22px;font-weight:800">Servicio Técnico</h1><p style="font-size:13px;color:var(--muted)">Órdenes de reparación</p></div>
+    <button class="btn-primary" onclick="stNuevaOrden()">🔧 Nueva Orden</button>
+  </div>
+  <div class="tabs" style="margin-bottom:16px">
+    <button class="tab-btn active" onclick="stSetTab('todas',this)">Todas</button>
+    <button class="tab-btn" onclick="stSetTab('por_asignar',this)">Por asignar</button>
+    <button class="tab-btn" onclick="stSetTab('en_proceso',this)">En proceso</button>
+    <button class="tab-btn" onclick="stSetTab('por_entregar',this)">Por entregar</button>
+    <button class="tab-btn" onclick="stSetTab('entregado',this)">Entregado</button>
+    <button class="tab-btn" onclick="stSetTab('sin_solucion',this)">Sin solución</button>
+  </div>
+  <div id="st-list"></div>
+</div>
+
 </div>
 
 </main>
@@ -689,6 +707,7 @@ function nav(id){
   if(id==='caja')renderCaja();
   if(id==='form'&&!editingId)resetForm();
   if(id==='archivados')renderArchivados();
+  if(id==='servtec')stRender();
 }
 
 function updateSidebarCounters(){
@@ -2404,6 +2423,339 @@ function enviarWADeliveryForm() {
     if(ev.target&&ev.target.id==='s-monto'){unfmtGs(ev.target);}
   },true);
 })();
+
+/* ══════════════════════════════════════════════════════════════════
+   SERVICIO TÉCNICO
+══════════════════════════════════════════════════════════════════ */
+if(!DB.reparaciones) DB.reparaciones = [];
+let stTab = 'todas';
+let stEditId = null;
+
+const ST_ESTADOS = {
+  por_asignar: {label:'Por asignar', cls:'chip-amber'},
+  en_proceso:  {label:'En proceso',  cls:'chip-blue'},
+  por_entregar:{label:'Por entregar',cls:'chip-purple'},
+  entregado:   {label:'Entregado',   cls:'chip-ok'},
+  sin_solucion:{label:'Sin solución',cls:'chip-err'},
+};
+
+function stOrdNum(n){ return 'ORD-' + String(n).padStart(7,'0'); }
+
+function stSetTab(tab, btn){
+  stTab = tab;
+  document.querySelectorAll('#page-servtec .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  stRender();
+}
+
+function stRender(){
+  let list = DB.reparaciones || [];
+  if(stTab !== 'todas') list = list.filter(r => r.estado === stTab);
+  list = [...list].sort((a,b) => b.num - a.num);
+  const el = document.getElementById('st-list');
+  if(!el) return;
+  if(!list.length){ el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:60px">Sin órdenes</div>'; return; }
+  el.innerHTML = list.map(r => {
+    const est = ST_ESTADOS[r.estado] || ST_ESTADOS.por_asignar;
+    return `<div class="scard" style="cursor:pointer" onclick="stVerOrden('${r.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${stOrdNum(r.num)}</span>
+            <span class="chip ${est.cls}">${est.label}</span>
+          </div>
+          <div style="font-weight:800;font-size:15px">${r.modelo}</div>
+          <div style="font-size:13px;color:var(--ink2);margin-top:2px"><strong>${r.clienteNombre}</strong>${r.clienteTel?' · '+r.clienteTel:''}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">${r.problema||''} ${r.tecnico?'· Técnico: '+r.tecnico:''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--green)">₲${gs(r.total||0)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">${fd(r.fecha)}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // update badge
+  const pend = (DB.reparaciones||[]).filter(r=>['por_asignar','en_proceso','por_entregar'].includes(r.estado)).length;
+  const b = document.getElementById('badge-servtec');
+  if(b){ b.textContent = pend; b.style.display = pend ? '' : 'none'; }
+}
+
+function stNuevaOrden(){
+  stEditId = null;
+  const nextNum = (DB.reparaciones||[]).reduce((m,r)=>Math.max(m,r.num||0),0)+1;
+  const html = `<div class="modal-title">Nueva Orden de Servicio</div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:12px">
+      <div class="row2">
+        <div class="fld"><label>Cliente *</label><input id="st-cliente" placeholder="Nombre completo"/></div>
+        <div class="fld"><label>Teléfono</label><input id="st-tel" placeholder="+595 9xx xxxxxx"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Modelo *</label><input id="st-modelo" placeholder="iPhone 14, Samsung S23..."/></div>
+        <div class="fld"><label>IMEI / Serie</label><input id="st-imei" placeholder="15 dígitos"/></div>
+      </div>
+      <div class="fld"><label>Passcode / Patrón</label><input id="st-pass" placeholder="Contraseña del equipo"/></div>
+      <div class="fld"><label>Problema *</label><textarea id="st-problema" rows="3" placeholder="Descripción del problema..." style="resize:vertical"></textarea></div>
+      <div class="row2">
+        <div class="fld"><label>Técnico</label><input id="st-tec" placeholder="Nombre del técnico"/></div>
+        <div class="fld"><label>Estado</label><select id="st-estado"><option value="por_asignar">Por asignar</option><option value="en_proceso">En proceso</option><option value="por_entregar">Por entregar</option><option value="entregado">Entregado</option><option value="sin_solucion">Sin solución</option></select></div>
+      </div>
+      <div class="fld"><label>Servicios / Reparaciones</label>
+        <div id="st-servicios-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px"></div>
+        <button class="btn-sec" style="font-size:12px;padding:6px 12px" onclick="stAddServicio()">+ Agregar servicio</button>
+      </div>
+      <div class="fld"><label>Anticipo (₲)</label><input type="text" inputmode="numeric" id="st-anticipo" placeholder="0" oninput="stFmtAnt(this)"/></div>
+      <div class="fld"><label>Notas internas</label><textarea id="st-notas" rows="2" style="resize:vertical"></textarea></div>
+    </div>
+    <div id="st-total-row" style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:13px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:600">Total</span><span id="st-total-display" style="font-family:var(--mono);font-weight:800;color:var(--green)">₲0</span>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="stGuardarOrden(${nextNum})" class="btn-primary" style="flex:1">Guardar Orden</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+  stAddServicio();
+}
+
+function stFmtAnt(el){ let v=el.value.replace(/\D/g,''); if(!v){el.value='';return;} el.value=parseInt(v).toLocaleString('es-PY'); stRecalcTotal(); }
+
+function stAddServicio(){
+  const list = document.getElementById('st-servicios-list');
+  if(!list) return;
+  const idx = list.children.length;
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:6px;align-items:center';
+  div.innerHTML = `<input placeholder="Descripción" style="flex:2;font-size:13px;padding:8px 10px" class="st-srv-desc"/>
+    <input placeholder="Precio ₲" style="flex:1;font-size:13px;padding:8px 10px" inputmode="numeric" class="st-srv-precio" oninput="stFmtPrecio(this)"/>
+    <button onclick="this.parentElement.remove();stRecalcTotal()" style="background:var(--redbg);color:var(--red);border:none;border-radius:7px;padding:6px 10px;font-size:13px;cursor:pointer">✕</button>`;
+  list.appendChild(div);
+}
+
+function stFmtPrecio(el){ let v=el.value.replace(/\D/g,''); if(!v){el.value='';stRecalcTotal();return;} el.value=parseInt(v).toLocaleString('es-PY'); stRecalcTotal(); }
+
+function stRecalcTotal(){
+  const precios = [...document.querySelectorAll('.st-srv-precio')].map(e=>parseInt(e.value.replace(/\./g,'')||'0')).reduce((a,b)=>a+b,0);
+  const ant = parseInt((document.getElementById('st-anticipo')?.value||'').replace(/\./g,'')||'0');
+  const display = document.getElementById('st-total-display');
+  if(display) display.textContent = '₲'+gs(precios);
+}
+
+function stGuardarOrden(num){
+  const cliente = document.getElementById('st-cliente')?.value.trim();
+  const modelo = document.getElementById('st-modelo')?.value.trim();
+  const problema = document.getElementById('st-problema')?.value.trim();
+  if(!cliente) return toast('Ingresá el cliente','err');
+  if(!modelo) return toast('Ingresá el modelo','err');
+  if(!problema) return toast('Ingresá el problema','err');
+  const servicios = [...document.querySelectorAll('#st-servicios-list > div')].map(d=>({
+    desc: d.querySelector('.st-srv-desc')?.value.trim()||'',
+    precio: parseInt((d.querySelector('.st-srv-precio')?.value||'').replace(/\./g,'')||'0')
+  })).filter(s=>s.desc);
+  const total = servicios.reduce((a,s)=>a+s.precio,0);
+  const anticipo = parseInt((document.getElementById('st-anticipo')?.value||'').replace(/\./g,'')||'0');
+  const ord = {
+    id: stEditId||uid(), num,
+    clienteNombre: cliente,
+    clienteTel: document.getElementById('st-tel')?.value.trim()||'',
+    modelo, imei: document.getElementById('st-imei')?.value.trim()||'',
+    passcode: document.getElementById('st-pass')?.value.trim()||'',
+    problema,
+    tecnico: document.getElementById('st-tec')?.value.trim()||'',
+    estado: document.getElementById('st-estado')?.value||'por_asignar',
+    servicios, total, anticipo,
+    notas: document.getElementById('st-notas')?.value.trim()||'',
+    fecha: today(),
+    historial: [{fecha:today(),estado:'Orden creada',nota:''}]
+  };
+  if(!DB.reparaciones) DB.reparaciones=[];
+  if(stEditId){ DB.reparaciones = DB.reparaciones.map(r=>r.id===stEditId?ord:r); }
+  else { DB.reparaciones.unshift(ord); }
+  save(); closeModal(); stRender(); toast('Orden guardada ✓');
+}
+
+function stVerOrden(id){
+  const r = (DB.reparaciones||[]).find(x=>x.id===id);
+  if(!r) return;
+  const est = ST_ESTADOS[r.estado]||ST_ESTADOS.por_asignar;
+  const srvsHtml = (r.servicios||[]).length ? r.servicios.map(s=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span>${s.desc}</span><span style="font-family:var(--mono);font-weight:700">₲${gs(s.precio)}</span></div>`).join('') : '<div style="color:var(--muted);font-size:13px">Sin servicios cargados</div>';
+  const html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div><div class="modal-title" style="margin:0">${stOrdNum(r.num)}</div><span class="chip ${est.cls}" style="margin-top:4px;display:inline-block">${est.label}</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select onchange="stCambiarEstado('${r.id}',this.value)" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border)">
+          ${Object.entries(ST_ESTADOS).map(([v,s])=>`<option value="${v}"${r.estado===v?' selected':''}>${s.label}</option>`).join('')}
+        </select>
+        <button class="btn-sm" style="background:var(--greenbg);color:var(--green);border:1.5px solid var(--greenb)" onclick="stWhatsApp('${r.id}')">📲 WhatsApp</button>
+        <button class="btn-sm btn-blue" onclick="stImprimir('${r.id}')">🖨️ Imprimir</button>
+        <button class="btn-sm btn-sec" onclick="stEditarOrden('${r.id}')">✏️ Editar</button>
+      </div>
+    </div>
+    <div class="row2" style="margin-bottom:12px">
+      <div style="background:var(--bg);border-radius:9px;padding:10px 14px">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Cliente</div>
+        <div style="font-weight:700">${r.clienteNombre}</div>
+        ${r.clienteTel?`<div style="font-size:12px;color:var(--muted)">${r.clienteTel}</div>`:''}
+      </div>
+      <div style="background:var(--bg);border-radius:9px;padding:10px 14px">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Equipo</div>
+        <div style="font-weight:700">${r.modelo}</div>
+        ${r.imei?`<div style="font-size:12px;color:var(--muted)">IMEI: ${r.imei}</div>`:''}
+        ${r.passcode?`<div style="font-size:12px;color:var(--muted)">Passcode: ${r.passcode}</div>`:''}
+      </div>
+    </div>
+    <div style="background:var(--amberbg);border:1.5px solid var(--amberb);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:13px">
+      <strong>Problema:</strong> ${r.problema}
+    </div>
+    <div style="margin-bottom:12px">${srvsHtml}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:2px solid var(--border);margin-bottom:4px">
+      <span style="font-weight:600">Anticipo</span><span style="font-family:var(--mono)">₲${gs(r.anticipo||0)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
+      <span style="font-weight:800;font-size:15px">Total</span><span style="font-family:var(--mono);font-weight:800;font-size:16px;color:var(--green)">₲${gs(r.total||0)}</span>
+    </div>
+    ${r.tecnico?`<div style="margin-top:8px;font-size:12px;color:var(--muted)">Técnico: ${r.tecnico}</div>`:''}
+    ${r.notas?`<div style="margin-top:8px;background:var(--bg);border-radius:8px;padding:8px 12px;font-size:13px">${r.notas}</div>`:''}`;
+  openModal(html);
+}
+
+function stCambiarEstado(id, estado){
+  DB.reparaciones = (DB.reparaciones||[]).map(r=>{
+    if(r.id!==id) return r;
+    return {...r, estado, historial:[...(r.historial||[]),{fecha:today(),estado:'Estado: '+ST_ESTADOS[estado]?.label,nota:''}]};
+  });
+  save(); stRender(); toast('Estado actualizado ✓');
+}
+
+function stEditarOrden(id){
+  const r = (DB.reparaciones||[]).find(x=>x.id===id);
+  if(!r) return;
+  stEditId = id; closeModal();
+  const html = `<div class="modal-title">Editar Orden ${stOrdNum(r.num)}</div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:12px">
+      <div class="row2">
+        <div class="fld"><label>Cliente *</label><input id="st-cliente" value="${r.clienteNombre||''}"/></div>
+        <div class="fld"><label>Teléfono</label><input id="st-tel" value="${r.clienteTel||''}"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Modelo *</label><input id="st-modelo" value="${r.modelo||''}"/></div>
+        <div class="fld"><label>IMEI / Serie</label><input id="st-imei" value="${r.imei||''}"/></div>
+      </div>
+      <div class="fld"><label>Passcode / Patrón</label><input id="st-pass" value="${r.passcode||''}"/></div>
+      <div class="fld"><label>Problema *</label><textarea id="st-problema" rows="3" style="resize:vertical">${r.problema||''}</textarea></div>
+      <div class="row2">
+        <div class="fld"><label>Técnico</label><input id="st-tec" value="${r.tecnico||''}"/></div>
+        <div class="fld"><label>Estado</label><select id="st-estado">${Object.entries(ST_ESTADOS).map(([v,s])=>`<option value="${v}"${r.estado===v?' selected':''}>${s.label}</option>`).join('')}</select></div>
+      </div>
+      <div class="fld"><label>Servicios</label>
+        <div id="st-servicios-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px">${(r.servicios||[]).map(s=>`<div style="display:flex;gap:6px;align-items:center"><input placeholder="Descripción" style="flex:2;font-size:13px;padding:8px 10px" class="st-srv-desc" value="${s.desc}"/><input placeholder="Precio ₲" style="flex:1;font-size:13px;padding:8px 10px" inputmode="numeric" class="st-srv-precio" value="${s.precio?parseInt(s.precio).toLocaleString('es-PY'):''}" oninput="stFmtPrecio(this)"/><button onclick="this.parentElement.remove();stRecalcTotal()" style="background:var(--redbg);color:var(--red);border:none;border-radius:7px;padding:6px 10px;font-size:13px;cursor:pointer">✕</button></div>`).join('')}</div>
+        <button class="btn-sec" style="font-size:12px;padding:6px 12px" onclick="stAddServicio()">+ Agregar servicio</button>
+      </div>
+      <div class="fld"><label>Anticipo (₲)</label><input type="text" inputmode="numeric" id="st-anticipo" value="${r.anticipo?parseInt(r.anticipo).toLocaleString('es-PY'):''}" oninput="stFmtAnt(this)"/></div>
+      <div class="fld"><label>Notas internas</label><textarea id="st-notas" rows="2" style="resize:vertical">${r.notas||''}</textarea></div>
+    </div>
+    <div id="st-total-row" style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:13px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:600">Total</span><span id="st-total-display" style="font-family:var(--mono);font-weight:800;color:var(--green)">₲${gs(r.total||0)}</span>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="stGuardarOrden(${r.num})" class="btn-primary" style="flex:1">Guardar Cambios</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+}
+
+function stWhatsApp(id){
+  const r = (DB.reparaciones||[]).find(x=>x.id===id);
+  if(!r) return;
+  const srvsText = (r.servicios||[]).map(s=>`• ${s.desc}: ₲${gs(s.precio)}`).join('\n');
+  const msg = `*TÍO IPHONERO - Orden de Servicio*\n`+
+    `*${stOrdNum(r.num)}* · ${fd(r.fecha)}\n\n`+
+    `*Cliente:* ${r.clienteNombre}\n`+
+    `*Equipo:* ${r.modelo}\n`+
+    (r.imei?`*IMEI:* ${r.imei}\n`:'')+
+    `*Problema:* ${r.problema}\n\n`+
+    (srvsText?`*Servicios:*\n${srvsText}\n\n`:'')+
+    `*Total: ₲${gs(r.total||0)}*\n`+
+    (r.anticipo?`*Anticipo: ₲${gs(r.anticipo)}*\n`:'')+
+    `\n_Tío Iphonero · R.I. Curupayty Esq. Juan Bautista Rivarola_`;
+  const tel = r.clienteTel.replace(/\D/g,'');
+  const url = tel ? `https://wa.me/595${tel.replace(/^0/,'')}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+}
+
+function stImprimir(id){
+  const r = (DB.reparaciones||[]).find(x=>x.id===id);
+  if(!r) return;
+  const srvsHtml = (r.servicios||[]).map(s=>`<tr><td>${s.desc}</td><td style="text-align:right;font-weight:700">₲${gs(s.precio)}</td></tr>`).join('');
+  const w = window.open('','_blank','width=900,height=700');
+  if(!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:12px;padding:20px;color:#111}
+.logo-area{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;border-bottom:2px solid #111;padding-bottom:12px}
+.logo-area img{height:50px}
+.ord-box{background:#111;color:#fff;padding:8px 14px;border-radius:6px;text-align:center}
+.ord-box .num{font-size:16px;font-weight:700}
+.ord-box .fecha{font-size:11px;opacity:.8}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.box{border:1px solid #ddd;border-radius:6px;padding:10px 14px}
+.box-title{background:#111;color:#fff;font-weight:700;font-size:11px;padding:3px 8px;border-radius:4px;margin-bottom:6px;text-transform:uppercase}
+.problem{background:#fff8e1;border:1px solid #ffd54f;border-radius:6px;padding:10px 14px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;margin-bottom:12px}
+th{background:#111;color:#fff;padding:6px 10px;text-align:left;font-size:11px}
+td{padding:6px 10px;border-bottom:1px solid #eee}
+.total-row{display:flex;justify-content:space-between;padding:8px 10px;font-weight:700;font-size:14px;border-top:2px solid #111}
+.sticker{margin-top:24px;border:2px dashed #999;border-radius:8px;padding:14px;max-width:320px}
+.sticker-title{font-size:10px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:4px}
+.sticker-num{font-size:20px;font-weight:900;letter-spacing:1px}
+.sticker-info{font-size:11px;color:#333;margin-top:4px}
+@media print{body{padding:10px}.sticker{page-break-before:always}}
+</style></head><body>
+<div class="logo-area">
+  <img src="https://tioiphonero.com.py/wp-content/uploads/2026/05/Logo-Final-Tio-Iphonero.png" onerror="this.style.display='none'">
+  <div style="font-size:20px;font-weight:900">TÍO IPHONERO</div>
+  <div class="ord-box"><div class="num">${stOrdNum(r.num)}</div><div class="fecha">${fd(r.fecha)}</div></div>
+</div>
+<div class="grid2">
+  <div class="box"><div class="box-title">Negocio</div>
+    <div><strong>Tío Iphonero</strong></div>
+    <div>+595 976500020</div>
+    <div>R.I. Curupayty Esq. Juan Bautista Rivarola</div>
+  </div>
+  <div class="box"><div class="box-title">Cliente</div>
+    <div><strong>${r.clienteNombre}</strong></div>
+    ${r.clienteTel?`<div>${r.clienteTel}</div>`:''}
+  </div>
+</div>
+<div class="box" style="margin-bottom:16px"><div class="box-title">Equipo</div>
+  <div><strong>${r.modelo}</strong></div>
+  ${r.imei?`<div>IMEI: ${r.imei}</div>`:''}
+  ${r.passcode?`<div>Passcode: ${r.passcode}</div>`:''}
+  ${r.tecnico?`<div>Técnico: ${r.tecnico}</div>`:''}
+</div>
+<div class="problem"><strong>Problema reportado:</strong> ${r.problema}</div>
+<table>
+  <thead><tr><th>Servicio / Reparación</th><th style="text-align:right">Precio</th></tr></thead>
+  <tbody>${srvsHtml||'<tr><td colspan="2" style="color:#999">Sin servicios</td></tr>'}</tbody>
+</table>
+<div class="total-row"><span>Anticipo</span><span>₲${gs(r.anticipo||0)}</span></div>
+<div class="total-row" style="font-size:16px;background:#f5f5f5;border-radius:6px;padding:10px"><span>TOTAL</span><span style="color:#059669">₲${gs(r.total||0)}</span></div>
+<p style="font-size:11px;color:#999;margin-top:8px;text-align:center">Firma cliente: _______________________</p>
+
+<div class="sticker">
+  <div class="sticker-title">Tío Iphonero — Sticker Equipo</div>
+  <div class="sticker-num">${stOrdNum(r.num)}</div>
+  <div class="sticker-info"><strong>${r.modelo}</strong></div>
+  <div class="sticker-info">${r.clienteNombre}${r.clienteTel?' · '+r.clienteTel:''}</div>
+  <div class="sticker-info" style="margin-top:4px;font-size:10px;color:#666">${r.problema}</div>
+  <div class="sticker-info" style="margin-top:4px;font-size:10px">${fd(r.fecha)}</div>
+</div>
+
+<script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script>
+</body></html>`);
+  w.document.close();
+}
+
 </script>
 </body>
 </html>

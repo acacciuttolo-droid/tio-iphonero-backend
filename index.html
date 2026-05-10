@@ -2615,8 +2615,21 @@ function stGuardarOrden(num){
   if(!DB.empleados) DB.empleados=[];
   if(!DB.liquidaciones) DB.liquidaciones=[];
   if(!DB.adelantos) DB.adelantos=[];
-  if(!DB.catalogo) DB.catalogo=[];
   if(!DB.catClicks) DB.catClicks=[];
+  if(!DB.catalogo || DB.catalogo.length===0) DB.catalogo=[
+    {id:'p1',nombre:'iPhone 16 Pro Max',categoria:'iphone',storage:'256GB',precioGs:8200000,precioUsd:1060,condicion:'Americano',desc:'Grado A+ · Titanio · Camera Control',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p2',nombre:'iPhone 16',categoria:'iphone',storage:'128GB',precioGs:6800000,precioUsd:880,condicion:'Americano',desc:'Grado A+ · Chip A18 · Batería 95%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p3',nombre:'iPhone 15 Pro Max',categoria:'iphone',storage:'256GB',precioGs:6500000,precioUsd:840,condicion:'Americano',desc:'Grado A · Titanio · USB-C',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p4',nombre:'iPhone 15 Pro',categoria:'iphone',storage:'128GB',precioGs:5200000,precioUsd:670,condicion:'Americano',desc:'Grado A · Titanio · Dynamic Island',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p5',nombre:'iPhone 15',categoria:'iphone',storage:'128GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · USB-C · Batería 90%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p6',nombre:'iPhone 14 Pro Max',categoria:'iphone',storage:'256GB',precioGs:5000000,precioUsd:645,condicion:'Americano',desc:'Grado A · Dynamic Island',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p7',nombre:'iPhone 14',categoria:'iphone',storage:'128GB',precioGs:3800000,precioUsd:490,condicion:'Americano',desc:'Grado A · Batería 88%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p8',nombre:'iPhone 13 Pro Max',categoria:'iphone',storage:'256GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · Batería 86%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-pro-finish-select-202209-6-7inch-sierrablue?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p9',nombre:'iPhone 13',categoria:'iphone',storage:'128GB',precioGs:2900000,precioUsd:375,condicion:'Americano',desc:'Grado A · Batería 84%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-finish-select-202207-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p10',nombre:'Samsung S25 Ultra',categoria:'samsung',storage:'256GB',precioGs:8500000,precioUsd:1100,condicion:'Nuevo',desc:'Nuevo sellado · S Pen · Garantía 1 año',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzkgmea-thumb-542573611?$650_519_PNG$'},
+    {id:'p11',nombre:'Samsung S25+',categoria:'samsung',storage:'256GB',precioGs:6800000,precioUsd:880,condicion:'Nuevo',desc:'Nuevo sellado · Garantía 1 año',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-plus-s936-sm-s936bzkgmea-thumb-542573546?$650_519_PNG$'},
+    {id:'p12',nombre:'Samsung S24 Ultra',categoria:'samsung',storage:'256GB',precioGs:7200000,precioUsd:930,condicion:'Americano',desc:'Grado A · S Pen · Batería 88%',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003?$650_519_PNG$'},
+  ];
   if(stEditId){ DB.reparaciones = DB.reparaciones.map(r=>r.id===stEditId?ord:r); }
   else { DB.reparaciones.unshift(ord); }
   save(); closeModal(); stRender(); toast('Orden guardada ✓');
@@ -3059,8 +3072,21 @@ function rrhhGuardarAdelanto(empleadoId){
   
   const adelanto = { id:uid(), empleadoId, monto, mes, mesLabel, fecha:fecha+' '+new Date().toLocaleTimeString('es-PY',{timeZone:'America/Asuncion',hour:'2-digit',minute:'2-digit',hour12:false}), nota };
   if(!DB.adelantos) DB.adelantos=[];
-  if(!DB.catalogo) DB.catalogo=[];
   if(!DB.catClicks) DB.catClicks=[];
+  if(!DB.catalogo || DB.catalogo.length===0) DB.catalogo=[
+    {id:'p1',nombre:'iPhone 16 Pro Max',categoria:'iphone',storage:'256GB',precioGs:8200000,precioUsd:1060,condicion:'Americano',desc:'Grado A+ · Titanio · Camera Control',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p2',nombre:'iPhone 16',categoria:'iphone',storage:'128GB',precioGs:6800000,precioUsd:880,condicion:'Americano',desc:'Grado A+ · Chip A18 · Batería 95%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p3',nombre:'iPhone 15 Pro Max',categoria:'iphone',storage:'256GB',precioGs:6500000,precioUsd:840,condicion:'Americano',desc:'Grado A · Titanio · USB-C',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p4',nombre:'iPhone 15 Pro',categoria:'iphone',storage:'128GB',precioGs:5200000,precioUsd:670,condicion:'Americano',desc:'Grado A · Titanio · Dynamic Island',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p5',nombre:'iPhone 15',categoria:'iphone',storage:'128GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · USB-C · Batería 90%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p6',nombre:'iPhone 14 Pro Max',categoria:'iphone',storage:'256GB',precioGs:5000000,precioUsd:645,condicion:'Americano',desc:'Grado A · Dynamic Island',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p7',nombre:'iPhone 14',categoria:'iphone',storage:'128GB',precioGs:3800000,precioUsd:490,condicion:'Americano',desc:'Grado A · Batería 88%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p8',nombre:'iPhone 13 Pro Max',categoria:'iphone',storage:'256GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · Batería 86%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-pro-finish-select-202209-6-7inch-sierrablue?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p9',nombre:'iPhone 13',categoria:'iphone',storage:'128GB',precioGs:2900000,precioUsd:375,condicion:'Americano',desc:'Grado A · Batería 84%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-finish-select-202207-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p10',nombre:'Samsung S25 Ultra',categoria:'samsung',storage:'256GB',precioGs:8500000,precioUsd:1100,condicion:'Nuevo',desc:'Nuevo sellado · S Pen · Garantía 1 año',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzkgmea-thumb-542573611?$650_519_PNG$'},
+    {id:'p11',nombre:'Samsung S25+',categoria:'samsung',storage:'256GB',precioGs:6800000,precioUsd:880,condicion:'Nuevo',desc:'Nuevo sellado · Garantía 1 año',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-plus-s936-sm-s936bzkgmea-thumb-542573546?$650_519_PNG$'},
+    {id:'p12',nombre:'Samsung S24 Ultra',categoria:'samsung',storage:'256GB',precioGs:7200000,precioUsd:930,condicion:'Americano',desc:'Grado A · S Pen · Batería 88%',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003?$650_519_PNG$'},
+  ];
   DB.adelantos.push(adelanto);
   save();
   
@@ -3389,7 +3415,7 @@ function catRenderProductos(){
         </div>
         <div style="flex:1;min-width:160px">
           <div style="font-weight:800;font-size:15px">${p.nombre}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${p.categoria||''} ${p.storage?'· '+p.storage:''} ${p.origen?'· '+p.origen:''}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${p.categoria||''} ${p.storage?'· '+p.storage:''} ${p.condicion?'· '+p.condicion:''}</div>
         </div>
         <div style="text-align:center;min-width:80px">
           <div style="font-size:22px;font-weight:800;color:var(--blue)">${clicks}</div>
@@ -3536,10 +3562,16 @@ function catNuevoProducto(){
         <div class="fld"><label>Precio (USD)</label><input type="number" id="cat-usd" placeholder="0"/></div>
       </div>
       <div class="row2">
-        <div class="fld"><label>Origen</label><input id="cat-origen" placeholder="Americano, Nuevo..."/></div>
+        <div class="fld"><label>Condición</label><select id="cat-origen"><option value="Americano">Americano (Seminuevo)</option><option value="Nuevo">Nuevo</option><option value="Usado">Usado</option><option value="Refurbished">Refurbished</option></select></div>
         <div class="fld"><label>WhatsApp destino</label><input id="cat-wa" placeholder="595976500020"/></div>
       </div>
-      <div class="fld"><label>Foto del producto</label><input type="file" id="cat-foto" accept="image/*" onchange="catPreviewFoto(this)"/><div id="cat-foto-prev" style="margin-top:6px"></div></div>
+      <div class="fld"><label>Foto del producto</label>
+        <div style="display:flex;gap:8px;margin-bottom:6px">
+          <input type="file" id="cat-foto" accept="image/*" onchange="catPreviewFoto(this)" style="flex:1;font-size:12px"/>
+        </div>
+        <input id="cat-foto-url" placeholder="O pegá URL de imagen..." style="font-size:12px;margin-bottom:6px" oninput="catPreviewUrl(this)"/>
+        <div id="cat-foto-prev" style="margin-top:4px"></div>
+      </div>
       <div class="fld"><label>Descripción / Detalle</label><textarea id="cat-desc" rows="2" style="resize:vertical" placeholder="Grado A, batería 95%..."></textarea></div>
       <div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="cat-activo" checked style="width:16px;height:16px"> Visible en catálogo</label></div>
     </div>
@@ -3548,6 +3580,14 @@ function catNuevoProducto(){
       <button class="btn-sec" onclick="closeModal()">Cancelar</button>
     </div>`;
   openModal(html);
+}
+
+function catPreviewUrl(input){
+  const url = input.value.trim();
+  if(!url) return;
+  window._catFotoB64 = url;
+  const prev = document.getElementById('cat-foto-prev');
+  if(prev) prev.innerHTML = `<img src="${url}" style="width:70px;height:70px;object-fit:contain;border-radius:8px;border:1px solid var(--border);background:#fff;padding:4px" onerror="this.parentElement.innerHTML='URL inválida'">`;
 }
 
 function catPreviewFoto(input){
@@ -3573,11 +3613,11 @@ function catGuardarProducto(editId){
     storage:document.getElementById('cat-storage')?.value.trim()||'',
     precioGs:precio,
     precioUsd:parseFloat(document.getElementById('cat-usd')?.value||'0')||0,
-    origen:document.getElementById('cat-origen')?.value.trim()||'',
+    condicion:document.getElementById('cat-origen')?.value||'Americano',
     wa:document.getElementById('cat-wa')?.value.trim()||'595976500020',
     desc:document.getElementById('cat-desc')?.value.trim()||'',
     activo:document.getElementById('cat-activo')?.checked!==false,
-    foto:window._catFotoB64||(editId?(DB.catalogo||[]).find(p=>p.id===editId)?.foto||''):'',
+    foto:window._catFotoB64||(document.getElementById('cat-foto-url')?.value.trim())||((editId?(DB.catalogo||[]).find(p=>p.id===editId)?.foto||''):'')||'',
   };
   window._catFotoB64=null;
   if(!DB.catalogo) DB.catalogo=[];
@@ -3604,10 +3644,14 @@ function catEditarProducto(id){
         <div class="fld"><label>Precio (USD)</label><input type="number" id="cat-usd" value="${p.precioUsd||''}"/></div>
       </div>
       <div class="row2">
-        <div class="fld"><label>Origen</label><input id="cat-origen" value="${p.origen||''}"/></div>
+        <div class="fld"><label>Condición</label><select id="cat-origen"><option value="Americano"${(p.condicion||p.origen)==='Americano'?' selected':''}>Americano (Seminuevo)</option><option value="Nuevo"${(p.condicion||p.origen)==='Nuevo'?' selected':''}>Nuevo</option><option value="Usado"${(p.condicion||p.origen)==='Usado'?' selected':''}>Usado</option><option value="Refurbished"${(p.condicion||p.origen)==='Refurbished'?' selected':''}>Refurbished</option></select></div>
         <div class="fld"><label>WhatsApp destino</label><input id="cat-wa" value="${p.wa||'595976500020'}"/></div>
       </div>
-      <div class="fld"><label>Foto del producto</label><input type="file" id="cat-foto" accept="image/*" onchange="catPreviewFoto(this)"/><div id="cat-foto-prev" style="margin-top:6px">${p.foto?`<img src="${p.foto}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">`:''}</div></div>
+      <div class="fld"><label>Foto del producto</label>
+        <input type="file" id="cat-foto" accept="image/*" onchange="catPreviewFoto(this)" style="font-size:12px;margin-bottom:6px"/>
+        <input id="cat-foto-url" placeholder="O pegá URL de imagen..." style="font-size:12px;margin-bottom:6px" value="${p.foto&&!p.foto.startsWith('data:')?p.foto:''}" oninput="catPreviewUrl(this)"/>
+        <div id="cat-foto-prev" style="margin-top:4px">${p.foto?`<img src="${p.foto}" style="width:70px;height:70px;object-fit:contain;border-radius:8px;border:1px solid var(--border);background:#fff;padding:4px">`:''}</div>
+      </div>
       <div class="fld"><label>Descripción</label><textarea id="cat-desc" rows="2" style="resize:vertical">${p.desc||''}</textarea></div>
       <div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="cat-activo"${p.activo!==false?' checked':''} style="width:16px;height:16px"> Visible en catálogo</label></div>
     </div>

@@ -835,7 +835,7 @@ function autoFillProvGar(provId){
   }
 }
 
-function saveDevice(){
+async function saveDevice(){
   const modelo=document.getElementById('f-modelo').value.trim();
   const costo=document.getElementById('f-costo').value.replace(/\./g,'');
   if(!modelo)return toast('Ingresá el modelo','err');

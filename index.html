@@ -1544,35 +1544,7 @@ function printWarrantyCert(d,sale){
 
 function printHTML(content){
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/><style>body{margin:0;font-family:'Plus Jakarta Sans',sans-serif}@media print{body{margin:0}}</style></head><body>${content}<script>window.onload=()=>{window.print();setTimeout(()=>window.close(),1000)}<\/script><script>
-(function(){
-  function fmtGs(el){
-    var v=el.value.replace(/\D/g,'');
-    if(!v){el.value='';return;}
-    el.value=parseInt(v).toLocaleString('es-PY');
-  }
-  function unfmtGs(el){
-    el.value=el.value.replace(/\./g,'');
-  }
-  document.addEventListener('DOMContentLoaded',function(){
-    ['f-costo','f-precio'].forEach(function(id){
-      var e=document.getElementById(id);
-      if(!e)return;
-      e.addEventListener('input',function(){fmtGs(this);});
-      e.addEventListener('focus',function(){unfmtGs(this);});
-      e.addEventListener('blur',function(){fmtGs(this);});
-    });
-  });
-  // For s-monto which is created dynamically in modals
-  document.addEventListener('input',function(ev){
-    if(ev.target&&ev.target.id==='s-monto'){fmtGs(ev.target);}
-  });
-  document.addEventListener('focus',function(ev){
-    if(ev.target&&ev.target.id==='s-monto'){unfmtGs(ev.target);}
-  },true);
-})();
-</script>
-</body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/><style>body{margin:0;font-family:'Plus Jakarta Sans',sans-serif}@media print{body{margin:0}}</style></head><body>${content}<script>window.onload=()=>{window.print();setTimeout(()=>window.close(),1000)}<\/script></body></html>`);
   w.document.close();
 }
 
@@ -2335,6 +2307,34 @@ function enviarWADeliveryForm() {
     window.open('https://web.whatsapp.com/', '_blank');
   }
 }
+</script>
+<script>
+(function(){
+  function fmtGs(el){
+    var v=el.value.replace(/\D/g,'');
+    if(!v){el.value='';return;}
+    el.value=parseInt(v).toLocaleString('es-PY');
+  }
+  function unfmtGs(el){
+    el.value=el.value.replace(/\./g,'');
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    ['f-costo','f-precio'].forEach(function(id){
+      var e=document.getElementById(id);
+      if(!e)return;
+      e.addEventListener('input',function(){fmtGs(this);});
+      e.addEventListener('focus',function(){unfmtGs(this);});
+      e.addEventListener('blur',function(){fmtGs(this);});
+    });
+  });
+  // For s-monto which is created dynamically in modals
+  document.addEventListener('input',function(ev){
+    if(ev.target&&ev.target.id==='s-monto'){fmtGs(ev.target);}
+  });
+  document.addEventListener('focus',function(ev){
+    if(ev.target&&ev.target.id==='s-monto'){unfmtGs(ev.target);}
+  },true);
+})();
 </script>
 <script>
 (function(){

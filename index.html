@@ -447,11 +447,11 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
 
     <div class="fsec"><div class="fsec-title">Costos & Precio</div><div class="fsec-body">
       <div class="row2">
-        <div class="fld"><label>Costo (₲) *</label><input type="number" id="f-costo" oninput="updateMargin()"/></div>
+        <div class="fld"><label>Costo (₲) *</label><input type="text" inputmode="numeric" id="f-costo" oninput="updateMarginFmt()"/></div>
         <div class="fld"><label>Costo (USD)</label><input type="number" id="f-costoUsd"/></div>
       </div>
       <div class="row2">
-        <div class="fld"><label>Precio Venta (₲)</label><input type="number" id="f-precio" oninput="updateMargin()"/></div>
+        <div class="fld"><label>Precio Venta (₲)</label><input type="text" inputmode="numeric" id="f-precio" oninput="updateMarginFmt()"/></div>
         <div class="fld"><label>Precio Venta (USD)</label><input type="number" id="f-precioUsd"/></div>
       </div>
       <div id="margin-preview" style="display:none" class="profit-strip">
@@ -771,9 +771,9 @@ function resetForm(){
 }
 function setGrade(g){currentGrade=g;document.querySelectorAll('.grade-btn').forEach(b=>b.classList.toggle('sel',b.textContent===g));}
 function cancelForm(){editingId=null;nav('stock');}
-function updateMargin(){
-  const c=+document.getElementById('f-costo').value||0;
-  const p=+document.getElementById('f-precio').value||0;
+function updateMarginFmt(){
+  const c=+(document.getElementById('f-costo').value||'').replace(/\./g,'')||0;
+  const p=+(document.getElementById('f-precio').value||'').replace(/\./g,'')||0;
   if(!c||!p){document.getElementById('margin-preview').style.display='none';return;}
   const g=p-c,pct=(g/c*100).toFixed(1),card=p*(1-CARD_FEE/100)-c;
   document.getElementById('mp-gan').textContent='₲ '+gs(g);
@@ -784,10 +784,10 @@ function updateMargin(){
 
 async function saveDevice(){
   const modelo=document.getElementById('f-modelo').value.trim();
-  const costo=document.getElementById('f-costo').value;
+  const costo=document.getElementById('f-costo').value.replace(/\./g,'');
   if(!modelo)return toast('Ingresá el modelo','err');
   if(!costo)return toast('Ingresá el costo','err');
-  const dev={id:editingId||uid(),modelo,categoria:document.getElementById('f-cat').value,storage:document.getElementById('f-storage').value,grade:currentGrade,origin:document.getElementById('f-origin').value,color:document.getElementById('f-color').value,imei:document.getElementById('f-imei').value,bateria:document.getElementById('f-bateria').value,proveedorId:document.getElementById('f-prov').value||'',costoGs:costo,costoUsd:document.getElementById('f-costoUsd').value,precioGs:document.getElementById('f-precio').value,precioUsd:document.getElementById('f-precioUsd').value,observaciones:document.getElementById('f-obs').value,fechaIngreso:document.getElementById('f-fecha').value,diasGarLocal:+document.getElementById('f-garlocal').value||180,diasGarProv:+document.getElementById('f-garprov').value||30,status:editingId?(DB.devices.find(d=>d.id===editingId)?.status||'stock'):'stock',historial:editingId?(DB.devices.find(d=>d.id===editingId)?.historial||[]):[{tipo:'ingreso',fecha:today(),nota:'Ingreso inicial'}]};
+  const dev={id:editingId||uid(),modelo,categoria:document.getElementById('f-cat').value,storage:document.getElementById('f-storage').value,grade:currentGrade,origin:document.getElementById('f-origin').value,color:document.getElementById('f-color').value,imei:document.getElementById('f-imei').value,bateria:document.getElementById('f-bateria').value,proveedorId:document.getElementById('f-prov').value||'',costoGs:costo,costoUsd:document.getElementById('f-costoUsd').value,precioGs:document.getElementById('f-precio').value.replace(/\./g,''),precioUsd:document.getElementById('f-precioUsd').value,observaciones:document.getElementById('f-obs').value,fechaIngreso:document.getElementById('f-fecha').value,diasGarLocal:+document.getElementById('f-garlocal').value||180,diasGarProv:+document.getElementById('f-garprov').value||30,status:editingId?(DB.devices.find(d=>d.id===editingId)?.status||'stock'):'stock',historial:editingId?(DB.devices.find(d=>d.id===editingId)?.historial||[]):[{tipo:'ingreso',fecha:today(),nota:'Ingreso inicial'}]};
   const payload={modelo:dev.modelo,categoria:dev.categoria,storage:dev.storage,grade:dev.grade,origin:dev.origin,color:dev.color||null,imei:dev.imei||null,bateria:dev.bateria?+dev.bateria:null,proveedor_id:dev.proveedorId||null,costo_gs:+dev.costoGs||0,costo_usd:+dev.costoUsd||0,precio_venta_gs:+dev.precioGs||0,precio_venta_usd:+dev.precioUsd||0,observaciones:dev.observaciones||null,fecha_ingreso:dev.fechaIngreso,dias_gar_local:dev.diasGarLocal||180,dias_gar_proveedor:dev.diasGarProv||30};
   if(editingId){const r=await api('PUT','/api/equipos/'+editingId,payload);if(r&&!r.error){DB.devices=DB.devices.map(d=>d.id===editingId?{...dev,id:editingId}:d);toast('Equipo actualizado ✓');}else toast('Error al actualizar','err');}
   else{const r=await api('POST','/api/equipos',payload);if(r&&!r.error){dev.id=r.id;DB.devices.unshift(dev);toast('Equipo cargado ✓');}else toast('Error al cargar','err');}
@@ -806,9 +806,9 @@ function editDevice(id){
     document.getElementById('f-origin').value=d.origin||'Americano';
     document.getElementById('f-obs').value=d.observaciones||'';
     document.getElementById('f-fecha').value=d.fechaIngreso||today();
-    document.getElementById('f-costo').value=d.costoGs||'';
+    document.getElementById('f-costo').value=d.costoGs?parseInt(d.costoGs).toLocaleString('es-PY'):'';
     document.getElementById('f-costoUsd').value=d.costoUsd||'';
-    document.getElementById('f-precio').value=d.precioGs||'';
+    document.getElementById('f-precio').value=d.precioGs?parseInt(d.precioGs).toLocaleString('es-PY'):'';
     document.getElementById('f-precioUsd').value=d.precioUsd||'';
     document.getElementById('f-garlocal').value=d.diasGarLocal||180;
     document.getElementById('f-garprov').value=d.diasGarProv||30;
@@ -816,7 +816,7 @@ function editDevice(id){
     setGrade(d.grade||'A');
     document.getElementById('form-title').textContent='Editar Equipo';
     document.getElementById('form-save-btn').textContent='Guardar Cambios';
-    updateMargin();
+    updateMarginFmt();
   },50);
 }
 
@@ -918,7 +918,7 @@ function openSaleModal(id){
     const descEl=document.getElementById('s-desc');
     if(descEl && descMap[this.value]){descEl.value=descMap[this.value];updateSaleCalc('{id}');}
     else if(descEl && !['Tarjeta'].includes(this.value)){descEl.value=0;updateSaleCalc('{id}');}"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>USDT</option><option>Mixto</option><option>Fiado</option><option>Tienda Naranja</option><option>Contimarket</option><option>Pagopar</option></select></div>
-        <div class="fld"><label>Monto (₲)</label><input type="number" id="s-monto" value="${d.precioGs||''}" oninput="updateSaleCalc('${id}')"/></div>
+        <div class="fld"><label>Monto (₲)</label><input type="text" inputmode="numeric" id="s-monto" value="${d.precioGs||''}" oninput="updateSaleCalc('${id}')"/></div>
         <div class="fld"><label>Descuento (%)</label><input type="number" id="s-desc" value="0" oninput="updateSaleCalc('${id}')"/></div>
       </div>
       <div id="s-tarjeta-row" style="display:none;background:var(--amberbg);border:1.5px solid var(--amberb);border-radius:9px;padding:11px 14px">
@@ -937,7 +937,7 @@ function openSaleModal(id){
 }
 function updateSaleCalc(id){
   const d=DB.devices.find(x=>x.id===id);if(!d)return;
-  const costo=+d.costoGs||0;let monto=+document.getElementById('s-monto')?.value||0;
+  const costo=+d.costoGs||0;let monto=+(document.getElementById('s-monto')?.value||'').replace(/\./g,'')||0;
   const disc=+document.getElementById('s-desc')?.value||0;if(disc>0)monto=monto*(1-disc/100);
   const pago=document.getElementById('s-pago')?.value;const comision=document.getElementById('s-comision')?.checked;
   let neto=monto;if(pago==='Tarjeta'&&comision)neto=monto*(1-CARD_FEE/100);
@@ -954,7 +954,7 @@ async function confirmSale(id){
   const nombre=document.getElementById('s-nombre')?.value.trim();
   if(!nombre)return toast('Ingresá nombre del comprador','err');
   const d=DB.devices.find(x=>x.id===id);
-  let monto=+document.getElementById('s-monto')?.value||0;
+  let monto=+(document.getElementById('s-monto')?.value||'').replace(/\./g,'')||0;
   const disc=+document.getElementById('s-desc')?.value||0;if(disc>0)monto=monto*(1-disc/100);
   const pago=document.getElementById('s-pago')?.value;const comision=document.getElementById('s-comision')?.checked;
   let neto=monto;if(pago==='Tarjeta'&&comision)neto=monto*(1-CARD_FEE/100);
@@ -1544,7 +1544,35 @@ function printWarrantyCert(d,sale){
 
 function printHTML(content){
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/><style>body{margin:0;font-family:'Plus Jakarta Sans',sans-serif}@media print{body{margin:0}}</style></head><body>${content}<script>window.onload=()=>{window.print();setTimeout(()=>window.close(),1000)}<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/><style>body{margin:0;font-family:'Plus Jakarta Sans',sans-serif}@media print{body{margin:0}}</style></head><body>${content}<script>window.onload=()=>{window.print();setTimeout(()=>window.close(),1000)}<\/script><script>
+(function(){
+  function fmtGs(el){
+    var v=el.value.replace(/\D/g,'');
+    if(!v){el.value='';return;}
+    el.value=parseInt(v).toLocaleString('es-PY');
+  }
+  function unfmtGs(el){
+    el.value=el.value.replace(/\./g,'');
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    ['f-costo','f-precio'].forEach(function(id){
+      var e=document.getElementById(id);
+      if(!e)return;
+      e.addEventListener('input',function(){fmtGs(this);});
+      e.addEventListener('focus',function(){unfmtGs(this);});
+      e.addEventListener('blur',function(){fmtGs(this);});
+    });
+  });
+  // For s-monto which is created dynamically in modals
+  document.addEventListener('input',function(ev){
+    if(ev.target&&ev.target.id==='s-monto'){fmtGs(ev.target);}
+  });
+  document.addEventListener('focus',function(ev){
+    if(ev.target&&ev.target.id==='s-monto'){unfmtGs(ev.target);}
+  },true);
+})();
+</script>
+</body></html>`);
   w.document.close();
 }
 
@@ -2116,9 +2144,9 @@ async function archivarEquipo(id, ev) {
   if (!confirm('Archivar este equipo? No aparecera en el inventario activo.')) return;
   try {
     await apiFetch('/api/equipos/' + id, 'PUT', { status: 'archivado' });
-    showToast('Equipo archivado', 'ok');
+    toast('Equipo archivado ✓');
     if(typeof loadStock==='function')loadStock(); else if(typeof renderStock==='function')renderStock();
-  } catch(err) { showToast('Error: ' + err.message, 'err'); }
+  } catch(err) { toast('Error al archivar','err'); }
 }
 
 // == Color dot ==
@@ -2307,6 +2335,34 @@ function enviarWADeliveryForm() {
     window.open('https://web.whatsapp.com/', '_blank');
   }
 }
+</script>
+<script>
+(function(){
+  function fmtGs(el){
+    var v=el.value.replace(/\D/g,'');
+    if(!v){el.value='';return;}
+    el.value=parseInt(v).toLocaleString('es-PY');
+  }
+  function unfmtGs(el){
+    el.value=el.value.replace(/\./g,'');
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    ['f-costo','f-precio'].forEach(function(id){
+      var e=document.getElementById(id);
+      if(!e)return;
+      e.addEventListener('input',function(){fmtGs(this);});
+      e.addEventListener('focus',function(){unfmtGs(this);});
+      e.addEventListener('blur',function(){fmtGs(this);});
+    });
+  });
+  // For s-monto which is created dynamically in modals
+  document.addEventListener('input',function(ev){
+    if(ev.target&&ev.target.id==='s-monto'){fmtGs(ev.target);}
+  });
+  document.addEventListener('focus',function(ev){
+    if(ev.target&&ev.target.id==='s-monto'){unfmtGs(ev.target);}
+  },true);
+})();
 </script>
 </body>
 </html>

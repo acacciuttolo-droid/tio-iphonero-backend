@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tío Iphonero — Catálogo</title>
+<meta name="description" content="iPhones y Samsung al mejor precio en Asunción, Paraguay. Entrega el mismo día.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;--border:#2a2a2a;--ink:#f0f0f0;--ink2:#888;--green:#00e676;--greenbg:rgba(0,230,118,.08);--gold:#ffd54f;--blue:#3b82f6;--radius:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+a{text-decoration:none;color:inherit}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.3px}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.header-wa{background:#25d366;color:#fff;border:none;border-radius:50px;padding:9px 18px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.hero{padding:48px 20px 32px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.04) 0%,transparent 70%)}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(28px,6vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:10px}
+.hero h1 span{color:var(--green)}
+.hero p{font-size:14px;color:var(--ink2);margin-bottom:24px}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+.badge{background:var(--surface2);border:1px solid var(--border);border-radius:50px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:4px}
+.badge.g{border-color:var(--green);color:var(--green);background:var(--greenbg)}
+.filters{display:flex;gap:6px;padding:0 20px 20px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fbtn{background:var(--surface2);border:1.5px solid var(--border);border-radius:50px;padding:7px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink2);cursor:pointer;white-space:nowrap;transition:all .15s}
+.fbtn:hover,.fbtn.active{background:#fff;border-color:#fff;color:#000}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;padding:0 20px 80px;max-width:1200px;margin:0 auto}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:#3a3a3a}
+.card-img{background:var(--surface2);height:200px;display:flex;align-items:center;justify-content:center;font-size:72px;position:relative;overflow:hidden}
+.card-img img{width:100%;height:100%;object-fit:contain;padding:16px}
+.card-badges{position:absolute;top:10px;left:10px;display:flex;gap:4px;flex-wrap:wrap}
+.chip{border-radius:50px;padding:3px 9px;font-size:11px;font-weight:700}
+.chip-black{background:#111;color:#fff;border:1px solid #333}
+.chip-green{background:var(--greenbg);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.chip-gold{background:rgba(255,213,79,.1);color:var(--gold);border:1px solid rgba(255,213,79,.3)}
+.card-body{padding:14px}
+.card-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.3px;margin-bottom:4px}
+.card-specs{font-size:11px;color:var(--ink2);margin-bottom:8px;display:flex;gap:5px;flex-wrap:wrap}
+.spec{background:var(--surface2);border-radius:4px;padding:2px 6px}
+.price-gs{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px}
+.price-usd{font-size:12px;color:var(--ink2);margin-top:1px}
+.card-desc{font-size:12px;color:var(--ink2);margin:6px 0 10px;line-height:1.4}
+.card-footer{display:flex;gap:7px;margin-top:12px}
+.btn-wa{flex:1;background:#25d366;color:#fff;border:none;border-radius:9px;padding:11px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:opacity .15s}
+.btn-wa:hover{opacity:.85}
+footer{border-top:1px solid var(--border);padding:20px;text-align:center;font-size:12px;color:var(--ink2)}
+footer strong{color:var(--ink)}
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 60px}
+  .hero{padding:28px 14px 20px}
+  .filters{padding:0 12px 14px}
+  header{padding:10px 14px}
+  .card-name{font-size:13px}
+  .price-gs{font-size:16px}
+  .card-img{height:150px}
+  .card-body{padding:10px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    TÍO IPHONERO
+  </div>
+  <button class="header-wa" onclick="window.open('https://wa.me/595976500020?text='+encodeURIComponent('Hola! Quisiera consultar sobre sus equipos disponibles.'),'_blank')">
+    📲 Consultar
+  </button>
+</header>
+
+<div class="hero">
+  <h1>iPhones & Samsung<br><span>al mejor precio</span></h1>
+  <p>Stock disponible · Entrega el mismo día · Asunción, Paraguay</p>
+  <div class="badges">
+    <div class="badge g">✓ Garantía incluida</div>
+    <div class="badge">🚚 Delivery mismo día</div>
+    <div class="badge">💳 Acepta financieras</div>
+    <div class="badge">🔧 Servicio técnico</div>
+  </div>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"></div>
+
+<footer>
+  <strong>Tío Iphonero</strong> · R.I. Curupayty Esq. Juan Bautista Rivarola · Asunción<br>
+  +595 976 500 020 · <a href="https://tioiphonero.com.py" style="color:var(--green)">tioiphonero.com.py</a>
+</footer>
+
+<script>
+const WA = '595976500020';
+
+// ── PRODUCTOS — editá estos directamente ──────────────────────────────────
+const PRODUCTOS = [
+  {id:'p1', nombre:'iPhone 16 Pro Max', cat:'iphone', storage:'256GB', precio:8200000, usd:1060, origen:'Americano', desc:'Grado A+ · Titanio · Camera Control', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p2', nombre:'iPhone 16', cat:'iphone', storage:'128GB', precio:6800000, usd:880, origen:'Americano', desc:'Grado A+ · Chip A18 · Batería 95%', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p3', nombre:'iPhone 15 Pro Max', cat:'iphone', storage:'256GB', precio:6500000, usd:840, origen:'Americano', desc:'Grado A · Titanio · USB-C', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p4', nombre:'iPhone 15 Pro', cat:'iphone', storage:'128GB', precio:5200000, usd:670, origen:'Americano', desc:'Grado A · Titanio · Dynamic Island', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p5', nombre:'iPhone 15', cat:'iphone', storage:'128GB', precio:4200000, usd:540, origen:'Americano', desc:'Grado A · USB-C · Batería 90%', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p6', nombre:'iPhone 14 Pro Max', cat:'iphone', storage:'256GB', precio:5000000, usd:645, origen:'Americano', desc:'Grado A · Dynamic Island', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p7', nombre:'iPhone 14', cat:'iphone', storage:'128GB', precio:3800000, usd:490, origen:'Americano', desc:'Grado A · Batería 88%', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p8', nombre:'iPhone 13 Pro Max', cat:'iphone', storage:'256GB', precio:4200000, usd:540, origen:'Americano', desc:'Grado A · Batería 86%', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-pro-finish-select-202209-6-7inch-sierrablue?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p9', nombre:'iPhone 13', cat:'iphone', storage:'128GB', precio:2900000, usd:375, origen:'Americano', desc:'Grado A · Batería 84%', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-finish-select-202207-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p10', nombre:'iPhone SE 4', cat:'iphone', storage:'128GB', precio:2900000, usd:375, origen:'Nuevo', desc:'Nuevo · Chip A18 · Disponible bajo pedido', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16e-finish-select-202502-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p11', nombre:'Samsung S25 Ultra', cat:'samsung', storage:'256GB', precio:8500000, usd:1100, origen:'Nuevo', desc:'Nuevo sellado · S Pen · Garantía 1 año', foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzkgmea-thumb-542573611?$650_519_PNG$'},
+  {id:'p12', nombre:'Samsung S25+', cat:'samsung', storage:'256GB', precio:6800000, usd:880, origen:'Nuevo', desc:'Nuevo sellado · Garantía 1 año', foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-plus-s936-sm-s936bzkgmea-thumb-542573546?$650_519_PNG$'},
+  {id:'p13', nombre:'Samsung S25', cat:'samsung', storage:'128GB', precio:5500000, usd:710, origen:'Nuevo', desc:'Nuevo sellado · Garantía 1 año', foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-s931-sm-s931bzkgmea-thumb-542573481?$650_519_PNG$'},
+  {id:'p14', nombre:'Samsung S24 Ultra', cat:'samsung', storage:'256GB', precio:7200000, usd:930, origen:'Americano', desc:'Grado A · S Pen · Batería 88%', foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003?$650_519_PNG$'},
+];
+
+// ── UTILS ────────────────────────────────────────────────────────────────
+function gs(n){ return new Intl.NumberFormat('es-PY').format(Math.round(n||0)); }
+
+function saveClick(prodId){
+  try{
+    const db = JSON.parse(localStorage.getItem('tio_db')||'{}');
+    if(!db.catClicks) db.catClicks=[];
+    db.catClicks.push({id:Math.random().toString(36).slice(2,9),prodId,fecha:new Date().toLocaleDateString('en-CA',{timeZone:'America/Asuncion'})});
+    localStorage.setItem('tio_db', JSON.stringify(db));
+  }catch(e){}
+}
+
+function getChip(p){
+  if(p.origen==='Nuevo') return '<span class="chip chip-gold">✦ Nuevo</span>';
+  if(p.origen==='Americano') return '<span class="chip chip-green">Americano</span>';
+  if(p.origen==='Usado') return '<span class="chip chip-black">Usado</span>';
+  return p.origen?`<span class="chip chip-black">${p.origen}</span>`:'';
+}
+
+// ── FILTERS ──────────────────────────────────────────────────────────────
+let filtroActual = 'todos';
+
+function renderFilters(){
+  const cats = [...new Set(PRODUCTOS.map(p=>p.cat))];
+  const labels = {iphone:'iPhone',samsung:'Samsung',accesorio:'Accesorios',smartwatch:'Smartwatch'};
+  const all = ['todos',...cats];
+  document.getElementById('filters').innerHTML = all.map(c=>
+    `<button class="fbtn${c===filtroActual?' active':''}" onclick="setFiltro('${c}',this)">${c==='todos'?'Todos':labels[c]||c}</button>`
+  ).join('');
+}
+
+function setFiltro(cat, btn){
+  filtroActual = cat;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+// ── GRID ─────────────────────────────────────────────────────────────────
+function renderGrid(){
+  const list = filtroActual==='todos' ? PRODUCTOS : PRODUCTOS.filter(p=>p.cat===filtroActual);
+  const msg = p => encodeURIComponent(`Hola! Vi el *${p.nombre} ${p.storage}* en el catalogo de Tio Iphonero. Esta disponible?`);
+  document.getElementById('grid').innerHTML = list.map(p=>`
+    <div class="card">
+      <div class="card-img">
+        ${p.foto?`<img src="${p.foto}" alt="${p.nombre}" onerror="this.parentElement.innerHTML='📱'">`:'📱'}
+        <div class="card-badges">${getChip(p)}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${p.nombre}</div>
+        <div class="card-specs">
+          ${p.storage?`<span class="spec">${p.storage}</span>`:''}
+        </div>
+        ${p.desc?`<div class="card-desc">${p.desc}</div>`:''}
+        <div class="card-price">
+          <div class="price-gs">₲${gs(p.precio)}</div>
+          ${p.usd?`<div class="price-usd">≈ USD ${p.usd}</div>`:''}
+        </div>
+        <div class="card-footer">
+          <button class="btn-wa" onclick="handleWA('${p.id}','${WA}','${msg(p)}')">
+            📲 Lo quiero
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function handleWA(prodId, tel, msg){
+  saveClick(prodId);
+  window.open(`https://wa.me/${tel}?text=${msg}`, '_blank');
+}
+
+renderFilters();
+renderGrid();
+</script>
+</body>
+</html>

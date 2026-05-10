@@ -298,6 +298,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <div class="nav-section">Operaciones</div>
     <button class="nav-btn" onclick="nav('servtec')"><span class="nav-icon">🔧</span>Servicio Técnico <span class="nav-badge" id="badge-servtec" style="background:var(--purple)">0</span></button>
     <div class="nav-section">Configuración</div>
+    <button class="nav-btn" onclick="nav('catalogo')"><span class="nav-icon">🛍️</span>Catálogo</button>
     <button class="nav-btn" onclick="nav('proveedores')"><span class="nav-icon">🏭</span>Proveedores</button>
     <button class="nav-btn" onclick="nav('search')"><span class="nav-icon">🔍</span>Búsqueda</button>
     <button class="nav-btn" onclick="nav('archivados')"><span class="nav-icon">🗄️</span>Archivados</button>
@@ -593,6 +594,21 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <button class="tab-btn" onclick="rrhhSetTab('liquidaciones',this)">Liquidaciones</button>
   </div>
   <div id="rrhh-list"></div>
+<div class="page" id="page-catalogo">
+  <div class="ph-row">
+    <div><h1 style="font-size:22px;font-weight:800">Catálogo Público</h1><p style="font-size:13px;color:var(--muted)">Productos · Precios · Analytics</p></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sec" onclick="window.open('catalogo.html','_blank')">🔗 Ver catálogo</button>
+      <button class="btn-primary" onclick="catNuevoProducto()">+ Agregar producto</button>
+    </div>
+  </div>
+  <div class="tabs" style="margin-bottom:16px">
+    <button class="tab-btn active" onclick="catSetTab('productos',this)">Productos</button>
+    <button class="tab-btn" onclick="catSetTab('analytics',this)">📊 Analytics</button>
+  </div>
+  <div id="cat-list"></div>
+</div>
+
 </div>
 
 </main>
@@ -721,6 +737,7 @@ function nav(id){
   if(id==='caja')renderCaja();
   if(id==='form'&&!editingId)resetForm();
   if(id==='archivados')renderArchivados();
+  if(id==='catalogo')catRender();
   if(id==='servtec')stRender();
   if(id==='rrhh')rrhhRender();
 }
@@ -2598,6 +2615,8 @@ function stGuardarOrden(num){
   if(!DB.empleados) DB.empleados=[];
   if(!DB.liquidaciones) DB.liquidaciones=[];
   if(!DB.adelantos) DB.adelantos=[];
+  if(!DB.catalogo) DB.catalogo=[];
+  if(!DB.catClicks) DB.catClicks=[];
   if(stEditId){ DB.reparaciones = DB.reparaciones.map(r=>r.id===stEditId?ord:r); }
   else { DB.reparaciones.unshift(ord); }
   save(); closeModal(); stRender(); toast('Orden guardada ✓');
@@ -3040,6 +3059,8 @@ function rrhhGuardarAdelanto(empleadoId){
   
   const adelanto = { id:uid(), empleadoId, monto, mes, mesLabel, fecha:fecha+' '+new Date().toLocaleTimeString('es-PY',{timeZone:'America/Asuncion',hour:'2-digit',minute:'2-digit',hour12:false}), nota };
   if(!DB.adelantos) DB.adelantos=[];
+  if(!DB.catalogo) DB.catalogo=[];
+  if(!DB.catClicks) DB.catClicks=[];
   DB.adelantos.push(adelanto);
   save();
   
@@ -3328,6 +3349,286 @@ window.onload=()=>setTimeout(()=>window.print(),500);
 <\/script>
 </body></html>`);
   w.document.close();
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   CATÁLOGO PÚBLICO
+══════════════════════════════════════════════════════════════════ */
+if(!DB.catalogo) DB.catalogo=[];
+if(!DB.catClicks) DB.catClicks=[];
+let catTab = 'productos';
+
+function catSetTab(tab, btn){
+  catTab = tab;
+  document.querySelectorAll('#page-catalogo .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  catRender();
+}
+
+function catRender(){
+  if(catTab==='productos') catRenderProductos();
+  else catRenderAnalytics();
+}
+
+function catRenderProductos(){
+  const el = document.getElementById('cat-list');
+  if(!el) return;
+  const list = DB.catalogo||[];
+  if(!list.length){
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:60px">Sin productos en el catálogo.<br>Agregá el primero con el botón de arriba.</div>';
+    return;
+  }
+  el.innerHTML = list.map(p => {
+    const clicks = (DB.catClicks||[]).filter(c=>c.prodId===p.id).length;
+    const activo = p.activo !== false;
+    return `<div class="scard">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="width:52px;height:52px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden">
+          ${p.foto?`<img src="${p.foto}" style="width:100%;height:100%;object-fit:cover">` : (p.categoria==='samsung'?'📲':'📱')}
+        </div>
+        <div style="flex:1;min-width:160px">
+          <div style="font-weight:800;font-size:15px">${p.nombre}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${p.categoria||''} ${p.storage?'· '+p.storage:''} ${p.origen?'· '+p.origen:''}</div>
+        </div>
+        <div style="text-align:center;min-width:80px">
+          <div style="font-size:22px;font-weight:800;color:var(--blue)">${clicks}</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">clicks</div>
+        </div>
+        <div style="text-align:right;min-width:120px">
+          <div style="font-family:var(--mono);font-weight:700;font-size:14px">₲${gs(p.precioGs||0)}</div>
+          ${p.precioUsd?`<div style="font-size:12px;color:var(--muted)">USD ${p.precioUsd}</div>`:''}
+          <span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:50px;font-size:11px;font-weight:700;background:${activo?'var(--greenbg)':'var(--redbg)'};color:${activo?'var(--green)':'var(--red)'}">${activo?'Visible':'Oculto'}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-sm btn-sec" onclick="catEditarProducto('${p.id}')">✏️</button>
+          <button class="btn-sm" style="background:var(--redbg);color:var(--red);border:1px solid var(--redb)" onclick="catEliminarProducto('${p.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function catRenderAnalytics(){
+  const el = document.getElementById('cat-list');
+  if(!el) return;
+  const clicks = DB.catClicks||[];
+  if(!clicks.length){
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:60px">Sin clicks registrados todavía.</div>';
+    return;
+  }
+
+  // Period selector
+  const periodos = [
+    {key:'hoy', label:'Hoy'},
+    {key:'semana', label:'Esta semana'},
+    {key:'mes', label:'Este mes'},
+    {key:'trimestre', label:'Trimestre'},
+    {key:'anio', label:'Este año'},
+    {key:'todo', label:'Todo'},
+  ];
+
+  const now = new Date();
+  const filtrar = (key) => {
+    const d = new Date();
+    if(key==='hoy') d.setHours(0,0,0,0);
+    else if(key==='semana') d.setDate(d.getDate()-7);
+    else if(key==='mes') d.setDate(1);
+    else if(key==='trimestre') d.setMonth(d.getMonth()-3);
+    else if(key==='anio') d.setMonth(0,1);
+    else return clicks;
+    return clicks.filter(c=>new Date(c.fecha)>=d);
+  };
+
+  const periodo = window._catPeriodo||'mes';
+  const filtered = filtrar(periodo);
+
+  // Count by product
+  const byProd = {};
+  filtered.forEach(c=>{
+    byProd[c.prodId]=(byProd[c.prodId]||0)+1;
+  });
+  const ranking = Object.entries(byProd).sort((a,b)=>b[1]-a[1]);
+  const total = filtered.length;
+
+  // Count by day for the last 7 days
+  const last7 = {};
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const key=d.toLocaleDateString('en-CA');
+    last7[key]=0;
+  }
+  filtered.forEach(c=>{
+    const key=(c.fecha||'').slice(0,10);
+    if(key in last7) last7[key]++;
+  });
+  const maxDay = Math.max(1,...Object.values(last7));
+
+  const tabsHtml = periodos.map(p=>`<button onclick="window._catPeriodo='${p.key}';catRenderAnalytics()" style="padding:6px 14px;border-radius:50px;border:1.5px solid ${periodo===p.key?'var(--blue)':'var(--border)'};background:${periodo===p.key?'var(--bluebg)':'transparent'};color:${periodo===p.key?'var(--blue)':'var(--ink2)'};font-size:12px;font-weight:600;cursor:pointer">${p.label}</button>`).join('');
+
+  const barHtml = Object.entries(last7).map(([d,v])=>{
+    const pct=Math.round(v/maxDay*100);
+    const label=new Date(d+'T12:00:00').toLocaleDateString('es-PY',{weekday:'short',day:'numeric'});
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+      <div style="font-size:11px;font-weight:700;color:var(--blue)">${v||''}</div>
+      <div style="width:100%;background:var(--surface2);border-radius:4px;height:60px;display:flex;align-items:flex-end">
+        <div style="width:100%;background:var(--blue);border-radius:4px;height:${pct}%;min-height:${v?4:0}px;transition:height .3s"></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center">${label}</div>
+    </div>`;
+  }).join('');
+
+  const rankHtml = ranking.slice(0,10).map(([prodId,count],i)=>{
+    const prod = (DB.catalogo||[]).find(p=>p.id===prodId);
+    const pct = Math.round(count/total*100);
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:20px;height:20px;background:${i<3?'var(--blue)':'var(--surface2)'};color:${i<3?'#fff':'var(--muted)'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${i+1}</span>
+          <span style="font-weight:600;font-size:13px">${prod?.nombre||prodId}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--mono);font-weight:700;font-size:14px;color:var(--blue)">${count}</span>
+          <span style="font-size:11px;color:var(--muted)">${pct}%</span>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:4px;height:6px"><div style="background:var(--blue);border-radius:4px;height:100%;width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">${tabsHtml}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+      <div class="scard" style="text-align:center;padding:16px">
+        <div style="font-size:32px;font-weight:900;color:var(--blue);font-family:var(--mono)">${total}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Clicks totales</div>
+      </div>
+      <div class="scard" style="text-align:center;padding:16px">
+        <div style="font-size:32px;font-weight:900;color:var(--green);font-family:var(--mono)">${ranking.length}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Productos consultados</div>
+      </div>
+      <div class="scard" style="text-align:center;padding:16px">
+        <div style="font-size:32px;font-weight:900;color:var(--purple);font-family:var(--mono)">${ranking[0]?((DB.catalogo||[]).find(p=>p.id===ranking[0][0])?.nombre||'—').split(' ').slice(0,2).join(' '):'—'}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Más consultado</div>
+      </div>
+    </div>
+    <div class="scard" style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px">Clicks últimos 7 días</div>
+      <div style="display:flex;gap:6px;align-items:flex-end;height:80px">${barHtml}</div>
+    </div>
+    <div class="scard">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px">Ranking de productos</div>
+      ${rankHtml}
+    </div>`;
+}
+
+function catNuevoProducto(){
+  const cats = ['iphone','samsung','accesorio','smartwatch','perfume','otro'];
+  const html = `<div class="modal-title">Nuevo Producto</div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:14px">
+      <div class="fld"><label>Nombre *</label><input id="cat-nombre" placeholder="iPhone 15 Pro Max, Samsung S24..."/></div>
+      <div class="row2">
+        <div class="fld"><label>Categoría</label><select id="cat-cat">${cats.map(c=>`<option value="${c}">${c.charAt(0).toUpperCase()+c.slice(1)}</option>`).join('')}</select></div>
+        <div class="fld"><label>Storage</label><input id="cat-storage" placeholder="128GB, 256GB..."/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Precio (₲) *</label><input type="text" inputmode="numeric" id="cat-precio" placeholder="0" oninput="fmtField(this)"/></div>
+        <div class="fld"><label>Precio (USD)</label><input type="number" id="cat-usd" placeholder="0"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Origen</label><input id="cat-origen" placeholder="Americano, Nuevo..."/></div>
+        <div class="fld"><label>WhatsApp destino</label><input id="cat-wa" placeholder="595976500020"/></div>
+      </div>
+      <div class="fld"><label>Foto del producto</label><input type="file" id="cat-foto" accept="image/*" onchange="catPreviewFoto(this)"/><div id="cat-foto-prev" style="margin-top:6px"></div></div>
+      <div class="fld"><label>Descripción / Detalle</label><textarea id="cat-desc" rows="2" style="resize:vertical" placeholder="Grado A, batería 95%..."></textarea></div>
+      <div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="cat-activo" checked style="width:16px;height:16px"> Visible en catálogo</label></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="catGuardarProducto(null)" class="btn-primary" style="flex:1">Guardar</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+}
+
+function catPreviewFoto(input){
+  if(!input.files||!input.files[0]) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    window._catFotoB64=e.target.result;
+    const prev=document.getElementById('cat-foto-prev');
+    if(prev) prev.innerHTML=`<img src="${e.target.result}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function catGuardarProducto(editId){
+  const nombre=document.getElementById('cat-nombre')?.value.trim();
+  if(!nombre) return toast('Ingresá el nombre','err');
+  const precio=parseInt((document.getElementById('cat-precio')?.value||'').replace(/\./g,'')||'0');
+  if(!precio) return toast('Ingresá el precio','err');
+  const prod={
+    id:editId||uid(),
+    nombre,
+    categoria:document.getElementById('cat-cat')?.value||'iphone',
+    storage:document.getElementById('cat-storage')?.value.trim()||'',
+    precioGs:precio,
+    precioUsd:parseFloat(document.getElementById('cat-usd')?.value||'0')||0,
+    origen:document.getElementById('cat-origen')?.value.trim()||'',
+    wa:document.getElementById('cat-wa')?.value.trim()||'595976500020',
+    desc:document.getElementById('cat-desc')?.value.trim()||'',
+    activo:document.getElementById('cat-activo')?.checked!==false,
+    foto:window._catFotoB64||(editId?(DB.catalogo||[]).find(p=>p.id===editId)?.foto||''):'',
+  };
+  window._catFotoB64=null;
+  if(!DB.catalogo) DB.catalogo=[];
+  if(editId){ DB.catalogo=DB.catalogo.map(p=>p.id===editId?prod:p); toast('Producto actualizado ✓'); }
+  else { DB.catalogo.push(prod); toast('Producto agregado ✓'); }
+  save(); closeModal(); catRender();
+  // Regenerate catalog file hint
+  toast('Actualizá el catálogo público con el botón Ver catálogo');
+}
+
+function catEditarProducto(id){
+  const p=(DB.catalogo||[]).find(x=>x.id===id);
+  if(!p) return;
+  const cats=['iphone','samsung','accesorio','smartwatch','perfume','otro'];
+  const html=`<div class="modal-title">Editar Producto</div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:14px">
+      <div class="fld"><label>Nombre *</label><input id="cat-nombre" value="${p.nombre||''}"/></div>
+      <div class="row2">
+        <div class="fld"><label>Categoría</label><select id="cat-cat">${cats.map(c=>`<option value="${c}"${p.categoria===c?' selected':''}>${c.charAt(0).toUpperCase()+c.slice(1)}</option>`).join('')}</select></div>
+        <div class="fld"><label>Storage</label><input id="cat-storage" value="${p.storage||''}"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Precio (₲) *</label><input type="text" inputmode="numeric" id="cat-precio" value="${p.precioGs?parseInt(p.precioGs).toLocaleString('es-PY'):''}" oninput="fmtField(this)"/></div>
+        <div class="fld"><label>Precio (USD)</label><input type="number" id="cat-usd" value="${p.precioUsd||''}"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Origen</label><input id="cat-origen" value="${p.origen||''}"/></div>
+        <div class="fld"><label>WhatsApp destino</label><input id="cat-wa" value="${p.wa||'595976500020'}"/></div>
+      </div>
+      <div class="fld"><label>Foto del producto</label><input type="file" id="cat-foto" accept="image/*" onchange="catPreviewFoto(this)"/><div id="cat-foto-prev" style="margin-top:6px">${p.foto?`<img src="${p.foto}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">`:''}</div></div>
+      <div class="fld"><label>Descripción</label><textarea id="cat-desc" rows="2" style="resize:vertical">${p.desc||''}</textarea></div>
+      <div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="cat-activo"${p.activo!==false?' checked':''} style="width:16px;height:16px"> Visible en catálogo</label></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="catGuardarProducto('${id}')" class="btn-primary" style="flex:1">Guardar Cambios</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+}
+
+function catEliminarProducto(id){
+  if(!confirm('¿Eliminar este producto del catálogo?')) return;
+  DB.catalogo=(DB.catalogo||[]).filter(p=>p.id!==id);
+  save(); catRender(); toast('Producto eliminado');
+}
+
+// Called from catalog page when someone clicks WhatsApp
+function catRegistrarClick(prodId){
+  if(!DB.catClicks) DB.catClicks=[];
+  DB.catClicks.push({id:uid(),prodId,fecha:nowPY()});
+  save();
 }
 
 </script>

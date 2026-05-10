@@ -558,6 +558,13 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
   <div id="delivery-list"></div>
 </div>
 
+<div class="page" id="page-archivados">
+  <div class="ph-row">
+    <div><h1 style="font-size:22px;font-weight:800">Archivados</h1><p style="font-size:13px;color:var(--muted)">Equipos fuera del inventario activo</p></div>
+  </div>
+  <div id="archivados-list"></div>
+</div>
+
 </main>
 </div>
 
@@ -681,6 +688,7 @@ function nav(id){
   if(id==='proveedores')renderSuppliers();
   if(id==='caja')renderCaja();
   if(id==='form'&&!editingId)resetForm();
+  if(id==='archivados')renderArchivados();
 }
 
 function updateSidebarCounters(){
@@ -2111,6 +2119,36 @@ async function autoCargarGarantia() {
 }
 
 // == Archivar equipo ==
+
+function renderArchivados(){
+  const list = DB.devices.filter(d => d.status === 'archivado');
+  document.getElementById('archivados-list').innerHTML = list.length ? list.map(d => {
+    const sup = DB.suppliers.find(s => s.id === d.proveedorId);
+    return `<div class="scard" style="opacity:.85">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:15px">${d.modelo} <span style="font-size:12px;font-weight:500;color:var(--muted)">${d.storage} · ${d.grade} · ${d.origin}</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">${sup?'via '+sup.nombre:''} · ${fd(d.fechaIngreso)}</div>
+          <div style="font-size:12px;color:var(--muted)">Costo: ₲${gs(d.costoGs)} · Precio: ₲${gs(d.precioGs)}</div>
+        </div>
+        <button class="btn-sm btn-ok" onclick="desarchivarEquipo('${d.id}')">Restaurar</button>
+      </div>
+    </div>`;
+  }).join('') : '<div style="text-align:center;color:var(--muted);padding:60px">Sin equipos archivados</div>';
+}
+
+async function desarchivarEquipo(id){
+  if(!confirm('Restaurar este equipo al inventario activo?')) return;
+  try {
+    await api('PUT', '/api/equipos/' + id, { status: 'stock' });
+    DB.devices = DB.devices.map(d => d.id === id ? {...d, status: 'stock'} : d);
+    toast('Equipo restaurado ✓');
+    save();
+    renderArchivados();
+    updateSidebarCounters();
+  } catch(err) { toast('Error al restaurar','err'); }
+}
+
 async function archivarEquipo(id, ev) {
   if (ev) ev.stopPropagation();
   if (!confirm('Archivar este equipo? No aparecera en el inventario activo.')) return;

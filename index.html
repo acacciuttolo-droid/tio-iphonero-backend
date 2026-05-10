@@ -581,6 +581,18 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     <button class="tab-btn" onclick="stSetTab('sin_solucion',this)">Sin solución</button>
   </div>
   <div id="st-list"></div>
+<div class="page" id="page-rrhh">
+  <div class="ph-row">
+    <div><h1 style="font-size:22px;font-weight:800">Recursos Humanos</h1><p style="font-size:13px;color:var(--muted)">Funcionarios · Liquidaciones · Recibos</p></div>
+    <button class="btn-primary" onclick="rrhhNuevoFuncionario()">👤 Nuevo Funcionario</button>
+  </div>
+  <div class="tabs" style="margin-bottom:16px">
+    <button class="tab-btn active" onclick="rrhhSetTab('funcionarios',this)">Funcionarios</button>
+    <button class="tab-btn" onclick="rrhhSetTab('liquidaciones',this)">Liquidaciones</button>
+  </div>
+  <div id="rrhh-list"></div>
+</div>
+
 </div>
 
 </main>
@@ -708,6 +720,7 @@ function nav(id){
   if(id==='form'&&!editingId)resetForm();
   if(id==='archivados')renderArchivados();
   if(id==='servtec')stRender();
+  if(id==='rrhh')rrhhRender();
 }
 
 function updateSidebarCounters(){
@@ -2569,6 +2582,8 @@ function stGuardarOrden(num){
     historial: [{fecha:today(),estado:'Orden creada',nota:''}]
   };
   if(!DB.reparaciones) DB.reparaciones=[];
+  if(!DB.empleados) DB.empleados=[];
+  if(!DB.liquidaciones) DB.liquidaciones=[];
   if(stEditId){ DB.reparaciones = DB.reparaciones.map(r=>r.id===stEditId?ord:r); }
   else { DB.reparaciones.unshift(ord); }
   save(); closeModal(); stRender(); toast('Orden guardada ✓');
@@ -2752,6 +2767,395 @@ td{padding:6px 10px;border-bottom:1px solid #eee}
 </div>
 
 <script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   RECURSOS HUMANOS
+══════════════════════════════════════════════════════════════════ */
+if(!DB.empleados) DB.empleados = [];
+if(!DB.liquidaciones) DB.liquidaciones = [];
+let rrhhTab = 'funcionarios';
+let rrhhEditId = null;
+
+function rrhhSetTab(tab, btn){
+  rrhhTab = tab;
+  document.querySelectorAll('#page-rrhh .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  rrhhRender();
+}
+
+function rrhhRender(){
+  if(rrhhTab === 'funcionarios') rrhhRenderFuncionarios();
+  else rrhhRenderLiquidaciones();
+}
+
+function rrhhRenderFuncionarios(){
+  const el = document.getElementById('rrhh-list');
+  if(!el) return;
+  const list = DB.empleados || [];
+  if(!list.length){
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:60px">Sin funcionarios cargados.<br>Agregá el primero con el botón de arriba.</div>';
+    return;
+  }
+  el.innerHTML = list.map(e => {
+    const iniciales = (e.nombre||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const activo = e.activo !== false;
+    return `<div class="scard">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="width:44px;height:44px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0">${iniciales}</div>
+        <div style="flex:1;min-width:160px">
+          <div style="font-weight:800;font-size:15px">${e.nombre}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${e.cargo||'Sin cargo'} ${e.tel?'· '+e.tel:''}</div>
+          <div style="font-size:12px;color:var(--muted)">${e.email||''}</div>
+        </div>
+        <div style="text-align:right;min-width:120px">
+          <div style="font-family:var(--mono);font-weight:700;font-size:14px">₲${gs(e.salario||0)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">salario base</div>
+          <span class="chip ${activo?'chip-ok':'chip-err'}" style="margin-top:4px;display:inline-block">${activo?'Activo':'Inactivo'}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-sm btn-blue" onclick="rrhhLiquidar('${e.id}')">📋 Liquidar</button>
+          <button class="btn-sm btn-sec" onclick="rrhhEditarFuncionario('${e.id}')">✏️ Editar</button>
+        </div>
+      </div>
+      ${e.notas?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">${e.notas}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function rrhhRenderLiquidaciones(){
+  const el = document.getElementById('rrhh-list');
+  if(!el) return;
+  const list = [...(DB.liquidaciones||[])].sort((a,b)=>b.fecha?.localeCompare(a.fecha||'')||0);
+  if(!list.length){
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:60px">Sin liquidaciones generadas todavía.</div>';
+    return;
+  }
+  el.innerHTML = list.map(liq => {
+    const emp = (DB.empleados||[]).find(e=>e.id===liq.empleadoId);
+    const iniciales = (emp?.nombre||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    return `<div class="scard" style="cursor:pointer" onclick="rrhhVerRecibo('${liq.id}')">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--bluebg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--blue);flex-shrink:0;border:1.5px solid var(--blueb)">${iniciales}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">${emp?.nombre||'Empleado'}</div>
+          <div style="font-size:12px;color:var(--muted)">${liq.periodo||''} · ${emp?.cargo||''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-weight:800;font-size:15px;color:var(--green)">₲${gs(liq.neto||0)}</div>
+          <div style="font-size:11px;color:var(--muted)">neto a cobrar</div>
+        </div>
+        <button class="btn-sm btn-blue" onclick="event.stopPropagation();rrhhImprimirRecibo('${liq.id}')">🖨️ Recibo</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function rrhhNuevoFuncionario(){
+  rrhhEditId = null;
+  const html = `<div class="modal-title">Nuevo Funcionario</div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:14px">
+      <div class="row2">
+        <div class="fld"><label>Nombre completo *</label><input id="rrhh-nombre" placeholder="Juan Pérez"/></div>
+        <div class="fld"><label>Cargo</label><input id="rrhh-cargo" placeholder="Vendedor, Técnico..."/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Teléfono</label><input id="rrhh-tel" placeholder="+595 9xx xxxxxx"/></div>
+        <div class="fld"><label>Email</label><input id="rrhh-email" placeholder="correo@email.com"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>CI / Documento</label><input id="rrhh-ci" placeholder="1.234.567"/></div>
+        <div class="fld"><label>Fecha ingreso</label><input type="date" id="rrhh-ingreso"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Salario base (₲)</label><input type="text" inputmode="numeric" id="rrhh-salario" placeholder="0" oninput="fmtField(this)"/></div>
+        <div class="fld"><label>Comisión (%)</label><input type="number" id="rrhh-comision" placeholder="0" min="0" max="100" step="0.1"/></div>
+      </div>
+      <div class="fld"><label>Dirección</label><input id="rrhh-direccion" placeholder="Calle, Barrio, Ciudad"/></div>
+      <div class="fld"><label>Estado</label>
+        <select id="rrhh-activo"><option value="1">Activo</option><option value="0">Inactivo</option></select>
+      </div>
+      <div class="fld"><label>Notas</label><textarea id="rrhh-notas" rows="2" style="resize:vertical" placeholder="Observaciones internas..."></textarea></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="rrhhGuardarFuncionario()" class="btn-primary" style="flex:1">Guardar</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+}
+
+function fmtField(el){ let v=el.value.replace(/\D/g,''); if(!v){el.value='';return;} el.value=parseInt(v).toLocaleString('es-PY'); }
+
+function rrhhGuardarFuncionario(){
+  const nombre = document.getElementById('rrhh-nombre')?.value.trim();
+  if(!nombre) return toast('Ingresá el nombre','err');
+  const emp = {
+    id: rrhhEditId || uid(),
+    nombre,
+    cargo: document.getElementById('rrhh-cargo')?.value.trim()||'',
+    tel: document.getElementById('rrhh-tel')?.value.trim()||'',
+    email: document.getElementById('rrhh-email')?.value.trim()||'',
+    ci: document.getElementById('rrhh-ci')?.value.trim()||'',
+    ingreso: document.getElementById('rrhh-ingreso')?.value||'',
+    salario: parseInt((document.getElementById('rrhh-salario')?.value||'').replace(/\./g,'')||'0'),
+    comision: parseFloat(document.getElementById('rrhh-comision')?.value||'0'),
+    direccion: document.getElementById('rrhh-direccion')?.value.trim()||'',
+    activo: document.getElementById('rrhh-activo')?.value === '1',
+    notas: document.getElementById('rrhh-notas')?.value.trim()||'',
+  };
+  if(!DB.empleados) DB.empleados=[];
+  if(rrhhEditId){ DB.empleados = DB.empleados.map(e=>e.id===rrhhEditId?emp:e); toast('Funcionario actualizado ✓'); }
+  else { DB.empleados.push(emp); toast('Funcionario agregado ✓'); }
+  save(); closeModal(); rrhhRender();
+}
+
+function rrhhEditarFuncionario(id){
+  const e = (DB.empleados||[]).find(x=>x.id===id);
+  if(!e) return;
+  rrhhEditId = id;
+  const html = `<div class="modal-title">Editar Funcionario</div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:14px">
+      <div class="row2">
+        <div class="fld"><label>Nombre completo *</label><input id="rrhh-nombre" value="${e.nombre||''}"/></div>
+        <div class="fld"><label>Cargo</label><input id="rrhh-cargo" value="${e.cargo||''}"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Teléfono</label><input id="rrhh-tel" value="${e.tel||''}"/></div>
+        <div class="fld"><label>Email</label><input id="rrhh-email" value="${e.email||''}"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>CI / Documento</label><input id="rrhh-ci" value="${e.ci||''}"/></div>
+        <div class="fld"><label>Fecha ingreso</label><input type="date" id="rrhh-ingreso" value="${e.ingreso||''}"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Salario base (₲)</label><input type="text" inputmode="numeric" id="rrhh-salario" value="${e.salario?parseInt(e.salario).toLocaleString('es-PY'):''}" oninput="fmtField(this)"/></div>
+        <div class="fld"><label>Comisión (%)</label><input type="number" id="rrhh-comision" value="${e.comision||0}" min="0" max="100" step="0.1"/></div>
+      </div>
+      <div class="fld"><label>Dirección</label><input id="rrhh-direccion" value="${e.direccion||''}"/></div>
+      <div class="fld"><label>Estado</label>
+        <select id="rrhh-activo"><option value="1"${e.activo!==false?' selected':''}>Activo</option><option value="0"${e.activo===false?' selected':''}>Inactivo</option></select>
+      </div>
+      <div class="fld"><label>Notas</label><textarea id="rrhh-notas" rows="2" style="resize:vertical">${e.notas||''}</textarea></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="rrhhGuardarFuncionario()" class="btn-primary" style="flex:1">Guardar Cambios</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+}
+
+function rrhhLiquidar(empleadoId){
+  const e = (DB.empleados||[]).find(x=>x.id===empleadoId);
+  if(!e) return;
+  const hoy = new Date();
+  const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  const mesLabel = hoy.toLocaleDateString('es-PY',{month:'long',year:'numeric'});
+  const html = `<div class="modal-title">Liquidación — ${e.nombre}</div>
+    <div style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:13px">
+      <strong>${e.cargo||'Funcionario'}</strong> · Salario base: ₲${gs(e.salario||0)}
+    </div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:14px">
+      <div class="row2">
+        <div class="fld"><label>Período</label><input id="liq-periodo" value="${mesLabel}" placeholder="Mayo 2026"/></div>
+        <div class="fld"><label>Días trabajados</label><input type="number" id="liq-dias" value="30" min="1" max="31" oninput="rrhhCalcLiq(${e.salario||0})"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Salario base (₲)</label><input type="text" inputmode="numeric" id="liq-salario" value="${e.salario?parseInt(e.salario).toLocaleString('es-PY'):0}" oninput="fmtField(this);rrhhCalcLiq()" /></div>
+        <div class="fld"><label>Comisiones (₲)</label><input type="text" inputmode="numeric" id="liq-comisiones" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Bonos / Extras (₲)</label><input type="text" inputmode="numeric" id="liq-bonos" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
+        <div class="fld"><label>Horas extra (₲)</label><input type="text" inputmode="numeric" id="liq-horas" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Adelantos / Descuentos (₲)</label><input type="text" inputmode="numeric" id="liq-descuentos" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
+        <div class="fld"><label>IPS empleado (%) </label><input type="number" id="liq-ips" value="9" min="0" max="100" step="0.1" oninput="rrhhCalcLiq()"/></div>
+      </div>
+      <div class="fld"><label>Notas / Observaciones</label><textarea id="liq-notas" rows="2" style="resize:vertical"></textarea></div>
+    </div>
+    <div style="background:var(--bg);border-radius:9px;padding:14px;margin-bottom:14px" id="liq-resumen">
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)"><span>Salario proporcional</span><span id="lr-salario" style="font-family:var(--mono)">₲0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)"><span>+ Comisiones</span><span id="lr-comisiones" style="font-family:var(--mono)">₲0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)"><span>+ Bonos/Extras</span><span id="lr-bonos" style="font-family:var(--mono)">₲0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)"><span>+ Horas extra</span><span id="lr-horas" style="font-family:var(--mono)">₲0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)"><span>− IPS empleado</span><span id="lr-ips" style="font-family:var(--mono);color:var(--red)">₲0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)"><span>− Adelantos/Descuentos</span><span id="lr-desc" style="font-family:var(--mono);color:var(--red)">₲0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;padding:8px 0;margin-top:4px"><span>NETO A COBRAR</span><span id="lr-neto" style="font-family:var(--mono);color:var(--green)">₲0</span></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="rrhhGuardarLiquidacion('${empleadoId}')" class="btn-primary" style="flex:1">Guardar e Imprimir</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+  rrhhCalcLiq();
+}
+
+function rrhhCalcLiq(){
+  const sal = parseInt((document.getElementById('liq-salario')?.value||'').replace(/\./g,'')||'0');
+  const dias = parseInt(document.getElementById('liq-dias')?.value||'30');
+  const com = parseInt((document.getElementById('liq-comisiones')?.value||'').replace(/\./g,'')||'0');
+  const bonos = parseInt((document.getElementById('liq-bonos')?.value||'').replace(/\./g,'')||'0');
+  const horas = parseInt((document.getElementById('liq-horas')?.value||'').replace(/\./g,'')||'0');
+  const desc = parseInt((document.getElementById('liq-descuentos')?.value||'').replace(/\./g,'')||'0');
+  const ipsPct = parseFloat(document.getElementById('liq-ips')?.value||'9');
+  const salProp = Math.round(sal * dias / 30);
+  const bruto = salProp + com + bonos + horas;
+  const ips = Math.round(bruto * ipsPct / 100);
+  const neto = bruto - ips - desc;
+  const s = id => { const el=document.getElementById(id); if(el) el.textContent='₲'+gs(arguments[1]); };
+  if(document.getElementById('lr-salario')) document.getElementById('lr-salario').textContent='₲'+gs(salProp);
+  if(document.getElementById('lr-comisiones')) document.getElementById('lr-comisiones').textContent='₲'+gs(com);
+  if(document.getElementById('lr-bonos')) document.getElementById('lr-bonos').textContent='₲'+gs(bonos);
+  if(document.getElementById('lr-horas')) document.getElementById('lr-horas').textContent='₲'+gs(horas);
+  if(document.getElementById('lr-ips')) document.getElementById('lr-ips').textContent='₲'+gs(ips);
+  if(document.getElementById('lr-desc')) document.getElementById('lr-desc').textContent='₲'+gs(desc);
+  if(document.getElementById('lr-neto')) document.getElementById('lr-neto').textContent='₲'+gs(neto);
+}
+
+function rrhhGuardarLiquidacion(empleadoId){
+  const e = (DB.empleados||[]).find(x=>x.id===empleadoId);
+  if(!e) return;
+  const sal = parseInt((document.getElementById('liq-salario')?.value||'').replace(/\./g,'')||'0');
+  const dias = parseInt(document.getElementById('liq-dias')?.value||'30');
+  const com = parseInt((document.getElementById('liq-comisiones')?.value||'').replace(/\./g,'')||'0');
+  const bonos = parseInt((document.getElementById('liq-bonos')?.value||'').replace(/\./g,'')||'0');
+  const horas = parseInt((document.getElementById('liq-horas')?.value||'').replace(/\./g,'')||'0');
+  const desc = parseInt((document.getElementById('liq-descuentos')?.value||'').replace(/\./g,'')||'0');
+  const ipsPct = parseFloat(document.getElementById('liq-ips')?.value||'9');
+  const salProp = Math.round(sal * dias / 30);
+  const bruto = salProp + com + bonos + horas;
+  const ips = Math.round(bruto * ipsPct / 100);
+  const neto = bruto - ips - desc;
+  const liq = {
+    id: uid(), empleadoId,
+    periodo: document.getElementById('liq-periodo')?.value||'',
+    fecha: today(), dias, salario: sal, salProp,
+    comisiones: com, bonos, horas, ips, ipsPct, descuentos: desc,
+    bruto, neto,
+    notas: document.getElementById('liq-notas')?.value.trim()||''
+  };
+  if(!DB.liquidaciones) DB.liquidaciones=[];
+  DB.liquidaciones.push(liq);
+  save(); closeModal();
+  toast('Liquidación guardada ✓');
+  rrhhImprimirRecibo(liq.id);
+}
+
+function rrhhVerRecibo(id){
+  rrhhImprimirRecibo(id);
+}
+
+function rrhhImprimirRecibo(id){
+  const liq = (DB.liquidaciones||[]).find(x=>x.id===id);
+  if(!liq) return;
+  const e = (DB.empleados||[]).find(x=>x.id===liq.empleadoId);
+  if(!e) return;
+  const w = window.open('','_blank','width=800,height=650');
+  if(!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:12px;background:#f5f5f5;padding:20px}
+.doc{background:#fff;max-width:680px;margin:0 auto;border-radius:10px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.header{background:#0a0a0a;padding:22px 28px;display:flex;align-items:center;justify-content:space-between}
+.header-logo{color:#fff;font-size:18px;font-weight:900;letter-spacing:-0.5px}
+.header-sub{color:#666;font-size:11px;margin-top:2px}
+.header-right{text-align:right}
+.recibo-label{color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.recibo-num{color:#fff;font-size:18px;font-weight:900}
+.recibo-fecha{color:#666;font-size:11px;margin-top:2px}
+.badge{background:#1a1a1a;border:1px solid #333;padding:8px 28px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#aaa;text-align:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #eee}
+.info{padding:18px 28px}
+.info:first-child{border-right:1px solid #eee}
+.info-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#bbb;margin-bottom:8px}
+.info-name{font-size:15px;font-weight:700;margin-bottom:3px}
+.info-line{font-size:12px;color:#666;margin-bottom:2px}
+.concepto-section{padding:20px 28px}
+.sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#bbb;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+.row.ingreso{color:#059669}
+.row.egreso{color:#dc2626}
+.row.total{font-size:16px;font-weight:800;padding:12px 0;border-top:2px solid #111;border-bottom:none;margin-top:4px}
+.firma-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:24px 28px;border-top:1px solid #eee}
+.firma-box{border-top:1.5px solid #111;padding-top:8px}
+.firma-label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:1px}
+.footer{background:#f9f9f9;padding:14px 28px;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee}
+.footer strong{color:#333}
+.actions{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.btn{padding:9px 22px;border-radius:50px;border:none;font-weight:700;font-size:13px;cursor:pointer}
+@media print{.actions{display:none}body{background:#fff;padding:0}.doc{box-shadow:none;border-radius:0}}
+</style></head><body>
+<div class="actions">
+  <button class="btn" style="background:#111;color:#fff" onclick="window.print()">🖨️ Imprimir / PDF</button>
+  <button class="btn" style="background:#25d366;color:#fff" onclick="compartirWA()">📲 WhatsApp</button>
+</div>
+<div class="doc">
+  <div class="header">
+    <div><div class="header-logo">TÍO IPHONERO</div><div class="header-sub">Recursos Humanos</div></div>
+    <div class="header-right">
+      <div class="recibo-label">Recibo de Salario</div>
+      <div class="recibo-num">${liq.periodo||''}</div>
+      <div class="recibo-fecha">${fd(liq.fecha)}</div>
+    </div>
+  </div>
+  <div class="badge">Comprobante de Liquidación Salarial</div>
+  <div class="grid2">
+    <div class="info">
+      <div class="info-title">Empleado</div>
+      <div class="info-name">${e.nombre}</div>
+      <div class="info-line">${e.cargo||''}</div>
+      <div class="info-line">CI: ${e.ci||'—'}</div>
+      ${e.tel?`<div class="info-line">${e.tel}</div>`:''}
+    </div>
+    <div class="info">
+      <div class="info-title">Empresa</div>
+      <div class="info-name">Tío Iphonero</div>
+      <div class="info-line">RUC: —</div>
+      <div class="info-line">+595 976 500 020</div>
+      <div class="info-line">Asunción, Paraguay</div>
+    </div>
+  </div>
+  <div class="concepto-section">
+    <div class="sec-title">Detalle de Liquidación · ${liq.dias} días trabajados</div>
+    <div class="row ingreso"><span>Salario proporcional (${liq.dias}/30 días)</span><span>+ ₲${gs(liq.salProp)}</span></div>
+    ${liq.comisiones?`<div class="row ingreso"><span>Comisiones</span><span>+ ₲${gs(liq.comisiones)}</span></div>`:''}
+    ${liq.bonos?`<div class="row ingreso"><span>Bonos / Extras</span><span>+ ₲${gs(liq.bonos)}</span></div>`:''}
+    ${liq.horas?`<div class="row ingreso"><span>Horas extra</span><span>+ ₲${gs(liq.horas)}</span></div>`:''}
+    <div class="row" style="color:#555"><span>Subtotal bruto</span><span>₲${gs(liq.bruto)}</span></div>
+    ${liq.ips?`<div class="row egreso"><span>IPS empleado (${liq.ipsPct}%)</span><span>− ₲${gs(liq.ips)}</span></div>`:''}
+    ${liq.descuentos?`<div class="row egreso"><span>Adelantos / Descuentos</span><span>− ₲${gs(liq.descuentos)}</span></div>`:''}
+    <div class="row total"><span>NETO A COBRAR</span><span style="color:#059669">₲${gs(liq.neto)}</span></div>
+    ${liq.notas?`<div style="margin-top:10px;padding:10px 14px;background:#f9f9f9;border-radius:6px;font-size:12px;color:#666">${liq.notas}</div>`:''}
+  </div>
+  <div class="firma-section">
+    <div class="firma-box"><div style="height:40px"></div><div class="firma-label">Firma del Empleado</div></div>
+    <div class="firma-box"><div style="height:40px"></div><div class="firma-label">Firma del Empleador</div></div>
+  </div>
+  <div class="footer"><strong>Tío Iphonero</strong> · R.I. Curupayty Esq. Juan Bautista Rivarola · Asunción · +595 976 500 020</div>
+</div>
+<script>
+function compartirWA(){
+  const msg = '*TÍO IPHONERO — Recibo de Salario*\\n'+
+    '*Empleado:* ${e.nombre}\\n'+
+    '*Período:* ${liq.periodo||''}\\n'+
+    '*Días trabajados:* ${liq.dias}\\n\\n'+
+    '• Salario proporcional: ₲${gs(liq.salProp)}\\n'+
+    ${liq.comisiones?`'• Comisiones: ₲${gs(liq.comisiones)}\\n'+`:''}
+    ${liq.bonos?`'• Bonos: ₲${gs(liq.bonos)}\\n'+`:''}
+    ${liq.ips?`'• IPS (${liq.ipsPct}%): -₲${gs(liq.ips)}\\n'+`:''}
+    ${liq.descuentos?`'• Descuentos: -₲${gs(liq.descuentos)}\\n'+`:''}
+    '*NETO: ₲${gs(liq.neto)}*\\n\\n'+
+    '_Tío Iphonero · +595 976 500 020_';
+  const tel = '${e.tel}'.replace(/\\D/g,'');
+  const url = tel ? 'https://wa.me/595'+tel.replace(/^0/,'')+'?text='+encodeURIComponent(msg) : 'https://wa.me/?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+window.onload=()=>setTimeout(()=>window.print(),500);
+<\/script>
 </body></html>`);
   w.document.close();
 }

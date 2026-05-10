@@ -2597,6 +2597,7 @@ function stGuardarOrden(num){
   if(!DB.reparaciones) DB.reparaciones=[];
   if(!DB.empleados) DB.empleados=[];
   if(!DB.liquidaciones) DB.liquidaciones=[];
+  if(!DB.adelantos) DB.adelantos=[];
   if(stEditId){ DB.reparaciones = DB.reparaciones.map(r=>r.id===stEditId?ord:r); }
   else { DB.reparaciones.unshift(ord); }
   save(); closeModal(); stRender(); toast('Orden guardada ✓');
@@ -2837,6 +2838,7 @@ function rrhhRenderFuncionarios(){
           <span style="display:inline-block;margin-top:4px;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:700;background:${activo?'var(--greenbg)':'var(--redbg)'};color:${activo?'var(--green)':'var(--red)'};border:1px solid ${activo?'rgba(5,150,105,.3)':'rgba(220,38,38,.3)'}">${activo?'● Activo':'● Inactivo'}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-sm" style="background:var(--amberbg);color:var(--amber);border:1.5px solid var(--amberb)" onclick="rrhhAdelanto('${e.id}')">💵 Adelanto</button>
           <button class="btn-sm btn-blue" onclick="rrhhLiquidar('${e.id}')">📋 Liquidar</button>
           <button class="btn-sm btn-sec" onclick="rrhhEditarFuncionario('${e.id}')">✏️ Editar</button>
         </div>
@@ -2971,6 +2973,97 @@ function rrhhEditarFuncionario(id){
   openModal(html);
 }
 
+
+/* ══════════════════════════════════════════════════════════════════
+   ADELANTOS
+══════════════════════════════════════════════════════════════════ */
+if(!DB.adelantos) DB.adelantos = [];
+
+function rrhhAdelanto(empleadoId){
+  const e = (DB.empleados||[]).find(x=>x.id===empleadoId);
+  if(!e) return;
+  const hoy = new Date();
+  
+  // Build month options (current + last 3)
+  const mesOpts = [];
+  for(let i=0;i<6;i++){
+    const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1);
+    const val=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=d.toLocaleDateString('es-PY',{month:'long',year:'numeric'});
+    mesOpts.push(`<option value="${val}"${i===0?' selected':''}>${label}</option>`);
+  }
+
+  // Show existing adelantos
+  const adelantosHtml = (DB.adelantos||[])
+    .filter(a=>a.empleadoId===empleadoId)
+    .sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''))
+    .slice(0,8)
+    .map(a=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <div><span style="color:var(--muted)">${fdh(a.fecha)}</span> · <span style="background:var(--surface2);border-radius:4px;padding:1px 6px">${a.mesLabel||a.mes}</span>${a.nota?' · '+a.nota:''}</div>
+      <span style="font-family:var(--mono);font-weight:700;color:var(--red)">₲${gs(a.monto)}</span>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12px">Sin adelantos registrados</div>';
+
+  const html = `<div class="modal-title">💵 Registrar Adelanto — ${e.nombre}</div>
+    <div style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:13px">
+      <strong>${e.cargo||'Funcionario'}</strong>${e.tel?' · '+e.tel:''}
+    </div>
+    <div class="fsec-body" style="gap:10px;margin-bottom:14px">
+      <div class="row2">
+        <div class="fld"><label>Monto (₲) *</label><input type="text" inputmode="numeric" id="adl-monto" placeholder="0" oninput="fmtField(this)" style="font-size:18px;font-weight:700"/></div>
+        <div class="fld"><label>Imputar al mes</label><select id="adl-mes">${mesOpts.join('')}</select></div>
+      </div>
+      <div class="fld"><label>Fecha</label><input type="date" id="adl-fecha" value="${today()}"/></div>
+      <div class="fld"><label>Motivo / Nota</label><input id="adl-nota" placeholder="Adelanto de quincena, emergencia..."/></div>
+    </div>
+    <div style="background:var(--surface);border-radius:9px;padding:10px 14px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Historial reciente</div>
+      ${adelantosHtml}
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="rrhhGuardarAdelanto('${empleadoId}')" class="btn-primary" style="flex:1;background:var(--amber);border-color:var(--amber)">💵 Registrar y Notificar</button>
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  openModal(html);
+}
+
+function rrhhGuardarAdelanto(empleadoId){
+  const e = (DB.empleados||[]).find(x=>x.id===empleadoId);
+  if(!e) return;
+  const montoRaw = document.getElementById('adl-monto')?.value.replace(/\./g,'')||'0';
+  const monto = parseInt(montoRaw);
+  if(!monto || monto<=0) return toast('Ingresá el monto','err');
+  const mesSel = document.getElementById('adl-mes');
+  const mes = mesSel?.value||'';
+  const mesLabel = mesSel?.options[mesSel.selectedIndex]?.text||'';
+  const fecha = document.getElementById('adl-fecha')?.value||today();
+  const nota = document.getElementById('adl-nota')?.value.trim()||'';
+  
+  const adelanto = { id:uid(), empleadoId, monto, mes, mesLabel, fecha:fecha+' '+new Date().toLocaleTimeString('es-PY',{timeZone:'America/Asuncion',hour:'2-digit',minute:'2-digit',hour12:false}), nota };
+  if(!DB.adelantos) DB.adelantos=[];
+  DB.adelantos.push(adelanto);
+  save();
+  
+  // WhatsApp
+  const tel = (e.tel||'').replace(/\D/g,'').replace(/^0/,'');
+  const msg = `*TÍO IPHONERO — Comprobante de Adelanto*\n\n`+
+    `Hola *${e.nombre}*! 👋\n`+
+    `Se registró el siguiente adelanto:\n\n`+
+    `💵 *Monto:* ₲${gs(monto)}\n`+
+    `📅 *Fecha:* ${fd(fecha)}\n`+
+    `📆 *Imputado a:* ${mesLabel}\n`+
+    (nota?`📝 *Nota:* ${nota}\n`:'')+
+    `\n_Este adelanto será descontado en tu liquidación de ${mesLabel}._\n`+
+    `_Tío Iphonero · RRHH_`;
+  
+  if(tel){
+    window.open(`https://wa.me/595${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+  
+  closeModal();
+  toast('Adelanto registrado ✓');
+  rrhhRender();
+}
+
 function rrhhPreviewFoto(input){
   if(!input.files||!input.files[0]) return;
   const reader = new FileReader();
@@ -2982,33 +3075,73 @@ function rrhhPreviewFoto(input){
   reader.readAsDataURL(input.files[0]);
 }
 
+function rrhhGetMesOpts(){
+  const opts=[];
+  const hoy=new Date();
+  for(let i=0;i<12;i++){
+    const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1);
+    const val=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=d.toLocaleDateString('es-PY',{month:'long',year:'numeric'});
+    opts.push(`<option value="${val}"${i===0?' selected':''}>${label}</option>`);
+  }
+  return opts.join('');
+}
+
+function rrhhGetAdelantosMes(empleadoId, mesKey){
+  return (DB.adelantos||[]).filter(a=>a.empleadoId===empleadoId && a.mes===mesKey);
+}
+
+function rrhhAutocargarAdelantos(empleadoId){
+  const sel=document.getElementById('liq-mes-sel');
+  if(!sel) return;
+  const mesKey=sel.value;
+  const adelantos=rrhhGetAdelantosMes(empleadoId,mesKey);
+  const total=adelantos.reduce((s,a)=>s+a.monto,0);
+  const field=document.getElementById('liq-descuentos');
+  if(field){ field.value=total?parseInt(total).toLocaleString('es-PY'):'0'; }
+  // Update adelantos summary
+  const sum=document.getElementById('liq-adelantos-sum');
+  if(sum){
+    sum.innerHTML=adelantos.length
+      ? adelantos.map(a=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0"><span>${fd(a.fecha)} — ${a.nota||'Adelanto'}</span><span style="font-family:var(--mono)">₲${gs(a.monto)}</span></div>`).join('')+`<div style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px;font-weight:700;font-size:12px;display:flex;justify-content:space-between"><span>Total adelantos</span><span style="font-family:var(--mono);color:var(--red)">₲${gs(total)}</span></div>`
+      : '<div style="font-size:12px;color:var(--muted)">Sin adelantos registrados para este mes</div>';
+  }
+  const mesLabel=sel.options[sel.selectedIndex]?.text||'';
+  const periodoField=document.getElementById('liq-periodo');
+  if(periodoField) periodoField.value=mesLabel;
+  rrhhCalcLiq();
+}
+
 function rrhhLiquidar(empleadoId){
   const e = (DB.empleados||[]).find(x=>x.id===empleadoId);
   if(!e) return;
   const hoy = new Date();
   const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
-  const mesLabel = hoy.toLocaleDateString('es-PY',{month:'long',year:'numeric'});
+  const adelantosMes = rrhhGetAdelantosMes(empleadoId, mesActual);
+  const totalAdelantos = adelantosMes.reduce((s,a)=>s+a.monto,0);
   const html = `<div class="modal-title">Liquidación — ${e.nombre}</div>
     <div style="background:var(--bg);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:13px">
       <strong>${e.cargo||'Funcionario'}</strong> · Salario base: ₲${gs(e.salario||0)}
     </div>
     <div class="fsec-body" style="gap:10px;margin-bottom:14px">
       <div class="row2">
-        <div class="fld"><label>Período</label><input id="liq-periodo" value="${mesLabel}" placeholder="Mayo 2026"/></div>
-        <div class="fld"><label>Días trabajados</label><input type="number" id="liq-dias" value="30" min="1" max="31" oninput="rrhhCalcLiq(${e.salario||0})"/></div>
+        <div class="fld"><label>Mes a liquidar</label><select id="liq-mes-sel" onchange="rrhhAutocargarAdelantos('${empleadoId}')">${rrhhGetMesOpts()}</select></div>
+        <div class="fld"><label>Período (etiqueta)</label><input id="liq-periodo" value="${hoy.toLocaleDateString('es-PY',{month:'long',year:'numeric'})}"/></div>
+      </div>
+      <div class="fld"><label>Adelantos del mes seleccionado</label><div id="liq-adelantos-sum" style="background:var(--redbg);border:1px solid var(--redb);border-radius:8px;padding:8px 12px;margin-top:4px"><div style="font-size:12px;color:var(--muted)">Sin adelantos registrados para este mes</div></div></div>
+      <div class="row2">
+        <div class="fld"><label>Días trabajados</label><input type="number" id="liq-dias" value="30" min="1" max="31" oninput="rrhhCalcLiq()"/></div>
+        <div class="fld"><label>Salario base (₲)</label><input type="text" inputmode="numeric" id="liq-salario" value="${e.salario?parseInt(e.salario).toLocaleString('es-PY'):0}" oninput="fmtField(this);rrhhCalcLiq()"/></div>
       </div>
       <div class="row2">
-        <div class="fld"><label>Salario base (₲)</label><input type="text" inputmode="numeric" id="liq-salario" value="${e.salario?parseInt(e.salario).toLocaleString('es-PY'):0}" oninput="fmtField(this);rrhhCalcLiq()" /></div>
         <div class="fld"><label>Comisiones (₲)</label><input type="text" inputmode="numeric" id="liq-comisiones" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
-      </div>
-      <div class="row2">
         <div class="fld"><label>Bonos / Extras (₲)</label><input type="text" inputmode="numeric" id="liq-bonos" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
-        <div class="fld"><label>Horas extra (₲)</label><input type="text" inputmode="numeric" id="liq-horas" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
       </div>
       <div class="row2">
-        <div class="fld"><label>Adelantos / Descuentos (₲)</label><input type="text" inputmode="numeric" id="liq-descuentos" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
-        <div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="liq-ips-check" checked onchange="rrhhCalcLiq()" style="width:16px;height:16px;cursor:pointer"> Descontar IPS</label><input type="number" id="liq-ips" value="9" min="0" max="100" step="0.1" oninput="rrhhCalcLiq()" style="margin-top:6px"/></div>
+        <div class="fld"><label>Horas extra (₲)</label><input type="text" inputmode="numeric" id="liq-horas" value="0" oninput="fmtField(this);rrhhCalcLiq()"/></div>
+        <div class="fld"><label>Adelantos / Descuentos (₲)</label><input type="text" inputmode="numeric" id="liq-descuentos" value="${totalAdelantos?parseInt(totalAdelantos).toLocaleString('es-PY'):'0'}" oninput="fmtField(this);rrhhCalcLiq()"/></div>
       </div>
+      <div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="liq-ips-check" checked onchange="rrhhCalcLiq()" style="width:16px;height:16px;cursor:pointer"> Descontar IPS</label><input type="number" id="liq-ips" value="9" min="0" max="100" step="0.1" oninput="rrhhCalcLiq()" style="margin-top:6px;max-width:100px"/></div>
       <div class="fld"><label>Notas / Observaciones</label><textarea id="liq-notas" rows="2" style="resize:vertical"></textarea></div>
     </div>
     <div style="background:var(--bg);border-radius:9px;padding:14px;margin-bottom:14px" id="liq-resumen">

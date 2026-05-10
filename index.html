@@ -2116,8 +2116,11 @@ async function archivarEquipo(id, ev) {
   if (!confirm('Archivar este equipo? No aparecera en el inventario activo.')) return;
   try {
     await api('PUT', '/api/equipos/' + id, { status: 'archivado' });
+    DB.devices = DB.devices.map(d => d.id === id ? {...d, status: 'archivado'} : d);
     toast('Equipo archivado ✓');
-    if(typeof loadStock==='function')loadStock(); else if(typeof renderStock==='function')renderStock();
+    save();
+    renderStock();
+    updateSidebarCounters();
   } catch(err) { toast('Error al archivar','err'); }
 }
 

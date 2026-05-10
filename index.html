@@ -2102,7 +2102,7 @@ async function autoCargarGarantia() {
   const sel = document.getElementById('comp-prov');
   if (!sel || !sel.value) return;
   try {
-    const provs = await apiFetch('/api/proveedores');
+    const provs = await api('GET', '/api/proveedores');
     const prov = provs.find(p => String(p.id) === String(sel.value));
     if (prov && prov.dias_garantia) {
       document.querySelectorAll('.eq-gar-dias').forEach(inp => { inp.value = prov.dias_garantia; });
@@ -2115,7 +2115,7 @@ async function archivarEquipo(id, ev) {
   if (ev) ev.stopPropagation();
   if (!confirm('Archivar este equipo? No aparecera en el inventario activo.')) return;
   try {
-    await apiFetch('/api/equipos/' + id, 'PUT', { status: 'archivado' });
+    await api('PUT', '/api/equipos/' + id, { status: 'archivado' });
     toast('Equipo archivado ✓');
     if(typeof loadStock==='function')loadStock(); else if(typeof renderStock==='function')renderStock();
   } catch(err) { toast('Error al archivar','err'); }

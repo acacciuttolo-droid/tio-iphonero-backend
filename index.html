@@ -443,7 +443,7 @@ nav{flex:1;padding:8px 10px;overflow-y:auto}
     </div></div>
 
     <div class="fsec"><div class="fsec-title">Proveedor</div><div class="fsec-body">
-      <div class="fld"><label>Proveedor</label><select id="f-prov"><option value="">— Sin proveedor —</option></select></div>
+      <div class="fld"><label>Proveedor</label><select id="f-prov" onchange="autoFillProvGar(this.value)"><option value="">— Sin proveedor —</option></select></div>
       <div id="no-sup-msg" style="display:none;font-size:12px;color:var(--muted)">Sin proveedores. <span onclick="nav('proveedores')" style="color:var(--c1);cursor:pointer">Agregar →</span></div>
     </div></div>
 
@@ -687,8 +687,10 @@ const load=()=>{try{const d=localStorage.getItem('ti5');if(d)DB=JSON.parse(d);}c
 
 const uid=()=>Math.random().toString(36).slice(2,9);
 const gs=n=>new Intl.NumberFormat('es-PY').format(Math.round(n||0));
-const fd=s=>s?new Date(s).toLocaleDateString('es-PY'):'—';
-const today=()=>new Date().toISOString().slice(0,10);
+const fd=s=>s?new Date(s+'T00:00:00').toLocaleDateString('es-PY'):'—';
+const fdh=s=>{if(!s)return'—';if(s.includes(' ')){const[d,h]=s.split(' ');return fd(d)+' '+h;}return fd(s);};
+const today=()=>{const d=new Date();return new Date(d.toLocaleString('en-US',{timeZone:'America/Asuncion'})).toISOString().slice(0,10);};
+const nowPY=()=>{const d=new Date();const py=new Date(d.toLocaleString('en-US',{timeZone:'America/Asuncion'}));return py.toISOString().slice(0,10)+' '+py.toTimeString().slice(0,5);};
 const addDays=(d,n)=>{const dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.toISOString().slice(0,10)};
 const diffDays=(a,b)=>Math.round((new Date(b)-new Date(a))/(1000*60*60*24));
 
@@ -822,12 +824,20 @@ function updateMarginFmt(){
   document.getElementById('margin-preview').style.display='flex';
 }
 
-async function saveDevice(){
+async function autoFillProvGar(provId){
+  if(!provId) return;
+  const sup = DB.suppliers.find(s=>s.id===provId);
+  if(!sup) return;
+  const garField = document.getElementById('f-garprov');
+  if(garField && sup.diasGarantia) garField.value = sup.diasGarantia;
+}
+
+function saveDevice(){
   const modelo=document.getElementById('f-modelo').value.trim();
   const costo=document.getElementById('f-costo').value.replace(/\./g,'');
   if(!modelo)return toast('Ingresá el modelo','err');
   if(!costo)return toast('Ingresá el costo','err');
-  const dev={id:editingId||uid(),modelo,categoria:document.getElementById('f-cat').value,storage:document.getElementById('f-storage').value,grade:currentGrade,origin:document.getElementById('f-origin').value,color:document.getElementById('f-color').value,imei:document.getElementById('f-imei').value,bateria:document.getElementById('f-bateria').value,proveedorId:document.getElementById('f-prov').value||'',costoGs:costo,costoUsd:document.getElementById('f-costoUsd').value,precioGs:document.getElementById('f-precio').value.replace(/\./g,''),precioUsd:document.getElementById('f-precioUsd').value,observaciones:document.getElementById('f-obs').value,fechaIngreso:document.getElementById('f-fecha').value,diasGarLocal:+document.getElementById('f-garlocal').value||180,diasGarProv:+document.getElementById('f-garprov').value||30,status:editingId?(DB.devices.find(d=>d.id===editingId)?.status||'stock'):'stock',historial:editingId?(DB.devices.find(d=>d.id===editingId)?.historial||[]):[{tipo:'ingreso',fecha:today(),nota:'Ingreso inicial'}]};
+  const dev={id:editingId||uid(),modelo,categoria:document.getElementById('f-cat').value,storage:document.getElementById('f-storage').value,grade:currentGrade,origin:document.getElementById('f-origin').value,color:document.getElementById('f-color').value,imei:document.getElementById('f-imei').value,bateria:document.getElementById('f-bateria').value,proveedorId:document.getElementById('f-prov').value||'',costoGs:costo,costoUsd:document.getElementById('f-costoUsd').value,precioGs:document.getElementById('f-precio').value.replace(/\./g,''),precioUsd:document.getElementById('f-precioUsd').value,observaciones:document.getElementById('f-obs').value,fechaIngreso:document.getElementById('f-fecha').value,diasGarLocal:+document.getElementById('f-garlocal').value||180,diasGarProv:+document.getElementById('f-garprov').value||30,status:editingId?(DB.devices.find(d=>d.id===editingId)?.status||'stock'):'stock',historial:editingId?(DB.devices.find(d=>d.id===editingId)?.historial||[]):[{tipo:'ingreso',fecha:nowPY(),nota:'Ingreso inicial'}]};
   const payload={modelo:dev.modelo,categoria:dev.categoria,storage:dev.storage,grade:dev.grade,origin:dev.origin,color:dev.color||null,imei:dev.imei||null,bateria:dev.bateria?+dev.bateria:null,proveedor_id:dev.proveedorId||null,costo_gs:+dev.costoGs||0,costo_usd:+dev.costoUsd||0,precio_venta_gs:+dev.precioGs||0,precio_venta_usd:+dev.precioUsd||0,observaciones:dev.observaciones||null,fecha_ingreso:dev.fechaIngreso,dias_gar_local:dev.diasGarLocal||180,dias_gar_proveedor:dev.diasGarProv||30};
   if(editingId){const r=await api('PUT','/api/equipos/'+editingId,payload);if(r&&!r.error){DB.devices=DB.devices.map(d=>d.id===editingId?{...dev,id:editingId}:d);toast('Equipo actualizado ✓');}else toast('Error al actualizar','err');}
   else{const r=await api('POST','/api/equipos',payload);if(r&&!r.error){dev.id=r.id;DB.devices.unshift(dev);toast('Equipo cargado ✓');}else toast('Error al cargar','err');}
@@ -1467,7 +1477,7 @@ function openDetail(id){
     {fecha:d.fechaIngreso,tipo:'ingreso',color:'var(--muted)',icon:'',nota:'Ingreso al stock'},
   ].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
   body+=`<div class="detail-section"><div class="detail-section-title">Historial completo</div>`;
-  body+=allHist.map(h=>`<div class="hline"><span class="hline-date">${fd(h.fecha)}</span><span class="hline-type" style="color:${h.color}">${h.icon} ${h.tipo}</span><span class="hline-note">${h.nota}</span></div>`).join('');
+  body+=allHist.map(h=>`<div class="hline"><span class="hline-date">${fdh(h.fecha)}</span><span class="hline-type" style="color:${h.color}">${h.icon} ${h.tipo}</span><span class="hline-note">${h.nota}</span></div>`).join('');
   body+=`</div>`;
   document.getElementById('detail-body').innerHTML=body;
   let foot='';
@@ -2636,7 +2646,7 @@ function stVerOrden(id){
 function stCambiarEstado(id, estado){
   DB.reparaciones = (DB.reparaciones||[]).map(r=>{
     if(r.id!==id) return r;
-    return {...r, estado, historial:[...(r.historial||[]),{fecha:today(),estado:'Estado: '+ST_ESTADOS[estado]?.label,nota:''}]};
+    return {...r, estado, historial:[...(r.historial||[]),{fecha:nowPY(),estado:'Estado: '+ST_ESTADOS[estado]?.label,nota:''}]};
   });
   save(); stRender(); toast('Estado actualizado ✓');
 }

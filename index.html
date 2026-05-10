@@ -826,10 +826,13 @@ function updateMarginFmt(){
 
 function autoFillProvGar(provId){
   if(!provId) return;
-  const sup = DB.suppliers.find(s=>s.id===provId);
+  const sup = DB.suppliers.find(s=>String(s.id)===String(provId));
   if(!sup) return;
   const garField = document.getElementById('f-garprov');
-  if(garField && sup.diasGarantia) garField.value = sup.diasGarantia;
+  if(garField){
+    const dias = sup.diasGarantia || sup.dias_garantia;
+    if(dias) garField.value = dias;
+  }
 }
 
 function saveDevice(){

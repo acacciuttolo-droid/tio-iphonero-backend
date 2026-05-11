@@ -94,8 +94,17 @@ footer strong{color:var(--ink)}
 <script>
 const WA = '595976500020';
 
-// ── PRODUCTOS — editá estos directamente ──────────────────────────────────
-const PRODUCTOS = [
+// ── PRODUCTOS — carga desde localStorage (admin-catalogo.html) ────────────
+const DB_PRODS_KEY = 'tio_db';
+function loadProductos(){
+  try{
+    const db = JSON.parse(localStorage.getItem(DB_PRODS_KEY)||'{}');
+    const prods = (db.catalogo||[]).filter(p=>p.activo!==false);
+    if(prods.length) return prods.map(p=>({...p, cat:p.categoria||'iphone', precio:p.precioGs, usd:p.precioUsd}));
+  }catch(e){}
+  return null;
+}
+let PRODUCTOS_DEFAULT = [
   {id:'p1', nombre:'iPhone 16 Pro Max', cat:'iphone', storage:'256GB', precio:8200000, usd:1060, origen:'Americano', desc:'Grado A+ · Titanio · Camera Control', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
   {id:'p2', nombre:'iPhone 16', cat:'iphone', storage:'128GB', precio:6800000, usd:880, origen:'Americano', desc:'Grado A+ · Chip A18 · Batería 95%', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
   {id:'p3', nombre:'iPhone 15 Pro Max', cat:'iphone', storage:'256GB', precio:6500000, usd:840, origen:'Americano', desc:'Grado A · Titanio · USB-C', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
@@ -111,6 +120,8 @@ const PRODUCTOS = [
   {id:'p13', nombre:'Samsung S25', cat:'samsung', storage:'128GB', precio:5500000, usd:710, origen:'Nuevo', desc:'Nuevo sellado · Garantía 1 año', foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-s931-sm-s931bzkgmea-thumb-542573481?$650_519_PNG$'},
   {id:'p14', nombre:'Samsung S24 Ultra', cat:'samsung', storage:'256GB', precio:7200000, usd:930, origen:'Americano', desc:'Grado A · S Pen · Batería 88%', foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003?$650_519_PNG$'},
 ];
+
+let PRODUCTOS = loadProductos() || PRODUCTOS_DEFAULT;
 
 // ── UTILS ────────────────────────────────────────────────────────────────
 function gs(n){ return new Intl.NumberFormat('es-PY').format(Math.round(n||0)); }
@@ -135,7 +146,8 @@ function getChip(p){
 let filtroActual = 'todos';
 
 function renderFilters(){
-  const cats = [...new Set(PRODUCTOS.map(p=>p.cat))];
+  PRODUCTOS = loadProductos() || PRODUCTOS_DEFAULT;
+  const cats = [...new Set(PRODUCTOS.map(p=>p.cat||p.categoria))];
   const labels = {iphone:'iPhone',samsung:'Samsung',accesorio:'Accesorios',smartwatch:'Smartwatch'};
   const all = ['todos',...cats];
   document.getElementById('filters').innerHTML = all.map(c=>
@@ -152,7 +164,7 @@ function setFiltro(cat, btn){
 
 // ── GRID ─────────────────────────────────────────────────────────────────
 function renderGrid(){
-  const list = filtroActual==='todos' ? PRODUCTOS : PRODUCTOS.filter(p=>p.cat===filtroActual);
+  const list = filtroActual==='todos' ? PRODUCTOS : PRODUCTOS.filter(p=>(p.cat||p.categoria)===filtroActual);
   const msg = p => encodeURIComponent(`Hola! Vi el *${p.nombre} ${p.storage}* en el catalogo de Tio Iphonero. Esta disponible?`);
   document.getElementById('grid').innerHTML = list.map(p=>`
     <div class="card">

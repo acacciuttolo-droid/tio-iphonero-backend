@@ -93,17 +93,38 @@ footer strong{color:var(--ink)}
 
 <script>
 const WA = '595976500020';
+const API_URL = 'https://tio-iphonero-backend-production.up.railway.app';
 
-// ── PRODUCTOS — carga desde localStorage (admin-catalogo.html) ────────────
-const DB_PRODS_KEY = 'tio_db';
-function loadProductos(){
-  try{
-    const db = JSON.parse(localStorage.getItem(DB_PRODS_KEY)||'{}');
-    const prods = (db.catalogo||[]).filter(p=>p.activo!==false);
-    if(prods.length) return prods.map(p=>({...p, cat:p.categoria||'iphone', precio:p.precioGs, usd:p.precioUsd}));
-  }catch(e){}
-  return null;
+// ── PRODUCTOS — carga desde la API pública /api/catalogo ────────────
+function mapProd(p){
+  return {
+    id: p.id,
+    nombre: p.nombre,
+    cat: p.categoria || 'iphone',
+    storage: p.storage || '',
+    precio: Number(p.precio_gs)||0,
+    usd: Number(p.precio_usd)||0,
+    origen: p.condicion || '',
+    desc: p.descripcion || '',
+    foto: p.foto || '',
+    wa: p.wa || WA,
+    activo: p.activo !== false
+  };
 }
+
+async function fetchProductos(){
+  try{
+    const res = await fetch(API_URL + '/api/catalogo', { cache:'no-store' });
+    if(!res.ok) return null;
+    const arr = await res.json();
+    if(!Array.isArray(arr)) return null;
+    return arr.filter(p => p.activo !== false).map(mapProd);
+  }catch(e){
+    console.warn('catalogo fetch:', e.message);
+    return null;
+  }
+}
+
 let PRODUCTOS_DEFAULT = [
   {id:'p1', nombre:'iPhone 16 Pro Max', cat:'iphone', storage:'256GB', precio:8200000, usd:1060, origen:'Americano', desc:'Grado A+ · Titanio · Camera Control', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
   {id:'p2', nombre:'iPhone 16', cat:'iphone', storage:'128GB', precio:6800000, usd:880, origen:'Americano', desc:'Grado A+ · Chip A18 · Batería 95%', foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
@@ -121,17 +142,20 @@ let PRODUCTOS_DEFAULT = [
   {id:'p14', nombre:'Samsung S24 Ultra', cat:'samsung', storage:'256GB', precio:7200000, usd:930, origen:'Americano', desc:'Grado A · S Pen · Batería 88%', foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003?$650_519_PNG$'},
 ];
 
-let PRODUCTOS = loadProductos() || PRODUCTOS_DEFAULT;
+let PRODUCTOS = PRODUCTOS_DEFAULT;
 
 // ── UTILS ────────────────────────────────────────────────────────────────
 function gs(n){ return new Intl.NumberFormat('es-PY').format(Math.round(n||0)); }
 
 function saveClick(prodId){
+  // POST best-effort, no bloquea la apertura de WhatsApp
   try{
-    const db = JSON.parse(localStorage.getItem('tio_db')||'{}');
-    if(!db.catClicks) db.catClicks=[];
-    db.catClicks.push({id:Math.random().toString(36).slice(2,9),prodId,fecha:new Date().toLocaleDateString('en-CA',{timeZone:'America/Asuncion'})});
-    localStorage.setItem('tio_db', JSON.stringify(db));
+    fetch(API_URL + '/api/catalogo/click', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prod_id: prodId }),
+      keepalive: true
+    }).catch(()=>{});
   }catch(e){}
 }
 
@@ -146,7 +170,6 @@ function getChip(p){
 let filtroActual = 'todos';
 
 function renderFilters(){
-  PRODUCTOS = loadProductos() || PRODUCTOS_DEFAULT;
   const cats = [...new Set(PRODUCTOS.map(p=>p.cat||p.categoria))];
   const labels = {iphone:'iPhone',samsung:'Samsung',accesorio:'Accesorios',smartwatch:'Smartwatch'};
   const all = ['todos',...cats];
@@ -197,8 +220,18 @@ function handleWA(prodId, tel, msg){
   window.open(`https://wa.me/${tel}?text=${msg}`, '_blank');
 }
 
-renderFilters();
-renderGrid();
+// ── INIT ─────────────────────────────────────────────────────────────────
+async function init(){
+  renderFilters();
+  renderGrid();
+  const remote = await fetchProductos();
+  if(remote && remote.length){
+    PRODUCTOS = remote;
+    renderFilters();
+    renderGrid();
+  }
+}
+init();
 </script>
 </body>
 </html>

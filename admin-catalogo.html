@@ -138,15 +138,65 @@ h1{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:4p
 <div class="toast" id="toast"></div>
 
 <script>
-const DB_KEY = 'tio_db';
+// ── API LAYER (Railway) ──────────────────────────────────────────────────
+const API_URL = 'https://tio-iphonero-backend-production.up.railway.app';
+const TOKEN_KEY = 'ti_token';
+function getToken(){ return localStorage.getItem(TOKEN_KEY) || null; }
 
-function loadDB(){
-  try{ return JSON.parse(localStorage.getItem(DB_KEY)||'{}'); }
-  catch(e){ return {}; }
+async function api(method, path, body){
+  const token = getToken();
+  try{
+    const res = await fetch(API_URL + path, {
+      method,
+      headers: {
+        'Content-Type':'application/json',
+        ...(token ? { Authorization:'Bearer '+token } : {})
+      },
+      ...(body ? { body: JSON.stringify(body) } : {})
+    });
+    if(res.status === 401){ return { __auth:true }; }
+    const txt = await res.text();
+    try{ return JSON.parse(txt); }catch(e){ return txt; }
+  }catch(err){
+    console.warn('API:', err.message);
+    return { error: err.message };
+  }
 }
-function saveDB(db){
-  try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-  catch(e){ toast('Error guardando','err'); }
+
+// ── STATE ────────────────────────────────────────────────────────────────
+let PRODS = [];   // productos crudos del backend (snake_case)
+let CLICKS = [];  // analytics de clicks (por prod_id)
+
+// Backend (snake_case) ↔ UI (camelCase)
+function fromApi(p){
+  return {
+    id: p.id,
+    nombre: p.nombre,
+    categoria: p.categoria || 'iphone',
+    storage: p.storage || '',
+    precioGs: Number(p.precio_gs)||0,
+    precioUsd: Number(p.precio_usd)||0,
+    condicion: p.condicion || 'Americano',
+    wa: p.wa || '595976500020',
+    foto: p.foto || '',
+    desc: p.descripcion || '',
+    activo: p.activo !== false
+  };
+}
+function toApi(p){
+  return {
+    id: p.id,
+    nombre: p.nombre,
+    categoria: p.categoria,
+    storage: p.storage,
+    precio_gs: Math.round(Number(p.precioGs)||0),
+    precio_usd: Number(p.precioUsd)||0,
+    condicion: p.condicion,
+    wa: p.wa,
+    foto: p.foto,
+    descripcion: p.desc,
+    activo: p.activo !== false
+  };
 }
 
 function gs(n){ return new Intl.NumberFormat('es-PY').format(Math.round(n||0)); }
@@ -207,8 +257,7 @@ function prevFoto(){
 }
 
 function editar(id){
-  const db=loadDB();
-  const p=(db.catalogo||[]).find(x=>x.id===id);
+  const p = PRODS.find(x=>x.id===id);
   if(!p)return;
   editId=id;
   document.getElementById('form-title-text').textContent='Editar Producto';
@@ -217,7 +266,7 @@ function editar(id){
   document.getElementById('f-storage').value=p.storage||'';
   document.getElementById('f-precio').value=p.precioGs?parseInt(p.precioGs).toLocaleString('es-PY'):'';
   document.getElementById('f-usd').value=p.precioUsd||'';
-  document.getElementById('f-condicion').value=p.condicion||p.origen||'Americano';
+  document.getElementById('f-condicion').value=p.condicion||'Americano';
   document.getElementById('f-wa').value=p.wa||'595976500020';
   document.getElementById('f-foto').value=p.foto||'';
   document.getElementById('f-desc').value=p.desc||'';
@@ -228,18 +277,15 @@ function editar(id){
   card.scrollIntoView({behavior:'smooth'});
 }
 
-function guardar(){
+async function guardar(){
   const nombre=document.getElementById('f-nombre').value.trim();
   if(!nombre){ toast('Ingresá el nombre','err'); return; }
   const precioRaw=document.getElementById('f-precio').value.replace(/\./g,'');
   const precio=parseInt(precioRaw)||0;
   if(!precio){ toast('Ingresá el precio','err'); return; }
 
-  const db=loadDB();
-  if(!db.catalogo) db.catalogo=[];
-
-  const prod={
-    id: editId||uid(),
+  const prod = {
+    id: editId || uid(),
     nombre,
     categoria: document.getElementById('f-cat').value,
     storage: document.getElementById('f-storage').value.trim(),
@@ -252,62 +298,73 @@ function guardar(){
     activo: document.getElementById('f-activo').checked,
   };
 
+  const payload = toApi(prod);
+  let res;
   if(editId){
-    db.catalogo=db.catalogo.map(p=>p.id===editId?prod:p);
-    toast('Producto actualizado');
+    res = await api('PUT', '/api/catalogo/'+encodeURIComponent(editId), payload);
   } else {
-    db.catalogo.push(prod);
-    toast('Producto agregado');
+    res = await api('POST', '/api/catalogo', payload);
   }
 
-  saveDB(db);
+  if(!res || res.error){ toast(res?.error || 'Error al guardar','err'); return; }
+  if(res.__auth){ toast('Sesión expirada. Iniciá sesión en el CRM','err'); return; }
+
+  toast(editId ? 'Producto actualizado' : 'Producto agregado');
   closeForm();
-  render();
+  await loadAndRender();
 }
 
-function eliminar(id){
+async function eliminar(id){
   if(!confirm('¿Eliminar este producto del catálogo?')) return;
-  const db=loadDB();
-  db.catalogo=(db.catalogo||[]).filter(p=>p.id!==id);
-  saveDB(db);
+  const res = await api('DELETE', '/api/catalogo/'+encodeURIComponent(id));
+  if(!res || res.error){ toast(res?.error || 'Error al eliminar','err'); return; }
+  if(res.__auth){ toast('Sesión expirada. Iniciá sesión en el CRM','err'); return; }
   toast('Producto eliminado');
-  render();
+  await loadAndRender();
 }
 
-function toggleVisible(id){
-  const db=loadDB();
-  db.catalogo=(db.catalogo||[]).map(p=>p.id===id?{...p,activo:!(p.activo!==false)}:p);
-  saveDB(db);
-  render();
+async function toggleVisible(id){
+  const p = PRODS.find(x=>x.id===id);
+  if(!p) return;
+  const nuevo = { ...p, activo: !(p.activo!==false) };
+  const res = await api('PUT', '/api/catalogo/'+encodeURIComponent(id), toApi(nuevo));
+  if(!res || res.error){ toast(res?.error || 'Error al actualizar','err'); return; }
+  if(res.__auth){ toast('Sesión expirada. Iniciá sesión en el CRM','err'); return; }
+  await loadAndRender();
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────
-function render(){
-  const db=loadDB();
-  const prods=db.catalogo||[];
-  const clicks=db.catClicks||[];
+function renderProducts(){
+  const prods = PRODS;
 
   // Stats
-  document.getElementById('s-total').textContent=prods.length;
-  document.getElementById('s-visible').textContent=prods.filter(p=>p.activo!==false).length;
-  const hoy=new Date().toLocaleDateString('en-CA',{timeZone:'America/Asuncion'});
-  document.getElementById('s-clicks').textContent=clicks.filter(c=>(c.fecha||'').slice(0,10)===hoy).length;
+  document.getElementById('s-total').textContent = prods.length;
+  document.getElementById('s-visible').textContent = prods.filter(p=>p.activo!==false).length;
+  const totalHoy = CLICKS.reduce((sum,c)=> sum + (Number(c.hoy)||0), 0);
+  document.getElementById('s-clicks').textContent = totalHoy;
 
-  const el=document.getElementById('prod-list');
+  const el = document.getElementById('prod-list');
   if(!prods.length){
-    el.innerHTML='<div class="empty">Sin productos todavía.<br>Agregá el primero con el botón de arriba.</div>';
+    el.innerHTML = `<div class="empty">
+      Sin productos todavía.<br>
+      Agregá el primero con el botón de arriba.
+      <div style="margin-top:18px"><button class="btn btn-green" onclick="seedDefaults()">📥 Cargar productos de ejemplo</button></div>
+    </div>`;
     return;
   }
 
-  const condChip=(c)=>{
+  const clicksById = Object.fromEntries(CLICKS.map(c => [c.prod_id, c]));
+
+  const condChip = (c) => {
     if(c==='Nuevo') return '<span class="chip chip-green">Nuevo</span>';
     if(c==='Americano') return '<span class="chip chip-amber">Americano</span>';
     return `<span class="chip" style="background:var(--surface2);color:var(--ink2)">${c||''}</span>`;
   };
 
-  el.innerHTML=prods.map(p=>{
-    const activo=p.activo!==false;
-    const prodClicks=clicks.filter(c=>c.prodId===p.id).length;
+  el.innerHTML = prods.map(p=>{
+    const activo = p.activo!==false;
+    const c = clicksById[p.id] || {};
+    const totalClicks = Number(c.total)||0;
     return `<div class="prod-card" style="opacity:${activo?1:.6}">
       ${p.foto
         ? `<img src="${p.foto}" class="prod-img" onerror="this.outerHTML='<div class=prod-emoji>📱</div>'">`
@@ -315,8 +372,8 @@ function render(){
       <div class="prod-info">
         <div class="prod-name">${p.nombre}${p.storage?' <span style="font-weight:500;color:var(--ink2);font-size:12px">'+p.storage+'</span>':''}</div>
         <div class="prod-meta" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px">
-          ${condChip(p.condicion||p.origen||'')}
-          <span style="color:var(--ink2)">· ${prodClicks} clicks</span>
+          ${condChip(p.condicion||'')}
+          <span style="color:var(--ink2)">· ${totalClicks} clicks</span>
           <span class="chip ${activo?'chip-green':'chip-red'}" style="font-size:10px">${activo?'Visible':'Oculto'}</span>
         </div>
       </div>
@@ -333,27 +390,51 @@ function render(){
   }).join('');
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────────
-// Load defaults if empty
-const _db=loadDB();
-if(!_db.catalogo||_db.catalogo.length===0){
-  _db.catalogo=[
-    {id:'p1',nombre:'iPhone 16 Pro Max',categoria:'iphone',storage:'256GB',precioGs:8200000,precioUsd:1060,condicion:'Americano',desc:'Grado A+ · Titanio · Camera Control',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p2',nombre:'iPhone 16',categoria:'iphone',storage:'128GB',precioGs:6800000,precioUsd:880,condicion:'Americano',desc:'Grado A+ · Chip A18 · Batería 95%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p3',nombre:'iPhone 15 Pro Max',categoria:'iphone',storage:'256GB',precioGs:6500000,precioUsd:840,condicion:'Americano',desc:'Grado A · Titanio · USB-C',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p4',nombre:'iPhone 15 Pro',categoria:'iphone',storage:'128GB',precioGs:5200000,precioUsd:670,condicion:'Americano',desc:'Grado A · Titanio · Dynamic Island',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p5',nombre:'iPhone 15',categoria:'iphone',storage:'128GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · USB-C · Batería 90%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p6',nombre:'iPhone 14 Pro Max',categoria:'iphone',storage:'256GB',precioGs:5000000,precioUsd:645,condicion:'Americano',desc:'Grado A · Dynamic Island',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p7',nombre:'iPhone 14',categoria:'iphone',storage:'128GB',precioGs:3800000,precioUsd:490,condicion:'Americano',desc:'Grado A · Batería 88%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p8',nombre:'iPhone 13',categoria:'iphone',storage:'128GB',precioGs:2900000,precioUsd:375,condicion:'Americano',desc:'Grado A · Batería 84%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-finish-select-202207-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p9',nombre:'Samsung S25 Ultra',categoria:'samsung',storage:'256GB',precioGs:8500000,precioUsd:1100,condicion:'Nuevo',desc:'Nuevo sellado · S Pen · Garantia 1 ano',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzkgmea-thumb-542573611'},
-    {id:'p10',nombre:'Samsung S25+',categoria:'samsung',storage:'256GB',precioGs:6800000,precioUsd:880,condicion:'Nuevo',desc:'Nuevo sellado · Garantia 1 ano',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-plus-s936-sm-s936bzkgmea-thumb-542573546'},
-    {id:'p11',nombre:'Samsung S24 Ultra',categoria:'samsung',storage:'256GB',precioGs:7200000,precioUsd:930,condicion:'Americano',desc:'Grado A · S Pen · Bateria 88%',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003'},
-  ];
-  saveDB(_db);
+async function loadAndRender(){
+  const list = await api('GET', '/api/catalogo');
+  if(list && list.__auth){ toast('Iniciá sesión en el CRM para administrar','err'); PRODS=[]; renderProducts(); return; }
+  if(!Array.isArray(list)){
+    PRODS = [];
+    document.getElementById('prod-list').innerHTML = `<div class="empty">No se pudo conectar al servidor.<br><span style="font-size:12px;color:var(--ink2)">${(list&&list.error)||'Revisá tu conexión.'}</span></div>`;
+    return;
+  }
+  PRODS = list.map(fromApi);
+
+  const clicksRes = await api('GET', '/api/catalogo/clicks');
+  CLICKS = Array.isArray(clicksRes) ? clicksRes : [];
+
+  renderProducts();
 }
 
-render();
+// ── SEED (opcional, solo si está vacío) ──────────────────────────────────
+const DEFAULT_PRODS = [
+  {id:'p1',nombre:'iPhone 16 Pro Max',categoria:'iphone',storage:'256GB',precioGs:8200000,precioUsd:1060,condicion:'Americano',desc:'Grado A+ · Titanio · Camera Control',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p2',nombre:'iPhone 16',categoria:'iphone',storage:'128GB',precioGs:6800000,precioUsd:880,condicion:'Americano',desc:'Grado A+ · Chip A18 · Batería 95%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p3',nombre:'iPhone 15 Pro Max',categoria:'iphone',storage:'256GB',precioGs:6500000,precioUsd:840,condicion:'Americano',desc:'Grado A · Titanio · USB-C',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p4',nombre:'iPhone 15 Pro',categoria:'iphone',storage:'128GB',precioGs:5200000,precioUsd:670,condicion:'Americano',desc:'Grado A · Titanio · Dynamic Island',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p5',nombre:'iPhone 15',categoria:'iphone',storage:'128GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · USB-C · Batería 90%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p6',nombre:'iPhone 14 Pro Max',categoria:'iphone',storage:'256GB',precioGs:5000000,precioUsd:645,condicion:'Americano',desc:'Grado A · Dynamic Island',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p7',nombre:'iPhone 14',categoria:'iphone',storage:'128GB',precioGs:3800000,precioUsd:490,condicion:'Americano',desc:'Grado A · Batería 88%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p8',nombre:'iPhone 13',categoria:'iphone',storage:'128GB',precioGs:2900000,precioUsd:375,condicion:'Americano',desc:'Grado A · Batería 84%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-finish-select-202207-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+  {id:'p9',nombre:'Samsung S25 Ultra',categoria:'samsung',storage:'256GB',precioGs:8500000,precioUsd:1100,condicion:'Nuevo',desc:'Nuevo sellado · S Pen · Garantía 1 año',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzkgmea-thumb-542573611'},
+  {id:'p10',nombre:'Samsung S25+',categoria:'samsung',storage:'256GB',precioGs:6800000,precioUsd:880,condicion:'Nuevo',desc:'Nuevo sellado · Garantía 1 año',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-plus-s936-sm-s936bzkgmea-thumb-542573546'},
+  {id:'p11',nombre:'Samsung S24 Ultra',categoria:'samsung',storage:'256GB',precioGs:7200000,precioUsd:930,condicion:'Americano',desc:'Grado A · S Pen · Batería 88%',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003'},
+];
+
+async function seedDefaults(){
+  if(!getToken()){ toast('Iniciá sesión en el CRM primero','err'); return; }
+  if(!confirm('Cargar 11 productos de ejemplo al catálogo?')) return;
+  let ok = 0;
+  for(const p of DEFAULT_PRODS){
+    const res = await api('POST','/api/catalogo', toApi(p));
+    if(res && !res.error && !res.__auth) ok++;
+  }
+  toast(`${ok}/${DEFAULT_PRODS.length} productos agregados`);
+  await loadAndRender();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+loadAndRender();
 </script>
 </body>
 </html>

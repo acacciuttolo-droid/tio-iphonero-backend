@@ -31,3 +31,7 @@ app.use((err, _req, res, _next) => { console.error(err); res.status(500).json({ 
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Tio Iphonero CRM corriendo en puerto ${PORT}`));
+
+// Catalogo
+const catalogo = require('./routes/catalogo');
+app.use('/api/catalogo', catalogo);

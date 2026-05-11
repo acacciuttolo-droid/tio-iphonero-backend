@@ -1838,13 +1838,33 @@ function openOrdenForm(saleId){
   if(!DB.ordenes) DB.ordenes=[];
   // Can be opened from sale or standalone
   const ventasConDomicilio = DB.sales.filter(s=>!DB.ordenes.find(o=>o.saleId===s.id&&o.estado!=='cancelado'));
-  const ventaOpts = ventasConDomicilio.map(s=>{
+  // Cache para búsqueda
+  window.__ventasBusqueda = ventasConDomicilio.map(s=>{
     const d = DB.devices.find(x=>x.id===s.equipoId);
-    return `<option value="${s.id}" ${s.id===saleId?'selected':''}>${d?d.modelo+' '+d.storage:'Equipo'} — ${s.clienteNombre||'?'} — ${fd(s.fecha)}</option>`;
-  }).join('');
+    const modelo = d ? `${d.modelo||''} ${d.storage||''}`.trim() : 'Equipo';
+    const display = `${modelo} — ${s.clienteNombre||'?'} — ${fd(s.fecha)}`;
+    const haystack = [
+      s.clienteNombre, s.clienteCi, s.clienteTel,
+      d?.imei, d?.modelo, d?.storage, d?.color, d?.observaciones,
+      s.fecha
+    ].filter(Boolean).join(' ').toLowerCase();
+    return { id:s.id, display, haystack, modelo, cliente:s.clienteNombre||'', ci:s.clienteCi||'', imei:d?.imei||'', fecha:s.fecha||'' };
+  });
   const html = `<div class="modal-title">Nueva Orden de Entrega</div>
     <div class="fsec-body" style="gap:10px;margin-bottom:12px">
-      <div class="fld"><label>Venta vinculada (opcional)</label><select id="od-sale" onchange="autoFillDelivery(this.value)"><option value="">— Sin venta vinculada —</option>${ventaOpts}</select></div>
+      <div class="fld" style="position:relative">
+        <label>Venta vinculada (opcional)</label>
+        <input type="hidden" id="od-sale" value=""/>
+        <div id="od-sale-box" style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:0 8px 0 12px">
+          <input id="od-sale-search" placeholder="Buscar por cliente, CI, IMEI o modelo…" autocomplete="off"
+            oninput="filterVentaSearch(this.value)" onfocus="filterVentaSearch(this.value);document.getElementById('od-sale-list').style.display='block'"
+            style="flex:1;border:none;outline:none;padding:10px 0;background:transparent;font-size:13px;color:var(--ink)"/>
+          <button type="button" id="od-sale-clear" onclick="clearVentaSearch()" title="Sin venta vinculada"
+            style="display:none;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px">×</button>
+        </div>
+        <div id="od-sale-hint" style="font-size:11px;color:var(--muted);margin-top:4px">— Sin venta vinculada —</div>
+        <div id="od-sale-list" style="display:none;position:absolute;top:calc(100% - 18px);left:0;right:0;z-index:50;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;max-height:240px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.18);margin-top:4px"></div>
+      </div>
       <div class="row2">
         <div class="fld"><label>Nombre del cliente *</label><input id="od-nombre" placeholder="Nombre completo"/></div>
         <div class="fld"><label>Teléfono *</label><input id="od-tel" placeholder="+595 9xx xxxxxx"/></div>
@@ -1885,6 +1905,11 @@ function openOrdenForm(saleId){
       <button class="btn-sec" onclick="closeModal()">❌ Cancelar</button>
     </div>`;
   openModal(html);
+  // Cerrar dropdown si se clickea afuera (idempotente)
+  setTimeout(()=>{
+    document.removeEventListener('mousedown', _ventaSearchOutsideClick);
+    document.addEventListener('mousedown', _ventaSearchOutsideClick);
+  },50);
   // Auto-fill from sale
   if(saleId){
     setTimeout(()=>{
@@ -1896,10 +1921,83 @@ function openOrdenForm(saleId){
         const d = DB.devices.find(x=>x.id===s.equipoId);
         document.getElementById('od-desc').value = d?d.modelo+' '+d.storage:'';
         document.getElementById('od-forma-pago').value = s.formaPago||'Efectivo';
-        document.getElementById('od-sale').value = saleId;
+        const item = (window.__ventasBusqueda||[]).find(x=>x.id===saleId);
+        pickVentaSearch(saleId, item?.display || (s.clienteNombre||'Venta'));
       }
     },80);
   }
+}
+
+function _ventaSearchOutsideClick(ev){
+  const box = document.getElementById('od-sale-box');
+  const list = document.getElementById('od-sale-list');
+  if(!box || !list){ document.removeEventListener('mousedown', _ventaSearchOutsideClick); return; }
+  if(!box.contains(ev.target) && !list.contains(ev.target)){
+    list.style.display='none';
+  }
+}
+
+function _ventaSearchEscape(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function _ventaSearchHighlight(text, q){
+  const safe = _ventaSearchEscape(text||'');
+  if(!q) return safe;
+  const re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
+  return safe.replace(re,'<mark style="background:rgba(0,230,118,.25);color:inherit;padding:0 2px;border-radius:3px">$1</mark>');
+}
+
+function filterVentaSearch(q){
+  const list = document.getElementById('od-sale-list');
+  if(!list) return;
+  const items = window.__ventasBusqueda || [];
+  const query = String(q||'').trim().toLowerCase();
+  let filtered = items;
+  if(query){
+    filtered = items.filter(it => it.haystack.includes(query));
+  }
+  filtered = filtered.slice(0, 30);
+  if(!items.length){
+    list.innerHTML = `<div style="padding:14px;color:var(--muted);font-size:12px;text-align:center">No hay ventas disponibles</div>`;
+  } else if(!filtered.length){
+    list.innerHTML = `<div style="padding:14px;color:var(--muted);font-size:12px;text-align:center">Sin resultados para "<strong>${_ventaSearchEscape(query)}</strong>"</div>`;
+  } else {
+    list.innerHTML = filtered.map(it=>{
+      const sub = [
+        it.ci ? 'CI ' + it.ci : '',
+        it.imei ? 'IMEI ' + (it.imei.length>8 ? it.imei.slice(0,4)+'…'+it.imei.slice(-3) : it.imei) : '',
+        it.fecha ? fd(it.fecha) : ''
+      ].filter(Boolean).join(' · ');
+      return `<div class="venta-search-item" onclick="pickVentaSearch('${it.id}', this.dataset.display)" data-display="${_ventaSearchEscape(it.display)}"
+        style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px"
+        onmouseenter="this.style.background='var(--surface,#1c1c1c)'" onmouseleave="this.style.background='transparent'">
+        <div style="font-weight:600">${_ventaSearchHighlight(it.cliente||'(sin nombre)', query)} <span style="color:var(--muted);font-weight:400">— ${_ventaSearchHighlight(it.modelo, query)}</span></div>
+        <div style="color:var(--muted);font-size:11px;margin-top:2px">${_ventaSearchHighlight(sub, query)}</div>
+      </div>`;
+    }).join('');
+  }
+  list.style.display='block';
+}
+
+function pickVentaSearch(saleId, display){
+  document.getElementById('od-sale').value = saleId;
+  document.getElementById('od-sale-search').value = display || '';
+  document.getElementById('od-sale-hint').textContent = '✓ Vinculada a esta venta';
+  document.getElementById('od-sale-hint').style.color = 'var(--green,#00e676)';
+  document.getElementById('od-sale-clear').style.display = 'inline-block';
+  document.getElementById('od-sale-list').style.display = 'none';
+  if(typeof autoFillDelivery === 'function') autoFillDelivery(saleId);
+}
+
+function clearVentaSearch(){
+  document.getElementById('od-sale').value = '';
+  document.getElementById('od-sale-search').value = '';
+  document.getElementById('od-sale-hint').textContent = '— Sin venta vinculada —';
+  document.getElementById('od-sale-hint').style.color = 'var(--muted)';
+  document.getElementById('od-sale-clear').style.display = 'none';
+  document.getElementById('od-sale-list').style.display = 'none';
+  document.getElementById('od-sale-search').focus();
 }
 
 function selDelivery(id){

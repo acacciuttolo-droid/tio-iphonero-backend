@@ -2582,25 +2582,6 @@ function stGuardarOrden(num){
     fecha: today(),
     historial: [{fecha:today(),estado:'Orden creada',nota:''}]
   };
-  if(!DB.reparaciones) DB.reparaciones=[];
-  if(!DB.empleados) DB.empleados=[];
-  if(!DB.liquidaciones) DB.liquidaciones=[];
-  if(!DB.adelantos) DB.adelantos=[];
-  if(!DB.catClicks) DB.catClicks=[];
-  if(!DB.catalogo || DB.catalogo.length===0) DB.catalogo=[
-    {id:'p1',nombre:'iPhone 16 Pro Max',categoria:'iphone',storage:'256GB',precioGs:8200000,precioUsd:1060,condicion:'Americano',desc:'Grado A+ · Titanio · Camera Control',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p2',nombre:'iPhone 16',categoria:'iphone',storage:'128GB',precioGs:6800000,precioUsd:880,condicion:'Americano',desc:'Grado A+ · Chip A18 · Batería 95%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p3',nombre:'iPhone 15 Pro Max',categoria:'iphone',storage:'256GB',precioGs:6500000,precioUsd:840,condicion:'Americano',desc:'Grado A · Titanio · USB-C',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p4',nombre:'iPhone 15 Pro',categoria:'iphone',storage:'128GB',precioGs:5200000,precioUsd:670,condicion:'Americano',desc:'Grado A · Titanio · Dynamic Island',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p5',nombre:'iPhone 15',categoria:'iphone',storage:'128GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · USB-C · Batería 90%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p6',nombre:'iPhone 14 Pro Max',categoria:'iphone',storage:'256GB',precioGs:5000000,precioUsd:645,condicion:'Americano',desc:'Grado A · Dynamic Island',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p7',nombre:'iPhone 14',categoria:'iphone',storage:'128GB',precioGs:3800000,precioUsd:490,condicion:'Americano',desc:'Grado A · Batería 88%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p8',nombre:'iPhone 13 Pro Max',categoria:'iphone',storage:'256GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · Batería 86%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-pro-finish-select-202209-6-7inch-sierrablue?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p9',nombre:'iPhone 13',categoria:'iphone',storage:'128GB',precioGs:2900000,precioUsd:375,condicion:'Americano',desc:'Grado A · Batería 84%',activo:true,foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-finish-select-202207-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90'},
-    {id:'p10',nombre:'Samsung S25 Ultra',categoria:'samsung',storage:'256GB',precioGs:8500000,precioUsd:1100,condicion:'Nuevo',desc:'Nuevo sellado · S Pen · Garantía 1 año',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzkgmea-thumb-542573611?$650_519_PNG$'},
-    {id:'p11',nombre:'Samsung S25+',categoria:'samsung',storage:'256GB',precioGs:6800000,precioUsd:880,condicion:'Nuevo',desc:'Nuevo sellado · Garantía 1 año',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-plus-s936-sm-s936bzkgmea-thumb-542573546?$650_519_PNG$'},
-    {id:'p12',nombre:'Samsung S24 Ultra',categoria:'samsung',storage:'256GB',precioGs:7200000,precioUsd:930,condicion:'Americano',desc:'Grado A · S Pen · Batería 88%',activo:true,foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003?$650_519_PNG$'},
-  ];
   if(stEditId){ DB.reparaciones = DB.reparaciones.map(r=>r.id===stEditId?ord:r); }
   else { DB.reparaciones.unshift(ord); }
   save(); closeModal(); stRender(); toast('Orden guardada ✓');

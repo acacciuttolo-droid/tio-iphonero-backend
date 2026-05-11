@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Catálogo — Tío Iphonero</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;--ink:#f0f0f0;--ink2:#888;--green:#00e676;--greenbg:rgba(0,230,118,.1);--red:#ef4444;--redbg:rgba(239,68,68,.1);--blue:#3b82f6;--bluebg:rgba(59,130,246,.1);--amber:#f59e0b;--amberbg:rgba(245,158,11,.1);--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.header-btns{display:flex;gap:8px}
+.btn{padding:8px 16px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-green{background:var(--greenbg);color:var(--green);border:1.5px solid rgba(0,230,118,.3)}
+.btn-red{background:var(--redbg);color:var(--red);border:1.5px solid rgba(239,68,68,.3)}
+.btn-sec{background:var(--surface2);color:var(--ink2);border:1.5px solid var(--border)}
+.container{max-width:900px;margin:0 auto;padding:24px 20px}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px}
+.subtitle{font-size:13px;color:var(--ink2);margin-bottom:24px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800}
+.stat-label{font-size:11px;color:var(--ink2);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+/* FORM */
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px;display:none}
+.form-card.open{display:block}
+.form-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.fld label{font-size:12px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px}
+.fld input,.fld select,.fld textarea{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--blue)}
+.fld textarea{resize:vertical}
+.foto-prev{width:80px;height:80px;border-radius:8px;border:1px solid var(--border);object-fit:contain;background:#fff;padding:4px;margin-top:6px;display:none}
+.form-actions{display:flex;gap:8px;margin-top:4px}
+/* PRODUCT LIST */
+.prod-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.prod-img{width:52px;height:52px;border-radius:8px;border:1px solid var(--border);object-fit:contain;background:#fff;padding:4px;flex-shrink:0}
+.prod-emoji{width:52px;height:52px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.prod-info{flex:1;min-width:140px}
+.prod-name{font-weight:700;font-size:14px;margin-bottom:2px}
+.prod-meta{font-size:12px;color:var(--ink2)}
+.prod-price{text-align:right;min-width:100px}
+.prod-gs{font-family:'Syne',sans-serif;font-weight:700;font-size:14px}
+.prod-usd{font-size:12px;color:var(--ink2);margin-top:1px}
+.chip{padding:2px 8px;border-radius:50px;font-size:11px;font-weight:700}
+.chip-green{background:var(--greenbg);color:var(--green)}
+.chip-red{background:var(--redbg);color:var(--red)}
+.chip-amber{background:var(--amberbg);color:var(--amber)}
+.prod-actions{display:flex;gap:6px}
+.icon-btn{padding:7px 10px;border-radius:7px;border:none;cursor:pointer;font-size:13px;font-weight:600}
+.empty{text-align:center;color:var(--ink2);padding:60px 20px;font-size:15px}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;z-index:100;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr 1fr}.container{padding:14px 12px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    TÍO IPHONERO · Admin Catálogo
+  </div>
+  <div class="header-btns">
+    <button class="btn btn-green" onclick="window.open('catalogo.html','_blank')">🔗 Ver catálogo</button>
+    <button class="btn btn-primary" onclick="toggleForm()">+ Agregar producto</button>
+  </div>
+</header>
+
+<div class="container">
+  <h1>Gestión del Catálogo</h1>
+  <p class="subtitle">Los cambios se reflejan en el catálogo público automáticamente.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="s-total" style="color:var(--blue)">0</div><div class="stat-label">Productos</div></div>
+    <div class="stat"><div class="stat-num" id="s-visible" style="color:var(--green)">0</div><div class="stat-label">Visibles</div></div>
+    <div class="stat"><div class="stat-num" id="s-clicks" style="color:var(--amber)">0</div><div class="stat-label">Clicks hoy</div></div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card" id="form-card">
+    <div class="form-title">
+      <span id="form-title-text">Nuevo Producto</span>
+      <button class="btn btn-sec" onclick="closeForm()" style="padding:5px 10px;font-size:12px">✕ Cerrar</button>
+    </div>
+    <div class="grid2">
+      <div class="fld" style="grid-column:1/-1"><label>Nombre *</label><input id="f-nombre" placeholder="iPhone 16 Pro Max, Samsung S25..."/></div>
+      <div class="fld"><label>Categoría</label>
+        <select id="f-cat">
+          <option value="iphone">iPhone</option>
+          <option value="samsung">Samsung</option>
+          <option value="accesorio">Accesorio</option>
+          <option value="smartwatch">Smartwatch</option>
+          <option value="perfume">Perfume</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="fld"><label>Storage</label><input id="f-storage" placeholder="128GB, 256GB..."/></div>
+      <div class="fld"><label>Precio (₲) *</label><input id="f-precio" type="text" inputmode="numeric" placeholder="0" oninput="fmtGs(this)"/></div>
+      <div class="fld"><label>Precio (USD)</label><input id="f-usd" type="number" placeholder="0" min="0"/></div>
+      <div class="fld"><label>Condición</label>
+        <select id="f-condicion">
+          <option value="Americano">Americano (Seminuevo)</option>
+          <option value="Nuevo">Nuevo</option>
+          <option value="Usado">Usado</option>
+          <option value="Refurbished">Refurbished</option>
+        </select>
+      </div>
+      <div class="fld"><label>WhatsApp destino</label><input id="f-wa" placeholder="595976500020" value="595976500020"/></div>
+      <div class="fld" style="grid-column:1/-1">
+        <label>URL de foto</label>
+        <input id="f-foto" placeholder="https://..." oninput="prevFoto()"/>
+        <img id="f-foto-prev" class="foto-prev" onerror="this.style.display='none'"/>
+      </div>
+      <div class="fld" style="grid-column:1/-1"><label>Descripción</label><textarea id="f-desc" rows="2" placeholder="Grado A, batería 95%, garantía incluida..."></textarea></div>
+      <div class="fld" style="grid-column:1/-1">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="f-activo" checked style="width:16px;height:16px;cursor:pointer">
+          <span>Visible en catálogo público</span>
+        </label>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="guardar()" style="flex:1">💾 Guardar</button>
+      <button class="btn btn-sec" onclick="closeForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div id="prod-list"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DB_KEY = 'tio_db';
+
+function loadDB(){
+  try{ return JSON.parse(localStorage.getItem(DB_KEY)||'{}'); }
+  catch(e){ return {}; }
+}
+function saveDB(db){
+  try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+  catch(e){ toast('Error guardando','err'); }
+}
+
+function gs(n){ return new Intl.NumberFormat('es-PY').format(Math.round(n||0)); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+
+function fmtGs(el){
+  let v=el.value.replace(/\D/g,'');
+  if(!v){el.value='';return;}
+  el.value=parseInt(v).toLocaleString('es-PY');
+}
+
+function toast(msg, type){
+  const el=document.getElementById('toast');
+  el.textContent=(type==='err'?'✕ ':'✓ ')+msg;
+  el.style.color=type==='err'?'var(--red)':'var(--green)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ── FORM ──────────────────────────────────────────────────────────────────
+let editId = null;
+
+function toggleForm(){
+  const card = document.getElementById('form-card');
+  if(card.classList.contains('open')){ closeForm(); return; }
+  editId = null;
+  document.getElementById('form-title-text').textContent = 'Nuevo Producto';
+  clearForm();
+  card.classList.add('open');
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+function closeForm(){
+  document.getElementById('form-card').classList.remove('open');
+  editId = null;
+  clearForm();
+}
+
+function clearForm(){
+  ['f-nombre','f-storage','f-foto','f-desc'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('f-precio').value='';
+  document.getElementById('f-usd').value='';
+  document.getElementById('f-wa').value='595976500020';
+  document.getElementById('f-cat').value='iphone';
+  document.getElementById('f-condicion').value='Americano';
+  document.getElementById('f-activo').checked=true;
+  const prev=document.getElementById('f-foto-prev');
+  prev.src='';prev.style.display='none';
+}
+
+function prevFoto(){
+  const url=document.getElementById('f-foto').value.trim();
+  const prev=document.getElementById('f-foto-prev');
+  if(url){ prev.src=url; prev.style.display='block'; }
+  else { prev.style.display='none'; }
+}
+
+function editar(id){
+  const db=loadDB();
+  const p=(db.catalogo||[]).find(x=>x.id===id);
+  if(!p)return;
+  editId=id;
+  document.getElementById('form-title-text').textContent='Editar Producto';
+  document.getElementById('f-nombre').value=p.nombre||'';
+  document.getElementById('f-cat').value=p.categoria||'iphone';
+  document.getElementById('f-storage').value=p.storage||'';
+  document.getElementById('f-precio').value=p.precioGs?parseInt(p.precioGs).toLocaleString('es-PY'):'';
+  document.getElementById('f-usd').value=p.precioUsd||'';
+  document.getElementById('f-condicion').value=p.condicion||p.origen||'Americano';
+  document.getElementById('f-wa').value=p.wa||'595976500020';
+  document.getElementById('f-foto').value=p.foto||'';
+  document.getElementById('f-desc').value=p.desc||'';
+  document.getElementById('f-activo').checked=p.activo!==false;
+  prevFoto();
+  const card=document.getElementById('form-card');
+  card.classList.add('open');
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+function guardar(){
+  const nombre=document.getElementById('f-nombre').value.trim();
+  if(!nombre){ toast('Ingresá el nombre','err'); return; }
+  const precioRaw=document.getElementById('f-precio').value.replace(/\./g,'');
+  const precio=parseInt(precioRaw)||0;
+  if(!precio){ toast('Ingresá el precio','err'); return; }
+
+  const db=loadDB();
+  if(!db.catalogo) db.catalogo=[];
+
+  const prod={
+    id: editId||uid(),
+    nombre,
+    categoria: document.getElementById('f-cat').value,
+    storage: document.getElementById('f-storage').value.trim(),
+    precioGs: precio,
+    precioUsd: parseFloat(document.getElementById('f-usd').value)||0,
+    condicion: document.getElementById('f-condicion').value,
+    wa: document.getElementById('f-wa').value.trim()||'595976500020',
+    foto: document.getElementById('f-foto').value.trim(),
+    desc: document.getElementById('f-desc').value.trim(),
+    activo: document.getElementById('f-activo').checked,
+  };
+
+  if(editId){
+    db.catalogo=db.catalogo.map(p=>p.id===editId?prod:p);
+    toast('Producto actualizado');
+  } else {
+    db.catalogo.push(prod);
+    toast('Producto agregado');
+  }
+
+  saveDB(db);
+  closeForm();
+  render();
+}
+
+function eliminar(id){
+  if(!confirm('¿Eliminar este producto del catálogo?')) return;
+  const db=loadDB();
+  db.catalogo=(db.catalogo||[]).filter(p=>p.id!==id);
+  saveDB(db);
+  toast('Producto eliminado');
+  render();
+}
+
+function toggleVisible(id){
+  const db=loadDB();
+  db.catalogo=(db.catalogo||[]).map(p=>p.id===id?{...p,activo:!(p.activo!==false)}:p);
+  saveDB(db);
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render(){
+  const db=loadDB();
+  const prods=db.catalogo||[];
+  const clicks=db.catClicks||[];
+
+  // Stats
+  document.getElementById('s-total').textContent=prods.length;
+  document.getElementById('s-visible').textContent=prods.filter(p=>p.activo!==false).length;
+  const hoy=new Date().toLocaleDateString('en-CA',{timeZone:'America/Asuncion'});
+  document.getElementById('s-clicks').textContent=clicks.filter(c=>(c.fecha||'').slice(0,10)===hoy).length;
+
+  const el=document.getElementById('prod-list');
+  if(!prods.length){
+    el.innerHTML='<div class="empty">Sin productos todavía.<br>Agregá el primero con el botón de arriba.</div>';
+    return;
+  }
+
+  const condChip=(c)=>{
+    if(c==='Nuevo') return '<span class="chip chip-green">Nuevo</span>';
+    if(c==='Americano') return '<span class="chip chip-amber">Americano</span>';
+    return `<span class="chip" style="background:var(--surface2);color:var(--ink2)">${c||''}</span>`;
+  };
+
+  el.innerHTML=prods.map(p=>{
+    const activo=p.activo!==false;
+    const prodClicks=clicks.filter(c=>c.prodId===p.id).length;
+    return `<div class="prod-card" style="opacity:${activo?1:.6}">
+      ${p.foto
+        ? `<img src="${p.foto}" class="prod-img" onerror="this.outerHTML='<div class=prod-emoji>📱</div>'">`
+        : `<div class="prod-emoji">${p.categoria==='samsung'?'📲':'📱'}</div>`}
+      <div class="prod-info">
+        <div class="prod-name">${p.nombre}${p.storage?' <span style="font-weight:500;color:var(--ink2);font-size:12px">'+p.storage+'</span>':''}</div>
+        <div class="prod-meta" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px">
+          ${condChip(p.condicion||p.origen||'')}
+          <span style="color:var(--ink2)">· ${prodClicks} clicks</span>
+          <span class="chip ${activo?'chip-green':'chip-red'}" style="font-size:10px">${activo?'Visible':'Oculto'}</span>
+        </div>
+      </div>
+      <div class="prod-price">
+        <div class="prod-gs">₲${gs(p.precioGs)}</div>
+        ${p.precioUsd?`<div class="prod-usd">USD ${p.precioUsd}</div>`:''}
+      </div>
+      <div class="prod-actions">
+        <button class="icon-btn" style="background:var(--bluebg);color:var(--blue)" onclick="editar('${p.id}')" title="Editar">✏️</button>
+        <button class="icon-btn" style="background:${activo?'var(--redbg)':'var(--greenbg)'};color:${activo?'var(--red)':'var(--green)'}" onclick="toggleVisible('${p.id}')" title="${activo?'Ocultar':'Mostrar'}">${activo?'👁️':'🚫'}</button>
+        <button class="icon-btn" style="background:var(--redbg);color:var(--red)" onclick="eliminar('${p.id}')" title="Eliminar">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+// Load defaults if empty
+const _db=loadDB();
+if(!_db.catalogo||_db.catalogo.length===0){
+  _db.catalogo=[
+    {id:'p1',nombre:'iPhone 16 Pro Max',categoria:'iphone',storage:'256GB',precioGs:8200000,precioUsd:1060,condicion:'Americano',desc:'Grado A+ · Titanio · Camera Control',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p2',nombre:'iPhone 16',categoria:'iphone',storage:'128GB',precioGs:6800000,precioUsd:880,condicion:'Americano',desc:'Grado A+ · Chip A18 · Batería 95%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p3',nombre:'iPhone 15 Pro Max',categoria:'iphone',storage:'256GB',precioGs:6500000,precioUsd:840,condicion:'Americano',desc:'Grado A · Titanio · USB-C',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p4',nombre:'iPhone 15 Pro',categoria:'iphone',storage:'128GB',precioGs:5200000,precioUsd:670,condicion:'Americano',desc:'Grado A · Titanio · Dynamic Island',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p5',nombre:'iPhone 15',categoria:'iphone',storage:'128GB',precioGs:4200000,precioUsd:540,condicion:'Americano',desc:'Grado A · USB-C · Batería 90%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p6',nombre:'iPhone 14 Pro Max',categoria:'iphone',storage:'256GB',precioGs:5000000,precioUsd:645,condicion:'Americano',desc:'Grado A · Dynamic Island',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p7',nombre:'iPhone 14',categoria:'iphone',storage:'128GB',precioGs:3800000,precioUsd:490,condicion:'Americano',desc:'Grado A · Batería 88%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p8',nombre:'iPhone 13',categoria:'iphone',storage:'128GB',precioGs:2900000,precioUsd:375,condicion:'Americano',desc:'Grado A · Batería 84%',activo:true,wa:'595976500020',foto:'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-finish-select-202207-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90'},
+    {id:'p9',nombre:'Samsung S25 Ultra',categoria:'samsung',storage:'256GB',precioGs:8500000,precioUsd:1100,condicion:'Nuevo',desc:'Nuevo sellado · S Pen · Garantia 1 ano',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzkgmea-thumb-542573611'},
+    {id:'p10',nombre:'Samsung S25+',categoria:'samsung',storage:'256GB',precioGs:6800000,precioUsd:880,condicion:'Nuevo',desc:'Nuevo sellado · Garantia 1 ano',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-plus-s936-sm-s936bzkgmea-thumb-542573546'},
+    {id:'p11',nombre:'Samsung S24 Ultra',categoria:'samsung',storage:'256GB',precioGs:7200000,precioUsd:930,condicion:'Americano',desc:'Grado A · S Pen · Bateria 88%',activo:true,wa:'595976500020',foto:'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkgmea-thumb-539526003'},
+  ];
+  saveDB(_db);
+}
+
+render();
+</script>
+</body>
+</html>
